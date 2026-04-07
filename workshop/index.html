@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelier LangChain4j-CDI — Devoxx France 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #1c2128;
+            --bg-card: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --border: #30363d;
+            --accent-orange: #ff6b35;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-purple: #bc8cff;
+            --accent-yellow: #d29922;
+            --accent-red: #f85149;
+            --code-bg: #0d1117;
+            --sidebar-width: 300px;
+            --header-height: 64px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            z-index: 100;
+            gap: 1rem;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+
+        .header-logo img {
+            height: 36px;
+            border-radius: 6px;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-left: auto;
+        }
+
+        .header-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .header-nav a:hover { color: var(--text-primary); }
+
+        .github-link {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .github-link svg { fill: currentColor; }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--header-height));
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 1.5rem 0;
+            z-index: 90;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-section {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.45rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 400;
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-link:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .sidebar-link.active {
+            color: var(--accent-blue);
+            border-left-color: var(--accent-blue);
+            background: rgba(88, 166, 255, 0.06);
+            font-weight: 500;
+        }
+
+        .sidebar-link .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-num.orange { background: var(--accent-orange); color: #000; }
+        .step-num.blue { background: var(--accent-blue); color: #000; }
+        .step-num.green { background: var(--accent-green); color: #000; }
+        .step-num.purple { background: var(--accent-purple); color: #000; }
+
+        .sidebar-link .icon { font-size: 1rem; flex-shrink: 0; }
+
+        /* Main content */
+        .main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem 4rem;
+        }
+
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 3rem 0 2.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 3rem;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(255, 107, 53, 0.15);
+            color: var(--accent-orange);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            margin-bottom: 1.2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 .highlight { color: var(--accent-orange); }
+
+        .hero .subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.5;
+        }
+
+        .hero .speakers {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .speaker {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+        }
+
+        .speaker img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
+        }
+
+        .speaker-name { font-weight: 600; }
+        .speaker-role { color: var(--text-muted); font-size: 0.8rem; }
+
+        /* Section headers */
+        .section-anchor { scroll-margin-top: calc(var(--header-height) + 1.5rem); }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin: 3rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h2:first-child { margin-top: 0; }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 2rem 0 0.75rem;
+            color: var(--accent-blue);
+        }
+
+        h4 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.5rem;
+            color: var(--accent-orange);
+        }
+
+        p { margin-bottom: 0.8rem; }
+
+        a { color: var(--accent-blue); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Code blocks */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            overflow-x: auto;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85em;
+        }
+
+        :not(pre) > code {
+            background: var(--bg-card);
+            padding: 0.15em 0.4em;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--accent-blue);
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover { border-color: var(--accent-blue); }
+
+        .card .card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .card h4 {
+            margin: 0 0 0.4rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        /* Admonitions / Callouts */
+        .callout {
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin: 1.25rem 0;
+            border-left: 4px solid;
+            font-size: 0.9rem;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .callout.info {
+            background: rgba(88, 166, 255, 0.08);
+            border-color: var(--accent-blue);
+        }
+        .callout.info .callout-title { color: var(--accent-blue); }
+
+        .callout.warning {
+            background: rgba(210, 153, 34, 0.08);
+            border-color: var(--accent-yellow);
+        }
+        .callout.warning .callout-title { color: var(--accent-yellow); }
+
+        .callout.success {
+            background: rgba(63, 185, 80, 0.08);
+            border-color: var(--accent-green);
+        }
+        .callout.success .callout-title { color: var(--accent-green); }
+
+        .callout.danger {
+            background: rgba(248, 81, 73, 0.08);
+            border-color: var(--accent-red);
+        }
+        .callout.danger .callout-title { color: var(--accent-red); }
+
+        .callout.tip {
+            background: rgba(188, 140, 255, 0.08);
+            border-color: var(--accent-purple);
+        }
+        .callout.tip .callout-title { color: var(--accent-purple); }
+
+        /* Lists */
+        ul, ol {
+            margin: 0.5rem 0 1rem 1.5rem;
+        }
+
+        li { margin-bottom: 0.35rem; }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.6rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-secondary);
+        }
+
+        tr:hover td { background: rgba(88, 166, 255, 0.04); }
+
+        /* Step boxes */
+        .step-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .step-box .step-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .step-box .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: 700;
+            background: var(--accent-orange);
+            color: #000;
+            flex-shrink: 0;
+        }
+
+        .step-box .step-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.2em 0.7em;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-orange { background: var(--accent-orange); color: #000; }
+        .badge-blue { background: var(--accent-blue); color: #000; }
+        .badge-green { background: var(--accent-green); color: #000; }
+        .badge-purple { background: var(--accent-purple); color: #000; }
+
+        /* Architecture diagram */
+        .arch-diagram {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 0.5rem 0 1.5rem 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0.65rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-orange);
+            border: 2px solid var(--bg-primary);
+        }
+
+        .timeline-item.blue::before { background: var(--accent-blue); }
+        .timeline-item.green::before { background: var(--accent-green); }
+        .timeline-item.purple::before { background: var(--accent-purple); }
+
+        .timeline-item strong { color: var(--text-primary); }
+        .timeline-item p { color: var(--text-secondary); font-size: 0.9rem; margin: 0; }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 3rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .footer a { color: var(--text-secondary); }
+
+        /* Responsive */
+        @media (max-width: 960px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; }
+            .content { padding: 2rem 1.5rem 3rem; }
+            .menu-toggle { display: block; }
+            .hero h1 { font-size: 2rem; }
+            .hero .speakers { flex-direction: column; align-items: center; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            margin-left: 0;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 0.4rem 0;
+            padding-left: 1.8rem;
+            position: relative;
+        }
+
+        .checklist li::before {
+            content: '\2713';
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+            font-weight: 700;
+        }
+
+        /* Comparison grid */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .compare-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+
+        .compare-box h4 { margin-top: 0; }
+
+        .file-tree {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            line-height: 1.8;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+        }
+
+        .file-tree .dir { color: var(--accent-blue); font-weight: 600; }
+        .file-tree .file { color: var(--text-secondary); }
+        .file-tree .highlight { color: var(--accent-orange); font-weight: 600; }
+        .file-tree .comment { color: var(--text-muted); font-style: italic; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Basculer le menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18"/>
+        </svg>
+    </button>
+    <a href="#" class="header-logo">
+        <span>Atelier LangChain4j-CDI</span>
+    </a>
+    <nav class="header-nav">
+        <a href="#overview">Vue d'ensemble</a>
+        <a href="#requirements">Prérequis</a>
+        <a href="#exercises">Exercices</a>
+        <a href="https://github.com/langchain4j/langchain4j-cdi" class="github-link" target="_blank">
+            <svg width="20" height="20" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            GitHub
+        </a>
+    </nav>
+</header>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">Pour commencer</div>
+        <a href="#overview" class="sidebar-link active">
+            <span class="icon">&#127968;</span> Vue d'ensemble
+        </a>
+        <a href="#requirements" class="sidebar-link">
+            <span class="icon">&#128736;</span> Prérequis
+        </a>
+        <a href="#architecture" class="sidebar-link">
+            <span class="icon">&#127959;</span> Architecture
+        </a>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">Diapositives de présentation</div>
+        <a href="#slides-intro" class="sidebar-link">
+            <span class="icon">&#127916;</span> Introduction et contexte
+        </a>
+        <a href="#slides-architecture" class="sidebar-link">
+            <span class="icon">&#128295;</span> Internes de l'extension CDI
+        </a>
+        <a href="#slides-features" class="sidebar-link">
+            <span class="icon">&#128736;</span> Fonctionnalités progressives
+        </a>
+        <a href="#slides-production" class="sidebar-link">
+            <span class="icon">&#128737;</span> Prêt pour la production
+        </a>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">Exercice 1 &mdash; Agent IA</div>
+        <a href="#ex1-intro" class="sidebar-link">
+            <span class="step-num orange">1</span> Installation et vue d'ensemble
+        </a>
+        <a href="#ex1-step1" class="sidebar-link">
+            <span class="step-num orange">2</span> @RegisterAIService
+        </a>
+        <a href="#ex1-step2" class="sidebar-link">
+            <span class="step-num orange">3</span> Point d'accès REST
+        </a>
+        <a href="#ex1-step3" class="sidebar-link">
+            <span class="step-num orange">4</span> Configuration
+        </a>
+        <a href="#ex1-step4" class="sidebar-link">
+            <span class="step-num orange">5</span> Streaming
+        </a>
+        <a href="#ex1-step5" class="sidebar-link">
+            <span class="step-num orange">6</span> Vision / Multimodal
+        </a>
+        <a href="#ex1-test" class="sidebar-link">
+            <span class="step-num orange">&#10003;</span> Test et validation
+        </a>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">Exercice 2 &mdash; Tolérance aux pannes</div>
+        <a href="#ex2-intro" class="sidebar-link">
+            <span class="step-num blue">1</span> Mémoire, RAG et outils
+        </a>
+        <a href="#ex2-step1" class="sidebar-link">
+            <span class="step-num blue">2</span> Ajouter @Retry
+        </a>
+        <a href="#ex2-step2" class="sidebar-link">
+            <span class="step-num blue">3</span> Ajouter @Timeout et @Fallback
+        </a>
+        <a href="#ex2-step3" class="sidebar-link">
+            <span class="step-num blue">4</span> Ajouter @CircuitBreaker
+        </a>
+        <a href="#ex2-step4" class="sidebar-link">
+            <span class="step-num blue">5</span> Télémétrie
+        </a>
+        <a href="#ex2-test" class="sidebar-link">
+            <span class="step-num blue">&#10003;</span> Test et validation
+        </a>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">Exercice 3 &mdash; MCP</div>
+        <a href="#ex3-intro" class="sidebar-link">
+            <span class="step-num green">1</span> Serveur MCP
+        </a>
+        <a href="#ex3-step1" class="sidebar-link">
+            <span class="step-num green">2</span> Service IA + MCP
+        </a>
+        <a href="#ex3-step2" class="sidebar-link">
+            <span class="step-num green">3</span> Configuration MCP
+        </a>
+        <a href="#ex3-step3" class="sidebar-link">
+            <span class="step-num green">4</span> Point d'accès REST
+        </a>
+        <a href="#ex3-test" class="sidebar-link">
+            <span class="step-num green">&#10003;</span> Test et validation
+        </a>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">Conclusion</div>
+        <a href="#whats-next" class="sidebar-link">
+            <span class="icon">&#128302;</span> Et après ?
+        </a>
+        <a href="#troubleshooting" class="sidebar-link">
+            <span class="icon">&#128027;</span> Dépannage
+        </a>
+    </div>
+</nav>
+
+<!-- Main content -->
+<main class="main">
+<div class="content">
+
+<!-- ============================================================ -->
+<!-- OVERVIEW                                                      -->
+<!-- ============================================================ -->
+<section id="overview" class="section-anchor">
+<div class="hero">
+    <div class="hero-badge">Atelier Devoxx France 2026</div>
+    <h1>LangChain4j-<span class="highlight">CDI</span></h1>
+    <p class="subtitle">
+        IA générative nativement injectable dans Jakarta&nbsp;EE &mdash; Construisez des agents IA prêts pour la production avec CDI, MicroProfile et LangChain4j sur WildFly.
+    </p>
+    <div class="speakers">
+        <div class="speaker">
+            <img src="yb.jpg" alt="Yann Blazart">
+            <div>
+                <div class="speaker-name">Yann Blazart</div>
+                <div class="speaker-role">Tech Lead @ SCIAM</div>
+            </div>
+        </div>
+        <div class="speaker">
+            <img src="eh.jpg" alt="Emmanuel Hugonnet">
+            <div>
+                <div class="speaker-name">Emmanuel Hugonnet</div>
+                <div class="speaker-role">WildFly Core @ IBM</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2>Ce que vous allez construire</h2>
+
+<p>Dans cet atelier pratique, vous allez progressivement construire trois applications alimentées par l'IA en utilisant <strong>LangChain4j-CDI</strong>, transformant des interfaces Jakarta EE en agents IA injectables avec une seule annotation.</p>
+
+<div class="card-grid">
+    <div class="card">
+        <div class="card-icon">&#128172;</div>
+        <h4>Exercice 1 : Agent IA</h4>
+        <p>Créez un skald viking injectable avec <code>@RegisterAIService</code>, des réponses en streaming et de la vision multimodale.</p>
+    </div>
+    <div class="card">
+        <div class="card-icon">&#128737;</div>
+        <h4>Exercice 2 : Résilience et observabilité</h4>
+        <p>Ajoutez MicroProfile Fault Tolerance (<code>@Retry</code>, <code>@Timeout</code>, <code>@CircuitBreaker</code>) et OpenTelemetry.</p>
+    </div>
+    <div class="card">
+        <div class="card-icon">&#128268;</div>
+        <h4>Exercice 3 : Intégration MCP</h4>
+        <p>Connectez votre agent IA à des outils externes via le Model Context Protocol (MCP) &mdash; « JDBC pour l'IA ».</p>
+    </div>
+</div>
+
+<div class="callout info">
+    <div class="callout-title">&#128161; Format de l'atelier</div>
+    <p>Chaque exercice dispose d'un module <code>base/</code> (squelette avec TODOs) et d'un module <code>solution/</code> (référence complète). Travaillez dans <code>base/</code> et suivez les étapes. Si vous êtes bloqué, la <code>solution/</code> est toujours là comme filet de sécurité.</p>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- REQUIREMENTS                                                  -->
+<!-- ============================================================ -->
+<section id="requirements" class="section-anchor">
+<h2>Prérequis</h2>
+
+<h3>Logiciels requis</h3>
+
+<table>
+    <thead>
+        <tr><th>Outil</th><th>Version</th><th>Utilité</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>JDK</strong></td><td>21+</td><td>Développement Java</td></tr>
+        <tr><td><strong>Maven</strong></td><td>3.9+</td><td>Outil de build</td></tr>
+        <tr><td><strong>IDE</strong></td><td>Apache NetBeans / IntelliJ IDEA / VS Code</td><td>Éditeur de code</td></tr>
+        <tr><td><strong>curl</strong></td><td>n'importe quelle</td><td>Test d'API</td></tr>
+        <tr><td><strong>Clé API Mistral AI</strong></td><td>&mdash;</td><td>Fournisseur LLM (niveau gratuit disponible)</td></tr>
+        <tr><td><strong>Docker / Podman</strong></td><td>n'importe quelle</td><td>Stack Grafana LGTM (Exercice 2 uniquement)</td></tr>
+    </tbody>
+</table>
+
+<h3>1. Récupérer le code source</h3>
+
+<pre><code>git clone https://github.com/yblazart/confs-langchain4j-cdi-javaone2026.git
+cd confs-langchain4j-cdi-javaone2026/demo-project</code></pre>
+
+<h3>2. Configurer Mistral AI</h3>
+
+<p>Inscrivez-vous sur <a href="https://console.mistral.ai/" target="_blank">console.mistral.ai</a> et suivez ces étapes pour obtenir une clé API gratuite :</p>
+
+<h4>Étape 1 : Accéder aux clés API</h4>
+<p>Depuis la page d'accueil de Mistral AI Studio, cliquez sur l'icône de votre profil (coin supérieur droit), puis sélectionnez <strong>API Keys</strong>.</p>
+<img src="mistral_screen_shots/Mistral001.png" alt="Mistral AI Studio - Access API Keys from profile menu" style="max-width: 100%; border: 1px solid var(--border); border-radius: 8px; margin: 1rem 0;">
+
+<h4>Étape 2 : Choisir un forfait</h4>
+<p>Sur la page API Keys, vous verrez un avertissement : <em>"No plan is currently active on this organization, the API keys will not be active."</em> Cliquez sur <strong>Choose a plan</strong> pour activer vos clés.</p>
+<img src="mistral_screen_shots/Mistral002.png" alt="Mistral AI - API Keys page with plan warning" style="max-width: 100%; border: 1px solid var(--border); border-radius: 8px; margin: 1rem 0;">
+
+<div class="callout warning">
+    <div class="callout-title">&#9888;&#65039; Important</div>
+    <p>Sans forfait actif, vos clés API seront créées mais <strong>ne fonctionneront pas</strong>. Vous obtiendrez une erreur <code>Unauthorized</code> lors de l'appel de l'API.</p>
+</div>
+
+<h4>Étape 3 : Sélectionner le forfait gratuit "Experiment"</h4>
+<p>Choisissez le forfait <strong>Experiment</strong> (côté gauche) &mdash; il est complètement <strong>gratuit</strong> et vous donne accès à tous les modèles d'IA de pointe. Cliquez sur <strong>"Experiment for free"</strong>.</p>
+<img src="mistral_screen_shots/Mistral003.png" alt="Mistral AI - Choose the free Experiment plan" style="max-width: 100%; border: 1px solid var(--border); border-radius: 8px; margin: 1rem 0;">
+
+<h4>Étape 4 : Accepter les conditions et s'abonner</h4>
+<p>Cochez la case pour accepter les conditions d'utilisation et la politique de confidentialité, puis cliquez sur <strong>Subscribe</strong>.</p>
+<img src="mistral_screen_shots/Mistral004.png" alt="Mistral AI - Sign up to Experiment plan" style="max-width: 100%; border: 1px solid var(--border); border-radius: 8px; margin: 1rem 0;">
+
+<p>Il vous sera ensuite demandé de fournir votre <strong>numéro de téléphone</strong> pour recevoir un <strong>code d'activation par SMS</strong>. Ceci est requis pour activer le forfait gratuit Experiment.</p>
+
+<h4>Étape 5 : Créer et exporter votre clé API</h4>
+<p>Une fois votre forfait activé, retournez sur la page API Keys et cliquez sur <strong>"Create new key"</strong>. Copiez la clé immédiatement &mdash; vous ne pourrez plus la revoir.</p>
+<img src="mistral_screen_shots/Mistral005.png" alt="Mistral AI - API key successfully created" style="max-width: 100%; border: 1px solid var(--border); border-radius: 8px; margin: 1rem 0;">
+
+<p>Puis exportez-la dans votre terminal :</p>
+
+<pre><code># Linux / macOS
+export MISTRAL_API_KEY=your-api-key-here
+
+# Windows (PowerShell)
+$env:MISTRAL_API_KEY="your-api-key-here"</code></pre>
+
+<div class="callout tip">
+    <div class="callout-title">&#128161; Alternative : Ollama local</div>
+    <p>Si vous préférez exécuter les modèles en local, installez <a href="https://ollama.ai" target="_blank">Ollama</a> et téléchargez un modèle : <code>ollama pull qwen2.5:7b</code>. Vous devrez ajuster le fichier <code>microprofile-config.properties</code> pour utiliser OllamaChatModel au lieu de MistralAiChatModel.</p>
+</div>
+
+<h3>3. WildFly (automatique)</h3>
+
+<p>WildFly 39 est automatiquement téléchargé et provisionné par le plugin Maven. Aucune installation manuelle nécessaire :</p>
+
+<pre><code># This downloads WildFly, starts it, and deploys the app
+cd demo-1-ai-agent/solution
+mvn clean wildfly:dev</code></pre>
+
+<p>L'objectif <code>wildfly:dev</code> est votre meilleur ami &mdash; il recharge à chaud à chaque <code>mvn package</code>.</p>
+
+<h3>4. Vérifier votre installation</h3>
+
+<pre><code># Build all modules to download dependencies
+cd demo-project
+mvn clean install -DskipTests
+
+# Quick smoke test
+cd demo-1-ai-agent/solution
+mvn clean wildfly:dev
+
+# In another terminal:
+curl -X POST -H "Content-Type: text/plain" \
+  -d "Sing me a heroic song" \
+  http://localhost:8080/demo-1/api/chat</code></pre>
+
+<div class="callout success">
+    <div class="callout-title">&#10003; Prêt !</div>
+    <p>Si vous obtenez une réponse du skald viking IA, votre environnement est correctement configuré. Arrêtez le serveur (<kbd>Ctrl+C</kbd>) et passez aux exercices.</p>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ARCHITECTURE                                                  -->
+<!-- ============================================================ -->
+<section id="architecture" class="section-anchor">
+<h2>Vue d'ensemble de l'architecture</h2>
+
+<p>LangChain4j-CDI est une extension CDI qui fait le pont entre <strong>LangChain4j</strong> (le framework IA Java) et les serveurs <strong>Jakarta EE / MicroProfile</strong>. Elle transforme des interfaces annotées en agents IA injectables.</p>
+
+<h3>Comment ça fonctionne</h3>
+
+<div class="timeline">
+    <div class="timeline-item">
+        <strong>1. Scan</strong>
+        <p>L'extension CDI scanne les interfaces <code>@RegisterAIService</code> au démarrage</p>
+    </div>
+    <div class="timeline-item blue">
+        <strong>2. Lire les attributs</strong>
+        <p>Pour chaque interface : <code>chatModelName</code>, <code>tools</code>, <code>chatMemoryProviderName</code>, <code>contentRetrieverName</code></p>
+    </div>
+    <div class="timeline-item green">
+        <strong>3. Créer un bean synthétique</strong>
+        <p>Un proxy LangChain4j est enveloppé dans un bean CDI géré</p>
+    </div>
+    <div class="timeline-item purple">
+        <strong>4. Résoudre les composants via SPI</strong>
+        <p>Le SPI <code>LLMConfig</code> lit depuis MicroProfile Config : <code>dev.langchain4j.cdi.plugin.&lt;name&gt;.class=...</code></p>
+    </div>
+    <div class="timeline-item">
+        <strong>5. Injecter !</strong>
+        <p><code>@Inject Assistant assistant;</code> &mdash; ça fonctionne tout simplement</p>
+    </div>
+</div>
+
+<h3>L'avant / après</h3>
+
+<div class="compare-grid">
+    <div class="compare-box">
+        <h4 style="color: var(--accent-red);">Sans CDI (verbeux)</h4>
+        <pre><code>ChatLanguageModel model =
+  MistralAiChatModel.builder()
+    .apiKey(System.getenv("MISTRAL_API_KEY"))
+    .modelName("pixtral-large-latest")
+    .temperature(0.3)
+    .maxTokens(1000)
+    .build();
+
+ChatMemory memory =
+  MessageWindowChatMemory.builder()
+    .maxMessages(20).build();
+
+Assistant assistant =
+  AiServices.builder(Assistant.class)
+    .chatLanguageModel(model)
+    .chatMemory(memory)
+    .tools(new VikingTools())
+    .build();</code></pre>
+    </div>
+    <div class="compare-box">
+        <h4 style="color: var(--accent-green);">Avec CDI (propre)</h4>
+        <pre><code>@RegisterAIService(
+  chatModelName = "my-model",
+  tools = VikingTools.class)
+public interface Assistant {
+
+  @SystemMessage("You are a
+    Viking expedition guide")
+  String chat(
+    @UserMessage String message);
+}
+
+// In your REST endpoint:
+@Inject
+Assistant assistant;</code></pre>
+    </div>
+</div>
+
+<h3>Double support d'extension CDI</h3>
+
+<p>LangChain4j-CDI fournit <strong>les deux</strong> types d'extensions, donc ça fonctionne sur <strong>n'importe quel</strong> serveur CDI :</p>
+
+<table>
+    <thead>
+        <tr><th>Type d'extension</th><th>Traitement</th><th>Serveurs</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>Portable Extension</strong></td><td>Runtime</td><td>WildFly, Payara, GlassFish, Liberty</td></tr>
+        <tr><td><strong>Build Compatible Extension</strong></td><td>Compile-time</td><td>Quarkus, Helidon</td></tr>
+    </tbody>
+</table>
+
+<h3>Structure du projet</h3>
+
+<div class="file-tree">
+<span class="dir">demo-project/</span><br>
+&#9500;&#9472;&#9472; <span class="file">pom.xml</span> <span class="comment">&larr; Parent POM (centralized versions)</span><br>
+&#9500;&#9472;&#9472; <span class="dir">demo-1-ai-agent/</span> <span class="comment">&larr; Injectable AI Agent</span><br>
+&#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="highlight">base/</span> <span class="comment">&larr; Skeleton with TODOs (your workspace)</span><br>
+&#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">solution/</span> <span class="comment">&larr; Complete reference</span><br>
+&#9500;&#9472;&#9472; <span class="dir">demo-2-ft-telemetry/</span> <span class="comment">&larr; Memory + RAG + Tools + FT + Telemetry</span><br>
+&#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="highlight">base/</span><br>
+&#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">solution/</span><br>
+&#9492;&#9472;&#9472; <span class="dir">demo-3-mcp/</span> <span class="comment">&larr; MCP Integration</span><br>
+&nbsp;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="dir">mcp-server/</span> <span class="comment">&larr; Standalone MCP server (fat JAR)</span><br>
+&nbsp;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="highlight">base/</span><br>
+&nbsp;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">solution/</span>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDES OVERVIEW                                               -->
+<!-- ============================================================ -->
+<section id="slides-intro" class="section-anchor">
+<h2>Diapositives de présentation</h2>
+
+<p>L'atelier comprend un jeu de diapositives Reveal.js couvrant la théorie derrière chaque exercice. Voici ce que couvre chaque section.</p>
+
+<div class="callout info">
+    <div class="callout-title">&#127916; Lancer les diapositives</div>
+    <p>Depuis la racine du projet : <code>cd slides && python3 -m http.server 8000</code>, puis ouvrez <a href="http://localhost:8000" target="_blank">http://localhost:8000</a>. Appuyez sur <kbd>S</kbd> pour les notes du présentateur, <kbd>F</kbd> pour le plein écran, <kbd>O</kbd> pour la vue d'ensemble.</p>
+</div>
+
+<h3 id="slides-intro-detail">Introduction et contexte</h3>
+<p>La présentation commence par l'énoncé du problème : LangChain4j fonctionne très bien avec Quarkus, mais les entreprises utilisent <strong>WildFly, Payara, Liberty, GlassFish, Helidon</strong>. La réponse : <code>@RegisterAIService</code> &mdash; « Injectez un agent IA aussi naturellement qu'un EntityManager ».</p>
+
+<h3 id="slides-architecture" class="section-anchor">Internes de l'extension CDI</h3>
+<p>Plongée approfondie dans la façon dont l'extension CDI scanne <code>@RegisterAIService</code>, crée des beans synthétiques, résout les composants via le SPI <code>LLMConfig</code> et fait le pont vers MicroProfile Config. Couvre à la fois les extensions Portable et Build Compatible.</p>
+
+<h3 id="slides-features" class="section-anchor">Fonctionnalités progressives</h3>
+<ul>
+    <li><strong>Mémoire de conversation</strong> : <code>@MemoryId</code> + <code>ChatMemoryProvider</code> pour l'état par session</li>
+    <li><strong>RAG</strong> : <code>contentRetrieverName</code> avec embeddings et vector stores</li>
+    <li><strong>Outils / Function Calling</strong> : beans CDI avec méthodes <code>@Tool</code> &mdash; la fonctionnalité majeure</li>
+    <li><strong>MCP</strong> : Model Context Protocol via <code>toolProviderName</code> &mdash; « JDBC pour l'IA »</li>
+</ul>
+
+<h3 id="slides-production" class="section-anchor">Prêt pour la production</h3>
+<ul>
+    <li><strong>MicroProfile Fault Tolerance</strong> : <code>@Retry</code>, <code>@Timeout</code>, <code>@Fallback</code>, <code>@CircuitBreaker</code></li>
+    <li><strong>MicroProfile Telemetry</strong> : traces et métriques OpenTelemetry avec Grafana LGTM</li>
+    <li><strong>Modules LangChain4j-CDI</strong> : core, portable-ext, build-compatible-ext, fault-tolerance, telemetry</li>
+    <li><strong>A2A (Agent-to-Agent)</strong> : aperçu du prochain protocole pour la communication inter-agents</li>
+</ul>
+</section>
+
+<!-- ============================================================ -->
+<!-- EXERCISE 1: AI AGENT                                         -->
+<!-- ============================================================ -->
+<section id="ex1-intro" class="section-anchor">
+<h2>Exercice 1 : Agent IA injectable</h2>
+
+<p><strong>Message clé</strong> : « De 15 lignes de code passe-partout à 1 annotation + 1 propriété de configuration »</p>
+
+<div class="callout info">
+    <div class="callout-title">&#128204; Objectif</div>
+    <p>Créez un chatbot IA simple en utilisant <code>@RegisterAIService</code>, injectez-le dans un point d'accès JAX-RS et testez-le. Ensuite, ajoutez des capacités de streaming et de vision multimodale.</p>
+</div>
+
+<pre><code>cd demo-project/demo-1-ai-agent/base
+# Open this directory in your IDE</code></pre>
+
+<h3>Fichiers clés</h3>
+
+<table>
+    <thead><tr><th>Fichier</th><th>Utilité</th></tr></thead>
+    <tbody>
+        <tr><td><code>ChatAssistant.java</code></td><td>Interface du service IA (votre tâche principale)</td></tr>
+        <tr><td><code>ChatAssistantStreaming.java</code></td><td>Service IA en streaming</td></tr>
+        <tr><td><code>ChatResource.java</code></td><td>Point d'accès REST JAX-RS</td></tr>
+        <tr><td><code>ImageAnalyzerServlet.java</code></td><td>Servlet de vision multimodale</td></tr>
+        <tr><td><code>microprofile-config.properties</code></td><td>Configuration LLM</td></tr>
+    </tbody>
+</table>
+</section>
+
+<!-- Step 1 -->
+<section id="ex1-step1" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number">1</span>
+        <span class="step-title">Créer l'interface du service IA</span>
+    </div>
+    <p>Ouvrez <code>ChatAssistant.java</code>. C'est une interface Java simple. Votre tâche : la transformer en agent IA injectable.</p>
+
+    <h4>Ajouter @RegisterAIService</h4>
+    <pre><code>@RegisterAIService(chatModelName = "my-model")
+public interface ChatAssistant {
+
+    @SystemMessage("""
+        You are a Viking skald (bard) entertaining warriors in a great hall.
+        You tell epic tales, sing heroic songs, compose witty verses about
+        battles, voyages, and the glorious chaos of Viking life.
+        Your style is bold, dramatic, and full of Norse spirit.
+        """)
+    String chat(@UserMessage String userMessage);
+}</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">&#128161; Ce qui se passe</div>
+        <ul>
+            <li><code>@RegisterAIService</code> indique à l'extension CDI de créer un bean injectable pour cette interface</li>
+            <li><code>chatModelName = "my-model"</code> fait référence à la configuration du modèle dans <code>microprofile-config.properties</code></li>
+            <li><code>@SystemMessage</code> définit la personnalité et le comportement de l'IA</li>
+            <li><code>@UserMessage</code> marque le paramètre comme entrée utilisateur</li>
+        </ul>
+    </div>
+</div>
+</section>
+
+<!-- Step 2 -->
+<section id="ex1-step2" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number">2</span>
+        <span class="step-title">Câbler le point d'accès REST</span>
+    </div>
+    <p>Ouvrez <code>ChatResource.java</code>. Injectez le service IA et appelez-le :</p>
+
+    <pre><code>@Path("/chat")
+@ApplicationScoped
+public class ChatResource {
+
+    @Inject
+    ChatAssistant assistant;  // CDI injection!
+
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String chat(String message) {
+        return assistant.chat(message);
+    }
+}</code></pre>
+
+    <div class="callout success">
+        <div class="callout-title">&#10003; Point clé</div>
+        <p>Le code métier n'a <strong>aucune dépendance sur LangChain4j</strong>. Le seul import est votre propre interface. Changer de framework IA demain ? Changez l'implémentation, pas le code métier.</p>
+    </div>
+</div>
+</section>
+
+<!-- Step 3 -->
+<section id="ex1-step3" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number">3</span>
+        <span class="step-title">Configurer le modèle</span>
+    </div>
+    <p>Ouvrez <code>src/main/resources/META-INF/microprofile-config.properties</code> et décommentez/ajoutez la configuration du modèle :</p>
+
+    <pre><code># Chat model (Mistral AI)
+dev.langchain4j.cdi.plugin.my-model.class=\
+    dev.langchain4j.model.mistralai.MistralAiChatModel
+dev.langchain4j.cdi.plugin.my-model.config.api-key=${MISTRAL_API_KEY}
+dev.langchain4j.cdi.plugin.my-model.config.model-name=mistral-small-latest
+dev.langchain4j.cdi.plugin.my-model.config.temperature=0.9</code></pre>
+
+    <div class="callout warning">
+        <div class="callout-title">&#9888; Critique : le préfixe .config.</div>
+        <p>Les propriétés du builder <strong>doivent</strong> utiliser le préfixe <code>.config.</code> : <code>dev.langchain4j.cdi.plugin.&lt;name&gt;.config.&lt;prop&gt;=value</code>. Sans <code>.config.</code>, la propriété est <strong>ignorée silencieusement</strong>.</p>
+    </div>
+
+    <h4>Déployer et tester</h4>
+    <pre><code>mvn clean wildfly:dev</code></pre>
+    <pre><code># In another terminal:
+curl -X POST -H "Content-Type: text/plain" \
+  -d "Tell me a saga about Java developers on a Viking voyage" \
+  http://localhost:8080/demo-1/api/chat</code></pre>
+</div>
+</section>
+
+<!-- Step 4: Streaming -->
+<section id="ex1-step4" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number">4</span>
+        <span class="step-title">Ajouter les réponses en streaming</span>
+    </div>
+    <p>Ouvrez <code>ChatAssistantStreaming.java</code> et créez un service IA en streaming :</p>
+
+    <pre><code>@RegisterAIService(streamingChatModelName = "my-streaming-model")
+public interface ChatAssistantStreaming {
+
+    @SystemMessage("You are a Viking storyteller in a great hall...")
+    TokenStream chatStream(@UserMessage String userMessage);
+}</code></pre>
+
+    <p>Then in <code>ChatResource.java</code>, add the SSE endpoint:</p>
+
+    <pre><code>@Inject
+ChatAssistantStreaming streamingAssistant;
+
+@GET
+@Path("/stream")
+@Produces(MediaType.SERVER_SENT_EVENTS)
+public void chatStream(@QueryParam("message") String message,
+                       @Context SseEventSink sink, @Context Sse sse) {
+    TokenStream tokenStream = streamingAssistant.chatStream(message);
+
+    tokenStream
+        .onPartialResponse(token ->
+            sink.send(sse.newEvent("token", token)))
+        .onCompleteResponse(resp -> {
+            sink.send(sse.newEvent("done", ""));
+            sink.close();
+        })
+        .onError(error -> {
+            sink.send(sse.newEvent("error", error.getMessage()));
+            sink.close();
+        })
+        .start();
+}</code></pre>
+
+    <p>Add the streaming model config in <code>microprofile-config.properties</code>:</p>
+
+    <pre><code>dev.langchain4j.cdi.plugin.my-streaming-model.class=\
+    dev.langchain4j.model.mistralai.MistralAiStreamingChatModel
+dev.langchain4j.cdi.plugin.my-streaming-model.config.api-key=${MISTRAL_API_KEY}
+dev.langchain4j.cdi.plugin.my-streaming-model.config.model-name=mistral-small-latest</code></pre>
+</div>
+</section>
+
+<!-- Step 5: Vision -->
+<section id="ex1-step5" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number">5</span>
+        <span class="step-title">Vision : analyse d'image</span>
+    </div>
+    <p>Ouvrez <code>ImageAnalyzerServlet.java</code> et injectez un modèle de vision :</p>
+
+    <pre><code>@WebServlet("/uploadServlet")
+@MultipartConfig
+public class ImageAnalyzerServlet extends HttpServlet {
+
+    @Inject
+    @Named("vision-model")
+    ChatModel visionModel;
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                         HttpServletResponse response) throws ... {
+        Part file = request.getPart("file");
+
+        UserMessage userMessage = UserMessage.from(
+            TextContent.from("Describe this image in detail"),
+            ImageContent.from(encodeBase64(file.getInputStream()),
+                            file.getContentType())
+        );
+
+        ChatResponse answer = visionModel.chat(userMessage);
+        response.getWriter().write(answer.aiMessage().text());
+    }
+}</code></pre>
+
+    <p>And the vision model config:</p>
+
+    <pre><code>dev.langchain4j.cdi.plugin.vision-model.class=\
+    dev.langchain4j.model.mistralai.MistralAiChatModel
+dev.langchain4j.cdi.plugin.vision-model.config.api-key=${MISTRAL_API_KEY}
+dev.langchain4j.cdi.plugin.vision-model.config.model-name=pixtral-large-latest</code></pre>
+</div>
+</section>
+
+<!-- Test Ex1 -->
+<section id="ex1-test" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-green);">&#10003;</span>
+        <span class="step-title">Tester et valider l'exercice 1</span>
+    </div>
+
+    <pre><code># Chat standard
+curl -X POST -H "Content-Type: text/plain" \
+  -d "What is CDI in 2 sentences?" \
+  http://localhost:8080/demo-1/api/chat
+
+# Streaming (ouvrir dans le navigateur)
+# http://localhost:8080/demo-1/stream.html
+
+# Analyse d'image (ouvrir dans le navigateur)
+# http://localhost:8080/demo-1/image.html
+
+# Vérification de santé
+curl http://localhost:8080/demo-1/api/chat/health</code></pre>
+
+    <ul class="checklist">
+        <li>Le chat standard renvoie une réponse du skald viking</li>
+        <li>Le streaming affiche les tokens arrivant en temps réel</li>
+        <li>Le téléchargement d'image renvoie une description générée par l'IA</li>
+    </ul>
+
+    <div class="callout tip">
+        <div class="callout-title">&#128161; Bloqué ?</div>
+        <p>Passez à la solution : <code>cd ../solution && mvn clean wildfly:dev</code></p>
+    </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- EXERCISE 2: FAULT TOLERANCE + TELEMETRY                       -->
+<!-- ============================================================ -->
+<section id="ex2-intro" class="section-anchor">
+<h2>Exercice 2 : Tolérance aux pannes et télémétrie</h2>
+
+<p><strong>Message clé</strong> : « Les annotations MicroProfile fonctionnent sur les services IA parce qu'ils sont des beans CDI »</p>
+
+<div class="callout info">
+    <div class="callout-title">&#128204; Objectif</div>
+    <p>Commencez avec un guide d'expéditions viking fonctionnel qui possède déjà la mémoire, RAG et des outils. Votre tâche : ajouter des annotations MicroProfile Fault Tolerance pour le rendre prêt pour la production, puis l'observer avec OpenTelemetry.</p>
+</div>
+
+<pre><code>cd demo-project/demo-2-ft-telemetry/base
+mvn clean wildfly:dev</code></pre>
+
+<h3>Ce qui fonctionne déjà</h3>
+
+<p>Le module base est pré-câblé avec ces fonctionnalités :</p>
+
+<div class="card-grid">
+    <div class="card">
+        <div class="card-icon">&#129504;</div>
+        <h4>Mémoire de conversation</h4>
+        <p><code>@MemoryId</code> fournit une mémoire par session via <code>ChatMemoryProviderBean</code>. Chaque onglet du navigateur obtient sa propre conversation.</p>
+    </div>
+    <div class="card">
+        <div class="card-icon">&#128196;</div>
+        <h4>RAG</h4>
+        <p><code>ExpeditionDetailsProvider</code> ingeste les données d'expéditions viking dans un vector store en mémoire en utilisant les embeddings Mistral.</p>
+    </div>
+    <div class="card">
+        <div class="card-icon">&#128295;</div>
+        <h4>Outils</h4>
+        <p><code>VikingTools</code> est un bean CDI avec 5 méthodes <code>@Tool</code> : lister expéditions, enrôler guerrier, annuler, vérifier disponibilité, voir enrôlements.</p>
+    </div>
+</div>
+
+<p>Testez que tout fonctionne avant d'ajouter la tolérance aux pannes :</p>
+
+<pre><code>curl -X POST -H "Content-Type: text/plain" \
+  -H "X-Session-Id: test-123" \
+  -d "What expeditions are available?" \
+  http://localhost:8080/demo-2/api/chat</code></pre>
+</section>
+
+<!-- Step 1: Retry -->
+<section id="ex2-step1" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-blue);">1</span>
+        <span class="step-title">Add @Retry</span>
+    </div>
+    <p>Open <code>ChatAssistant.java</code>. The AI service interface already has <code>@RegisterAIService</code> with memory, RAG, and tools. Add the <code>@Retry</code> annotation:</p>
+
+    <pre><code>import org.eclipse.microprofile.faulttolerance.Retry;
+
+@RegisterAIService(chatModelName = "my-model",
+                   chatMemoryProviderName = "my-memory",
+                   contentRetrieverName = "my-rag",
+                   tools = VikingTools.class)
+public interface ChatAssistant {
+
+    @Retry(maxRetries = 3, delay = 1000)
+    String chat(@MemoryId String sessionId,
+                @UserMessage String message);
+}</code></pre>
+
+    <div class="callout info">
+        <div class="callout-title">&#128161; Why this works</div>
+        <p>Because <code>@RegisterAIService</code> creates a CDI bean, <strong>all MicroProfile interceptors apply</strong>. The CDI container wraps the proxy with the Fault Tolerance interceptor &mdash; no glue code needed.</p>
+    </div>
+</div>
+</section>
+
+<!-- Step 2: Timeout + Fallback -->
+<section id="ex2-step2" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-blue);">2</span>
+        <span class="step-title">Add @Timeout and @Fallback</span>
+    </div>
+    <p>Stack the Fault Tolerance annotations:</p>
+
+    <pre><code>import org.eclipse.microprofile.faulttolerance.*;
+import java.time.temporal.ChronoUnit;
+
+@RegisterAIService(chatModelName = "my-model",
+                   chatMemoryProviderName = "my-memory",
+                   contentRetrieverName = "my-rag",
+                   tools = VikingTools.class)
+public interface ChatAssistant {
+
+    @Retry(maxRetries = 3, delay = 1000)
+    @Timeout(value = 30, unit = ChronoUnit.SECONDS)
+    @Fallback(fallbackMethod = "chatFallback")
+    String chat(@MemoryId String sessionId,
+                @UserMessage String message);
+
+    default String chatFallback(String sessionId, String message) {
+        return "I'm sorry, our AI service is temporarily unavailable. "
+             + "Please try again in a moment. "
+             + "Our team has been notified.";
+    }
+}</code></pre>
+</div>
+</section>
+
+<!-- Step 3: CircuitBreaker -->
+<section id="ex2-step3" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-blue);">3</span>
+        <span class="step-title">Add @CircuitBreaker</span>
+    </div>
+    <p>Add the final piece &mdash; the circuit breaker prevents flooding a failing service:</p>
+
+    <pre><code>@Retry(maxRetries = 3, delay = 1000)
+@Timeout(value = 30, unit = ChronoUnit.SECONDS)
+@Fallback(fallbackMethod = "chatFallback")
+@CircuitBreaker(requestVolumeThreshold = 5, failureRatio = 0.5)
+String chat(@MemoryId String sessionId,
+            @UserMessage String message);</code></pre>
+
+    <p>Hot-reload: save and run <code>mvn package</code> (or let your IDE auto-build).</p>
+
+    <div class="callout success">
+        <div class="callout-title">&#10003; Test the resilience</div>
+        <p>Simulate a failure: temporarily change the API key to an invalid value, then send requests. You should see retries, then the fallback message. Restore the key and the circuit breaker recovers automatically.</p>
+    </div>
+</div>
+</section>
+
+<!-- Step 4: Telemetry -->
+<section id="ex2-step4" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-blue);">4</span>
+        <span class="step-title">Add OpenTelemetry Observability</span>
+    </div>
+    <p>Start the Grafana LGTM stack (Loki + Grafana + Tempo + Mimir):</p>
+
+    <pre><code># Start the observability stack
+podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 \
+           --rm -ti grafana/otel-lgtm</code></pre>
+
+    <p>The telemetry configuration is already in <code>microprofile-config.properties</code>:</p>
+
+    <pre><code># OpenTelemetry
+otel.exporter.otlp.endpoint=http://localhost:4318
+otel.service.name=demo-2-langchain4j-cdi
+otel.traces.exporter=otlp
+otel.metrics.exporter=otlp
+
+# LangChain4j-CDI Telemetry Listeners
+dev.langchain4j.cdi.plugin.my-model.config.listeners=\
+    dev.langchain4j.cdi.telemetry.SpanChatModelListener,\
+    dev.langchain4j.cdi.telemetry.MetricsChatModelListener</code></pre>
+
+    <p>Send a few chat requests, then open <a href="http://localhost:3000" target="_blank">http://localhost:3000</a> (Grafana). Navigate to <strong>Explore &rarr; Tempo</strong> and search for service <code>demo-2-langchain4j-cdi</code>.</p>
+
+    <p>You will see distributed traces showing:</p>
+    <ul>
+        <li>LLM call latency</li>
+        <li>Token counts (in/out)</li>
+        <li>Tool calls and their durations</li>
+        <li>RAG retrieval steps</li>
+    </ul>
+</div>
+</section>
+
+<!-- Test Ex2 -->
+<section id="ex2-test" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-green);">&#10003;</span>
+        <span class="step-title">Test & Validate Exercise 2</span>
+    </div>
+
+    <pre><code># Chat with session
+curl -X POST -H "Content-Type: text/plain" \
+  -H "X-Session-Id: test-456" \
+  -d "What expeditions are available?" \
+  http://localhost:8080/demo-2/api/chat
+
+# Enroll a warrior
+curl -X POST -H "Content-Type: text/plain" \
+  -H "X-Session-Id: test-456" \
+  -d "Enroll Erik Bloodaxe for the first expedition" \
+  http://localhost:8080/demo-2/api/chat
+
+# Inspect memory
+curl "http://localhost:8080/demo-2/api/chat/memory?sessionId=test-456"</code></pre>
+
+    <ul class="checklist">
+        <li>Memory retains context across messages in the same session</li>
+        <li>RAG retrieves relevant expedition information</li>
+        <li>Tools execute enrollments, cancellations, and queries</li>
+        <li>Fallback responds gracefully when the AI is unavailable</li>
+        <li>Traces appear in Grafana/Tempo</li>
+    </ul>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- EXERCISE 3: MCP                                               -->
+<!-- ============================================================ -->
+<section id="ex3-intro" class="section-anchor">
+<h2>Exercise 3: MCP Integration</h2>
+
+<p><strong>Key message</strong>: "MCP is JDBC for AI &mdash; your agents talk to any tool server"</p>
+
+<div class="callout info">
+    <div class="callout-title">&#128204; Goal</div>
+    <p>Connect an AI agent to an external MCP (Model Context Protocol) server. The MCP server provides dice-rolling tools, and your AI agent plays a Viking dice game (Orlog) via the protocol.</p>
+</div>
+
+<h3>What is MCP?</h3>
+
+<p>The <strong>Model Context Protocol</strong> is an open standard for connecting AI agents to external tools. Think of it as a universal adapter: one protocol, any tool server, any language.</p>
+
+<div class="arch-diagram">
+&#128640; Agent CDI &nbsp;&nbsp;&rarr;&nbsp;&nbsp; &#128268; McpToolProvider &nbsp;&nbsp;&rarr;&nbsp;&nbsp; &#127760; MCP Server (any language)<br>
+<span style="color: var(--text-muted);">@RegisterAIService &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; toolProviderName &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; JSON-RPC via HTTP SSE</span>
+</div>
+</section>
+
+<section id="ex3-step0" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-green);">0</span>
+        <span class="step-title">Build & Start the MCP Server</span>
+    </div>
+    <p>First, build and start the external MCP dice server:</p>
+
+    <pre><code># Build the MCP server
+cd demo-project/demo-3-mcp/mcp-server
+mvn clean package
+
+# Start it (runs on port 8090)
+java -jar target/mcp-server-1.0-SNAPSHOT-jar-with-dependencies.jar</code></pre>
+
+    <p>The MCP server exposes a <code>roll</code> tool that generates random dice results for the Viking game. It communicates via HTTP SSE (Server-Sent Events) with JSON-RPC 2.0.</p>
+
+    <div class="callout info">
+        <div class="callout-title">&#128161; Keep this running</div>
+        <p>Leave the MCP server running in a separate terminal. The AI agent will connect to it via HTTP SSE on <code>localhost:8090/sse</code>.</p>
+    </div>
+
+    <h3 style="margin-top: 1.5em;">Test with MCP Inspector</h3>
+    <p>Before wiring the MCP server into the AI agent, you can verify it works using the <strong>MCP Inspector</strong> &mdash; a visual debugging tool for MCP servers. In a new terminal:</p>
+
+    <pre><code># From the demo-3-mcp directory
+cd demo-project/demo-3-mcp
+./run-mcp-inspector.sh</code></pre>
+
+    <p>This opens a web UI (usually at <code>http://localhost:6274</code>) connected to your MCP server. Click on the <strong>Tools</strong> tab, then on the <code>roll</code> tool to inspect it and test it interactively:</p>
+
+    <img src="mcp-inspector.png" alt="MCP Inspector showing the roll tool" style="max-width: 100%; border-radius: 12px; margin: 1em 0; border: 1px solid var(--border);">
+
+    <div class="callout tip">
+        <div class="callout-title">&#128736; What to check</div>
+        <ul style="margin: 0.5em 0 0 1.2em;">
+            <li>The connection status shows <strong>Connected</strong></li>
+            <li>The <code>roll</code> tool appears in the Tools list</li>
+            <li>Set <code>numberOfDice</code> to <code>2</code>, click <strong>Run Tool</strong>, and verify you get dice results back</li>
+        </ul>
+    </div>
+</div>
+</section>
+
+<!-- Step 1 -->
+<section id="ex3-step1" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-green);">1</span>
+        <span class="step-title">Create the Viking Game Master AI Service</span>
+    </div>
+    <p>Open <code>VikingGameMasterAI.java</code> in <code>demo-3-mcp/base/</code>:</p>
+
+    <pre><code>@RegisterAIService(chatModelName = "mistral",
+                   toolProviderName = "mcp")
+public interface VikingGameMasterAI {
+
+    @SystemMessage("""
+        You are Ragnar the Wise, master of Orlog in the great Viking hall.
+        You run the sacred Viking dice game Orlog.
+
+        RULES: Roll 2 dice. Use the roll tool with numberOfDice=2.
+        - 7 or 11 on first roll = VICTORY in Odin's favor
+        - 2, 3, or 12 on first roll = DEFEAT by the Norns
+        - Any other = that is your fate number
+
+        REQUIRED FORMAT:
+        DICE: [X, Y]
+        TOTAL: [sum]
+        RESULT: [what happened in Viking terms]
+        """)
+    String play(@UserMessage String playerAction);
+}</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">&#128161; toolProviderName</div>
+        <p><code>toolProviderName = "mcp"</code> connects this agent to the <code>McpToolProvider</code> bean, which automatically discovers dice-rolling tools from the external MCP server for the Viking Orlog game.</p>
+    </div>
+</div>
+</section>
+
+<!-- Step 2 -->
+<section id="ex3-step2" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-green);">2</span>
+        <span class="step-title">Configure MCP via Properties</span>
+    </div>
+    <p>Open <code>microprofile-config.properties</code> and uncomment the MCP configuration:</p>
+
+    <pre><code># Chat Model (Mistral AI)
+dev.langchain4j.cdi.plugin.mistral.class=\
+    dev.langchain4j.model.mistralai.MistralAiChatModel
+dev.langchain4j.cdi.plugin.mistral.config.api-key=${MISTRAL_API_KEY}
+dev.langchain4j.cdi.plugin.mistral.config.model-name=mistral-small-latest
+
+# MCP Transport (SSE to Viking dice server)
+dev.langchain4j.cdi.plugin.ssetransport.class=\
+    dev.langchain4j.mcp.client.transport.http.HttpMcpTransport
+dev.langchain4j.cdi.plugin.ssetransport.config.sseUrl=\
+    http://localhost:8090/sse
+
+# MCP Client
+dev.langchain4j.cdi.plugin.mcpclient.class=\
+    dev.langchain4j.mcp.client.DefaultMcpClient
+dev.langchain4j.cdi.plugin.mcpclient.config.transport=lookup:@ssetransport
+
+# MCP Tool Provider
+dev.langchain4j.cdi.plugin.mcp.class=\
+    dev.langchain4j.mcp.McpToolProvider
+dev.langchain4j.cdi.plugin.mcp.config.mcpClients=lookup:@mcpclient</code></pre>
+
+    <div class="callout info">
+        <div class="callout-title">&#128161; The lookup: pattern</div>
+        <p><code>lookup:@ssetransport</code> references another CDI bean by its config name. This is how you wire beans together purely through configuration &mdash; no Java code needed for the plumbing.</p>
+    </div>
+</div>
+</section>
+
+<!-- Step 3 -->
+<section id="ex3-step3" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-green);">3</span>
+        <span class="step-title">Wire the REST Endpoint</span>
+    </div>
+    <p>Open <code>GameResource.java</code>:</p>
+
+    <pre><code>@Path("/game")
+@ApplicationScoped
+public class GameResource {
+
+    @Inject
+    VikingGameMasterAI gameMaster;
+
+    @POST
+    @Path("/play")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String play(String playerAction) {
+        return gameMaster.play(playerAction);
+    }
+
+    @GET
+    @Path("/start")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String start() {
+        return gameMaster.play(
+            "Hail! I wish to play Orlog with you.");
+    }
+}</code></pre>
+</div>
+</section>
+
+<!-- Test Ex3 -->
+<section id="ex3-test" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-green);">&#10003;</span>
+        <span class="step-title">Test & Validate Exercise 3</span>
+    </div>
+
+    <pre><code># Make sure the MCP server is running on port 8090!
+
+# Deploy
+cd demo-project/demo-3-mcp/base
+mvn clean wildfly:dev
+
+# Start a game
+curl http://localhost:8080/demo-3/api/game/start
+
+# Roll the dice
+curl -X POST -H "Content-Type: text/plain" \
+  -d "Cast the bones of fate!" \
+  http://localhost:8080/demo-3/api/game/play
+
+# Open the web UI
+# http://localhost:8080/demo-3/</code></pre>
+
+    <ul class="checklist">
+        <li>The AI agent calls the MCP server's <code>roll</code> tool via HTTP SSE</li>
+        <li>Dice results are returned in the DICE: [X, Y] format</li>
+        <li>Ragnar the Wise announces victories, defeats, and fate numbers with Viking spirit</li>
+        <li>The web UI renders visual dice with animated pips</li>
+    </ul>
+
+    <div class="callout success">
+        <div class="callout-title">&#127922; Congratulations!</div>
+        <p>You have built three AI-powered applications using LangChain4j-CDI: a Viking skald, a resilient expedition guide, and an MCP-integrated Viking dice game. All using standard Jakarta EE patterns.</p>
+    </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHAT'S NEXT                                                   -->
+<!-- ============================================================ -->
+<section id="whats-next" class="section-anchor">
+<h2>Et après ?</h2>
+
+<h3>A2A : Protocole Agent-to-Agent</h3>
+
+<p>MCP connecte les agents aux <em>outils</em>. <strong>A2A</strong> connecte les agents <em>entre eux</em>. Imaginez votre agent Jakarta EE déléguant des tâches à d'autres agents spécialisés, chacun tournant sur son propre serveur.</p>
+
+<h3>Modules LangChain4j-CDI</h3>
+
+<table>
+    <thead><tr><th>Module</th><th>Artefact</th><th>Utilité</th></tr></thead>
+    <tbody>
+        <tr><td><span class="badge badge-orange">core</span></td><td>langchain4j-cdi-core</td><td>API + annotations</td></tr>
+        <tr><td><span class="badge badge-blue">portable</span></td><td>langchain4j-cdi-portable-ext</td><td>WildFly, Payara, GlassFish, Liberty</td></tr>
+        <tr><td><span class="badge badge-green">build</span></td><td>langchain4j-cdi-build-compatible-ext</td><td>Quarkus, Helidon</td></tr>
+        <tr><td><span class="badge badge-purple">config</span></td><td>langchain4j-cdi-config</td><td>MicroProfile Config SPI</td></tr>
+        <tr><td><span class="badge badge-orange">FT</span></td><td>langchain4j-cdi-fault-tolerance</td><td>Retry, Timeout, CircuitBreaker</td></tr>
+        <tr><td><span class="badge badge-blue">telemetry</span></td><td>langchain4j-cdi-telemetry</td><td>Spans et métriques OpenTelemetry</td></tr>
+    </tbody>
+</table>
+
+<h3>Ressources</h3>
+
+<ul>
+    <li><a href="https://github.com/langchain4j/langchain4j-cdi" target="_blank">LangChain4j-CDI on GitHub</a></li>
+    <li><a href="https://docs.langchain4j.dev/" target="_blank">LangChain4j Documentation</a></li>
+    <li><a href="https://spec.modelcontextprotocol.io/" target="_blank">MCP Specification</a></li>
+    <li><a href="https://docs.wildfly.org/" target="_blank">WildFly Documentation</a></li>
+</ul>
+</section>
+
+<!-- ============================================================ -->
+<!-- TROUBLESHOOTING                                               -->
+<!-- ============================================================ -->
+<section id="troubleshooting" class="section-anchor">
+<h2>Dépannage</h2>
+
+<table>
+    <thead><tr><th>Problème</th><th>Cause</th><th>Solution</th></tr></thead>
+    <tbody>
+        <tr>
+            <td><code>ClassNotFoundException: ...faulttolerance.Retry</code></td>
+            <td>Couches Galleon manquantes</td>
+            <td>Ajouter <code>microprofile-fault-tolerance</code> dans <code>&lt;layers&gt;</code></td>
+        </tr>
+        <tr>
+            <td>Propriétés ignorées silencieusement</td>
+            <td>Préfixe <code>.config.</code> manquant</td>
+            <td>Utiliser <code>...plugin.X.config.prop=val</code></td>
+        </tr>
+        <tr>
+            <td>La mémoire se réinitialise à chaque message</td>
+            <td><code>get()</code> crée une nouvelle instance</td>
+            <td>Utiliser <code>computeIfAbsent()</code> dans le provider</td>
+        </tr>
+        <tr>
+            <td><code>ChatMessage.text()</code> ne compile pas</td>
+            <td><code>ChatMessage</code> n'a pas de <code>text()</code></td>
+            <td>Pattern-match : <code>SystemMessage</code>, <code>UserMessage</code>, etc.</td>
+        </tr>
+        <tr>
+            <td>404 sur la racine du contexte</td>
+            <td>Pas de <code>&lt;name&gt;</code> dans le plugin wildfly</td>
+            <td>Ajouter <code>&lt;name&gt;demo-N&lt;/name&gt;</code></td>
+        </tr>
+        <tr>
+            <td>Le serveur MCP ne répond pas</td>
+            <td>Le serveur ne tourne pas sur le port 8090</td>
+            <td>Démarrer le serveur MCP d'abord</td>
+        </tr>
+        <tr>
+            <td><code>MISTRAL_API_KEY</code> introuvable</td>
+            <td>Variable d'environnement non définie</td>
+            <td><code>export MISTRAL_API_KEY=your-key</code></td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="callout danger">
+    <div class="callout-title">&#9888; Secours d'urgence</div>
+    <p>Si quelque chose ne va pas, passez au module solution :</p>
+    <pre><code>cd demo-N-xxx/solution && mvn clean wildfly:dev</code></pre>
+</div>
+</section>
+
+</div><!-- /content -->
+
+<footer class="footer">
+    <p>
+        Atelier LangChain4j-CDI &mdash; Devoxx France 2026 &mdash;
+        <a href="https://github.com/langchain4j/langchain4j-cdi">GitHub</a> &mdash;
+        Licence : Apache 2.0
+    </p>
+    <p style="margin-top: 0.5rem;">
+        Par <strong>Yann Blazart</strong> &amp; <strong>Emmanuel Hugonnet</strong>
+    </p>
+</footer>
+</main>
+
+<script>
+// Sidebar active link tracking
+const sidebarLinks = document.querySelectorAll('.sidebar-link');
+const sections = document.querySelectorAll('.section-anchor');
+
+function updateActiveLink() {
+    let current = '';
+    const scrollPos = window.scrollY + 100;
+
+    sections.forEach(section => {
+        if (section.offsetTop <= scrollPos) {
+            current = section.id;
+        }
+    });
+
+    sidebarLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('active');
+        }
+    });
+}
+
+window.addEventListener('scroll', updateActiveLink);
+window.addEventListener('load', updateActiveLink);
+
+// Close mobile sidebar on link click
+sidebarLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth <= 960) {
+            document.querySelector('.sidebar').classList.remove('open');
+        }
+    });
+});
+</script>
+
+</body>
+</html>

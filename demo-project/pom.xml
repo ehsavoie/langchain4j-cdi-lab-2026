@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>langchain4j-cdi-demo</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>LangChain4j-CDI Demo — Devoxx France 2026</name>
+    <description>Progressive demos: Injectable AI Agent, Fault Tolerance, MCP</description>
+
+    <modules>
+        <module>demo-1-ai-agent</module>
+        <module>demo-2-ft-telemetry</module>
+        <module>demo-3-mcp</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Versions -->
+        <jakartaee.version>10.0.0</jakartaee.version>
+        <microprofile.version>6.1</microprofile.version>
+        <langchain4j.version>1.12.2</langchain4j.version>
+        <langchain4j-cdi.version>1.1.0</langchain4j-cdi.version>
+        <wildfly.version>39.0.0.Final</wildfly.version>
+
+        <!-- Mistral AI -->
+        <mistral.model>mistral-small-latest</mistral.model>
+
+        <!-- LangChain4j MCP (beta versioning) -->
+        <langchain4j-mcp.version>1.11.0-beta19</langchain4j-mcp.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Jakarta EE 10 -->
+            <dependency>
+                <groupId>jakarta.platform</groupId>
+                <artifactId>jakarta.jakartaee-api</artifactId>
+                <version>${jakartaee.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- MicroProfile -->
+            <dependency>
+                <groupId>org.eclipse.microprofile</groupId>
+                <artifactId>microprofile</artifactId>
+                <version>${microprofile.version}</version>
+                <type>pom</type>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- LangChain4j-CDI (own version) -->
+            <dependency>
+                <groupId>dev.langchain4j.cdi</groupId>
+                <artifactId>langchain4j-cdi-core</artifactId>
+                <version>${langchain4j-cdi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j.cdi</groupId>
+                <artifactId>langchain4j-cdi-portable-ext</artifactId>
+                <version>${langchain4j-cdi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j.cdi.mp</groupId>
+                <artifactId>langchain4j-cdi-config</artifactId>
+                <version>${langchain4j-cdi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j.cdi.mp</groupId>
+                <artifactId>langchain4j-cdi-fault-tolerance</artifactId>
+                <version>${langchain4j-cdi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j.cdi.mp</groupId>
+                <artifactId>langchain4j-cdi-telemetry</artifactId>
+                <version>${langchain4j-cdi.version}</version>
+            </dependency>
+
+            <!-- LangChain4j core + Mistral AI -->
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-mistral-ai</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-open-ai</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-mcp</artifactId>
+                <version>${langchain4j-mcp.version}</version>
+            </dependency>
+
+            <!-- JSON processing -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.17.0</version>
+            </dependency>
+
+            <!-- Logging -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>2.0.11</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>2.0.11</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>3.4.0</version>
+                    <configuration>
+                        <failOnMissingWebXml>false</failOnMissingWebXml>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.wildfly.plugins</groupId>
+                    <artifactId>wildfly-maven-plugin</artifactId>
+                    <version>5.1.5.Final</version>
+                    <configuration>
+                        <feature-packs>
+                            <feature-pack>
+                                <location>org.wildfly:wildfly-galleon-pack:${wildfly.version}</location>
+                            </feature-pack>
+                        </feature-packs>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

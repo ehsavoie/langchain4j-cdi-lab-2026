@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🖼️ Runique Vision — Analyse Viking</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f08 100%);
+            color: #e8dcc8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(184, 134, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        header {
+            background: linear-gradient(to bottom, #3a2517, #2c1810);
+            border-bottom: 2px solid #8b6914;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 10;
+        }
+        header h1 {
+            font-size: 1.3rem;
+            color: #daa520;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            font-weight: bold;
+        }
+        header .badge {
+            background: linear-gradient(135deg, #b8860b, #daa520);
+            color: #1a0f08;
+            font-size: 0.7rem;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: 1px solid #8b6914;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        header .subtitle {
+            color: #b8956f;
+            font-size: 0.8rem;
+            margin-left: auto;
+            font-style: italic;
+        }
+        header a {
+            color: #daa520;
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            border: 2px solid #8b6914;
+            border-radius: 4px;
+            background: rgba(139, 105, 20, 0.2);
+            font-weight: bold;
+        }
+        header a:hover {
+            background: rgba(218, 165, 32, 0.3);
+            border-color: #daa520;
+        }
+        .container {
+            flex: 1;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        .info-box {
+            background: rgba(58, 37, 23, 0.7);
+            border: 2px solid #6b4423;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        .info-box h2 {
+            color: #daa520;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        .info-box p {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+        .info-box code {
+            background: rgba(218, 165, 32, 0.2);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            color: #daa520;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            border: 1px solid #8b6914;
+            display: inline-block;
+            margin: 0.2rem 0;
+        }
+        .config-section {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            border-left: 3px solid #8b6914;
+        }
+        .config-section strong {
+            color: #daa520;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .config-section code {
+            display: block;
+            margin: 0.3rem 0;
+            padding: 0.4rem 0.8rem;
+        }
+        #dropbox {
+            width: 100%;
+            min-height: 250px;
+            border: 3px dashed #8b6914;
+            border-radius: 12px;
+            padding: 2rem;
+            color: #b8956f;
+            background: rgba(58, 37, 23, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        #dropbox:hover {
+            background: rgba(58, 37, 23, 0.7);
+            border-color: #daa520;
+        }
+        #dropbox .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        #dropbox .text {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        #dropbox .hint {
+            font-size: 0.85rem;
+            color: #8b6914;
+            margin-top: 0.5rem;
+        }
+        #status {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #2f2418, #3d2f1f);
+            border: 2px solid #6b4423;
+            border-radius: 8px;
+            min-height: 100px;
+            white-space: pre-wrap;
+            line-height: 1.7;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            display: none;
+        }
+        #status.visible {
+            display: block;
+        }
+        .loading {
+            text-align: center;
+            color: #daa520;
+        }
+        .loading::after {
+            content: '⚒️';
+            animation: hammer 1s infinite;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+        @keyframes hammer {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-20deg); }
+            75% { transform: rotate(20deg); }
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            var dropbox = document.getElementById("dropbox");
+            dropbox.addEventListener("dragenter", noop, false);
+            dropbox.addEventListener("dragexit", noop, false);
+            dropbox.addEventListener("dragover", noop, false);
+            dropbox.addEventListener("drop", dropUpload, false);
+        }
+
+        function noop(event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+
+        function dropUpload(event) {
+            noop(event);
+            var files = event.dataTransfer.files;
+
+            for (var i = 0; i < files.length; i++) {
+                upload(files[i]);
+            }
+        }
+
+        function upload(file) {
+            var statusDiv = document.getElementById("status");
+            statusDiv.className = "visible loading";
+            statusDiv.innerHTML = "🔥 Le skalde analyse: " + file.name;
+
+            var formData = new FormData();
+            formData.append("file", file);
+
+            var xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener("progress", uploadProgress, false);
+            xhr.addEventListener("load", uploadComplete, false);
+            xhr.addEventListener("error", uploadError, false);
+            xhr.open("POST", "uploadServlet", true);
+            xhr.send(formData);
+        }
+
+        function uploadProgress(event) {
+            var progress = Math.round(event.loaded / event.total * 100);
+            var statusDiv = document.getElementById("status");
+            statusDiv.className = "visible loading";
+            statusDiv.innerHTML = "⚔️ Analyse runique en cours... " + progress + "%";
+        }
+
+        function uploadComplete(event) {
+            var statusDiv = document.getElementById("status");
+            statusDiv.className = "visible";
+            statusDiv.innerHTML = "🛡️ Révélation du skalde:\n\n" + event.target.responseText;
+        }
+
+        function uploadError(event) {
+            var statusDiv = document.getElementById("status");
+            statusDiv.className = "visible";
+            statusDiv.innerHTML = "⚠️ Difficulté technique: " + event.target.statusText;
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>🖼️ Runique Vision</h1>
+        <span class="badge">👁️ Vision IA</span>
+        <span class="subtitle">L'œil du skalde</span>
+        <a href="index.html" style="margin-left: auto;">🎲 Chat Simple</a>
+        <a href="stream.html">⚡ Streaming SSE</a>
+    </header>
+
+    <div class="container">
+        <div class="info-box">
+            <h2>⚔️ Bienvenue dans Runique Vision!</h2>
+            <p>
+                Le skalde déchiffre les runes et artefacts que vos yeux ne peuvent voir!
+                Déposez une image et il révèlera les secrets des symboles vikings, armes, boucliers et objets anciens.
+            </p>
+            <p style="margin-top: 1rem;">
+                <strong>📋 Configuration (dans microprofile-config.properties):</strong>
+            </p>
+
+            <div class="config-section">
+                <strong>🔸 Ollama (local):</strong>
+                <code>vision-model.class=...OllamaChatModel</code>
+                <code>vision-model.config.model-name=llama3.2-vision:11b</code>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem;">Puis exécuter : <code style="display: inline;">ollama pull llama3.2-vision:11b</code></p>
+            </div>
+
+            <div class="config-section">
+                <strong>🔸 OpenAI (cloud):</strong>
+                <code>vision-model.class=...OpenAiChatModel</code>
+                <code>vision-model.config.model-name=gpt-4o</code>
+                <code>vision-model.config.api-key=${OPENAI_API_KEY}</code>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem;">Variable d'environnement : <code style="display: inline;">export OPENAI_API_KEY=sk-...</code></p>
+            </div>
+
+            <div class="config-section">
+                <strong>🔸 GROQ (cloud, rapide):</strong>
+                <code>vision-model.class=...OpenAiChatModel</code>
+                <code>vision-model.config.base-url=https://api.groq.com/openai/v1</code>
+                <code>vision-model.config.model-name=meta-llama/llama-4-scout-17b-16e-instruct</code>
+                <code>vision-model.config.api-key=${GROQ_API_KEY}</code>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem;">Variable d'environnement : <code style="display: inline;">export GROQ_API_KEY=gsk_...</code></p>
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.85rem; color: #8b6914;">
+                <em>"Les anciens Vikings voyaient ce que les autres ne pouvaient percevoir..."</em>
+            </p>
+        </div>
+
+        <div id="dropbox">
+            <div class="icon">🖼️</div>
+            <div class="text">Déposez une image ici</div>
+            <div class="hint">JPG, PNG, GIF... Le skalde accepte tous les formats!</div>
+        </div>
+
+        <div id="status"></div>
+    </div>
+</body>
+</html>

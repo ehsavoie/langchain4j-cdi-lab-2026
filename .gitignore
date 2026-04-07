@@ -1,0 +1,31 @@
+# === IDE ===
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+*.swp
+*~
+
+# === OS ===
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# === Build ===
+target/
+build/
+out/
+bin/
+
+# === Logs ===
+*.log
+
+# === Secrets ===
+.env
+.env.local

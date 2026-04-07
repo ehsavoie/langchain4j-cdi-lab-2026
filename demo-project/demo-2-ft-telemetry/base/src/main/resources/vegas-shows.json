@@ -1,0 +1,92 @@
+[
+  {
+    "id": "cirque-o",
+    "title": "Cirque du Soleil: O",
+    "date": "2026-03-17",
+    "capacity": 50,
+    "speaker": "Cirque du Soleil",
+    "description": "A mesmerizing aquatic masterpiece at the Bellagio. Performers dive, swim, and soar above and within a 1.5 million-gallon pool. Combining acrobatics, synchronized swimming, and aerial artistry, O blurs the line between dreams and reality in a breathtaking water theater.",
+    "prerequisites": "Suitable for all ages. Show duration: 90 minutes. Smart casual dress code recommended."
+  },
+  {
+    "id": "beatles-love",
+    "title": "The Beatles LOVE by Cirque du Soleil",
+    "date": "2026-03-17",
+    "capacity": 40,
+    "speaker": "Cirque du Soleil & The Beatles",
+    "description": "A theatrical celebration of The Beatles music at The Mirage. This immersive show weaves acrobatics, dance, and stunning visuals through iconic songs like Hey Jude, Come Together, and Let It Be. A vibrant tribute to the Fab Four's legacy.",
+    "prerequisites": "Suitable for all ages. Show duration: 90 minutes."
+  },
+  {
+    "id": "ka-mgm",
+    "title": "Cirque du Soleil: KA",
+    "date": "2026-03-18",
+    "capacity": 35,
+    "speaker": "Cirque du Soleil",
+    "description": "An epic saga of imperial twins on a perilous journey at MGM Grand. KA features gravity-defying acrobatics on a rotating stage that tilts, spins, and transforms. Martial arts, pyrotechnics, and aerial combat create a cinematic spectacle unlike any other.",
+    "prerequisites": "Recommended for ages 5 and up. Show duration: 90 minutes."
+  },
+  {
+    "id": "penn-teller",
+    "title": "Penn & Teller",
+    "date": "2026-03-18",
+    "capacity": 30,
+    "speaker": "Penn Jillette & Teller",
+    "description": "The longest-running headlining act in Las Vegas at the Rio. Penn & Teller blend comedy, magic, and audience participation in a unique show that often reveals how tricks are done -- only to fool you even more. Sharp wit meets jaw-dropping illusions.",
+    "prerequisites": "Suitable for ages 12 and up. Show duration: 90 minutes."
+  },
+  {
+    "id": "mystere",
+    "title": "Cirque du Soleil: Mystere",
+    "date": "2026-03-18",
+    "capacity": 45,
+    "speaker": "Cirque du Soleil",
+    "description": "The original Cirque du Soleil show in Las Vegas at Treasure Island. Mystere takes audiences on a journey through a fantastical world of whimsical characters, powerful acrobatics, and vibrant music. High-energy acts include bungee jumping, aerial silk, and Chinese poles.",
+    "prerequisites": "Suitable for all ages. Show duration: 90 minutes."
+  },
+  {
+    "id": "david-cop",
+    "title": "David Copperfield",
+    "date": "2026-03-19",
+    "capacity": 25,
+    "speaker": "David Copperfield",
+    "description": "The world's most famous illusionist performs at the MGM Grand. David Copperfield's show features grand-scale illusions, intimate close-up magic, and compelling storytelling. Expect the unexpected -- from vanishing audiences to teleportation across the stage.",
+    "prerequisites": "Suitable for all ages. Show duration: 90 minutes. Photography not permitted."
+  },
+  {
+    "id": "blue-man",
+    "title": "Blue Man Group",
+    "date": "2026-03-19",
+    "capacity": 40,
+    "speaker": "Blue Man Group",
+    "description": "A multisensory experience at the Luxor combining music, comedy, and technology. Three bald, blue characters take the audience on a wild ride of pounding rhythms, paint splatters, and interactive surprises. A high-energy, family-friendly spectacle.",
+    "prerequisites": "Suitable for all ages. Show duration: 90 minutes. Poncho provided for front rows."
+  },
+  {
+    "id": "absinthe",
+    "title": "Absinthe",
+    "date": "2026-03-19",
+    "capacity": 20,
+    "speaker": "Spiegelworld",
+    "description": "A wild, adults-only variety show performed in an intimate Spiegeltent at Caesars Palace. Absinthe features jaw-dropping acrobatics, raunchy comedy, and burlesque acts just feet from the audience. Described as Cirque du Soleil's naughty little sister.",
+    "prerequisites": "Ages 18 and over only. Show duration: 90 minutes. Contains strong language and adult content."
+  },
+  {
+    "id": "mac-king",
+    "title": "The Mac King Comedy Magic Show",
+    "date": "2026-03-17",
+    "capacity": 30,
+    "speaker": "Mac King",
+    "description": "A beloved afternoon comedy magic show at Excalibur. Mac King's quirky humor and clever sleight-of-hand make this one of the best-value shows on the Strip. Expect rope tricks, live goldfish, and laugh-out-loud audience participation.",
+    "prerequisites": "Suitable for all ages. Afternoon show. Show duration: 60 minutes."
+  },
+  {
+    "id": "michael-jackson",
+    "title": "Michael Jackson ONE by Cirque du Soleil",
+    "date": "2026-03-17",
+    "capacity": 45,
+    "speaker": "Cirque du Soleil & Michael Jackson Estate",
+    "description": "A high-energy tribute to the King of Pop at Mandalay Bay. Using immersive sound, acrobatics, and aerial arts, the show brings Michael Jackson's music to life through themes of unity and self-expression. Hits include Thriller, Billie Jean, and Smooth Criminal.",
+    "prerequisites": "Suitable for all ages. Show duration: 90 minutes."
+  }
+]

@@ -1,0 +1,1621 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangChain4j-CDI — Devoxx France 2026</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --r-background-color: #0a0a1a;
+            --r-main-font: 'Inter', sans-serif;
+            --r-heading-font: 'Inter', sans-serif;
+            --r-code-font: 'JetBrains Mono', monospace;
+            --r-main-color: #e0e0e0;
+            --r-heading-color: #ffffff;
+            --r-link-color: #64b5f6;
+            --accent-orange: #ff6b35;
+            --accent-blue: #4fc3f7;
+            --accent-green: #81c784;
+            --accent-purple: #b39ddb;
+            --accent-yellow: #ffd54f;
+        }
+
+        .reveal { font-size: 32px; }
+        .reveal h1 { font-size: 2.2em; font-weight: 900; letter-spacing: -0.02em; }
+        .reveal h2 { font-size: 1.6em; font-weight: 700; color: var(--accent-blue); }
+        .reveal h3 { font-size: 1.2em; font-weight: 600; color: var(--accent-orange); }
+        .reveal code { font-family: var(--r-code-font); font-size: 0.85em; }
+        .reveal pre { width: 95%; margin: 0.5em auto; }
+        .reveal pre code { padding: 1em; border-radius: 12px; line-height: 1.4; max-height: 520px; }
+        .reveal section img { border: none; box-shadow: none; background: none; }
+
+        /* Custom classes */
+        .accent { color: var(--accent-orange); font-weight: 700; }
+        .accent-blue { color: var(--accent-blue); }
+        .accent-green { color: var(--accent-green); }
+        .accent-purple { color: var(--accent-purple); }
+        .small { font-size: 0.65em; color: #999; }
+        .medium { font-size: 0.8em; }
+        .big { font-size: 1.3em; }
+        .huge { font-size: 2em; font-weight: 900; }
+
+        .two-col { display: flex; gap: 2em; align-items: flex-start; }
+        .two-col > * { flex: 1; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.15em 0.6em;
+            border-radius: 8px;
+            font-size: 0.7em;
+            font-weight: 600;
+            margin: 0.1em;
+        }
+        .badge-orange { background: var(--accent-orange); color: #000; }
+        .badge-blue { background: var(--accent-blue); color: #000; }
+        .badge-green { background: var(--accent-green); color: #000; }
+        .badge-purple { background: var(--accent-purple); color: #000; }
+
+        .emoji-big { font-size: 2.5em; }
+
+        .speaker-card {
+            display: flex;
+            align-items: center;
+            gap: 1.5em;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 1.2em;
+            margin: 0.5em 0;
+            border-left: 4px solid var(--accent-orange);
+        }
+        .speaker-card.emmanuel { border-left-color: var(--accent-blue); }
+        .speaker-card .avatar {
+            font-size: 3em;
+            min-width: 80px;
+            text-align: center;
+        }
+        .speaker-card .info { text-align: left; }
+        .speaker-card .info h3 { margin: 0 0 0.2em 0; font-size: 1.1em; }
+        .speaker-card .info p { margin: 0; font-size: 0.7em; color: #bbb; }
+
+        .timeline {
+            text-align: left;
+            padding-left: 2em;
+        }
+        .timeline .step {
+            position: relative;
+            padding: 0.5em 0 0.5em 1.5em;
+            border-left: 2px solid #444;
+        }
+        .timeline .step::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 0.8em;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-orange);
+        }
+        .timeline .step.blue::before { background: var(--accent-blue); }
+        .timeline .step.green::before { background: var(--accent-green); }
+        .timeline .step.purple::before { background: var(--accent-purple); }
+
+        .box {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 1em;
+            margin: 0.5em 0;
+        }
+        .box-accent { border: 1px solid var(--accent-orange); }
+        .box-blue { border: 1px solid var(--accent-blue); }
+
+        .fragment.highlight-orange.visible { color: var(--accent-orange); }
+
+        /* Server logos grid */
+        .server-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1em;
+            justify-content: center;
+            margin: 1em 0;
+        }
+        .server-item {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 0.8em 1.2em;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        /* Joke slide */
+        .joke-slide {
+            background: linear-gradient(135deg, rgba(255,107,53,0.1), rgba(79,195,247,0.1));
+            border-radius: 20px;
+            padding: 2em !important;
+            box-sizing: border-box;
+        }
+
+        /* DEMO banner */
+        .demo-banner {
+            background: linear-gradient(90deg, var(--accent-orange), #ff8a65);
+            color: #000;
+            font-weight: 900;
+            font-size: 1.4em;
+            padding: 0.3em 1em;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 0.5em;
+            letter-spacing: 0.05em;
+        }
+
+        .versus {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1em;
+        }
+        .versus .vs {
+            font-size: 1.5em;
+            font-weight: 900;
+            color: var(--accent-orange);
+        }
+
+        .checklist {
+            text-align: left;
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 0.3em 0;
+            font-size: 0.85em;
+        }
+        .checklist li::before {
+            content: '✅ ';
+        }
+
+        /* Speaker indicator — hidden, decided on the fly */
+        .speaker-tag { display: none; }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================= -->
+<!-- SECTION 1: INTRO                              -->
+<!-- ============================================= -->
+
+<!-- Slide 1: Title with logo -->
+<section>
+    <img src="cbgmd-javaone26-hero.webp"
+         alt="Devoxx France 2026"
+         style="position: absolute; top: 0; right: 0; max-width: 180px; z-index: 10;">
+    <img src="langchain4j-cdi-logo.png"
+         onerror="this.src='https://raw.githubusercontent.com/langchain4j/langchain4j-cdi/main/langchain4j-cdi-logo.png'"
+         alt="LangChain4j-CDI" style="max-width: 280px; margin-bottom: 0.3em;">
+    <h1>LangChain4j-CDI</h1>
+    <h3 style="color: var(--accent-blue);">IA Générative<br>Nativement Injectable dans Jakarta EE</h3>
+    <p class="small" style="margin-top: 1em;">
+        <span class="accent">Yann Blazart</span> &amp; <span class="accent">Emmanuel Hugonnet</span>
+    </p>
+    <p class="small">Devoxx France 2026</p>
+    <aside class="notes">
+        Bienvenue à tous ! On espère que vous êtes prêts, parce qu'on va parler de choses sérieuses... enfin, aussi sérieuses que deux types qui ont construit un framework d'IA peuvent l'être.
+
+        Aujourd'hui on va vous montrer comment faire ce que l'extension Quarkus fait, mais sur N'IMPORTE QUEL serveur CDI. Oui, même votre bon vieux WildFly qui tourne en production depuis 2015.
+    </aside>
+</section>
+
+<!-- Slide 2: Disclaimer (effet de surprise) -->
+<section data-background-gradient="linear-gradient(135deg, #2a0a0a, #1a0a00)">
+    <p class="emoji-big">⚠️</p>
+    <h2 style="color: var(--accent-orange);">Avertissement</h2>
+    <p class="big" style="margin-top: 0.5em;">
+        Cette présentation a été <span class="accent">honteusement générée</span> avec l'aide d'une IA.
+    </p>
+    <p class="fragment medium" style="margin-top: 1em; color: #ccc;">
+        Rassurez-vous, les speakers sont <em>réels</em>.<br>
+        <span class="fragment">Enfin... on n'a pas encore vérifié avec un CAPTCHA.</span>
+    </p>
+    <p class="fragment small" style="margin-top: 1.5em; color: #999;">
+        Aucun développeur Jakarta EE n'a été maltraité pendant la production de ces slides. Mais on ne parlera pas des raids Viking ⚔️<br>
+        <span class="fragment">Le LLM, par contre, a fait 247 tentatives.</span>
+    </p>
+    <aside class="notes">
+        Slide de disclaimer. On assume pleinement -- l'IA a aidé à construire ces slides. Ça fait rire et ça colle parfaitement avec le sujet de la session.
+
+        Si quelqu'un rigole à la ligne du CAPTCHA, enchaîner avec : "Sérieusement, si vous voulez nous vérifier, demandez-nous d'identifier des feux de circulation dans une grille."
+    </aside>
+</section>
+
+<!-- Slide 3: Yann + SCIAM -->
+<section>
+    <h2>Qui suis-je ?</h2>
+    <div class="speaker-card" style="border-left-width: 6px;">
+        <div class="avatar"><img src="yb.jpg" alt="Yann Blazart" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;"></div>
+        <div class="info">
+            <h3 style="color: var(--accent-orange);">Yann Blazart</h3>
+            <p>25+ ans en Java • Passionné de CDI • Co-créateur de langchain4j-cdi</p>
+            <p>Speaker pendant mon temps libre (et quand on veut bien de moi)</p>
+            <p><span class="badge badge-orange">Jakarta EE</span> <span class="badge badge-orange">CDI</span> <span class="badge badge-orange">LangChain4j</span></p>
+        </div>
+    </div>
+    <div class="fragment" style="margin-top: 1.2em; text-align: center;">
+        <p class="medium" style="color: #ccc; margin-top: 0.3em;">
+            Tech Lead @ <strong style="color: var(--accent-orange);">SCIAM</strong> — Conseil et expertise IT
+        </p>
+        <p class="small" style="color: #999;">
+            <a href="https://twitter.com/yblazart" style="color: var(--accent-blue);">@yblazart</a>
+        </p>
+    </div>
+    <aside class="notes">
+        Yann se présente.
+
+        25 ans de Java, j'ai commencé à l'époque où on codait encore avec EJB 2.1 et des descripteurs XML de 500 lignes.
+
+        Je travaille chez SCIAM -- "Oncle SCIAM vous veut" -- c'est une boîte de conseil spécialisée en sciences cognitives et IA. On aide les entreprises à intégrer l'IA intelligemment. Et croyez-moi, quand je dis intelligemment, c'est pas juste un wrapper ChatGPT dans un PowerPoint.
+
+        Co-créateur de langchain4j-cdi avec Emmanuel et Buhake Sindi.
+    </aside>
+</section>
+
+<!-- Slide 4: Emmanuel + IBM -->
+<section>
+    <h2>Mon co-pilote</h2>
+    <div class="speaker-card emmanuel" style="border-left-width: 6px;">
+        <div class="avatar"><img src="eh.jpg" alt="Emmanuel Hugonnet" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;"></div>
+        <div class="info">
+            <h3 style="color: var(--accent-blue);">Emmanuel Hugonnet (ehsavoie)</h3>
+            <p>25+ ans en Java • Développeur • Co-créateur de langchain4j-cdi</p>
+            <p>Développeur cœur WildFly</p>
+            <p><span class="badge badge-blue">WildFly</span> <span class="badge badge-blue">Apache NetBeans</span> <span class="badge badge-blue">LangChain4j</span></p>
+        </div>
+    </div>
+    <div class="fragment" style="margin-top: 1.2em; text-align: center;">
+        <p style="font-size: 1.6em; font-weight: 900;">
+            🐝 <span style="color: #002d9c;"><span class="accent-blue">IBM</span>
+        </p>
+        <p class="medium" style="color: #ccc; margin-top: 0.3em;">
+            Celui qui fait tourner <strong style="color: var(--accent-blue);">WildFly</strong> pour que vous n'ayez pas à le faire
+        </p>
+        <p class="small" style="color: #999;">
+            <a href="https://twitter.com/ehsavoie" style="color: var(--accent-blue);">@ehsavoie</a>
+        </p>
+    </div>
+    <p class="fragment small" style="margin-top: 0.8em; color: #777;">
+        À nous deux, on cumule 50 ans d'expérience Java. Ça ne nous rajeunit pas. 👴👴
+    </p>
+    <aside class="notes">
+        Emmanuel se présente (ou Yann le présente).
+
+        Emmanuel sort de la salle des serveurs après de longues années passées à collectionner bugs et patches.
+
+        Il intègre l'IA dans WildFly : WildFly AI Feature Pack (LC4J-CDI, MCP Server, WASM WASI) et A2A Java/JakartaEE SDK.
+
+        À nous deux, 50 ans de Java. On est des dinosaures 🦕🦕, mais des dinosaures avec de l'IA maintenant : 🦖🦖🦖🦖
+    </aside>
+</section>
+
+<!-- Slide 3: Le contexte -->
+<section>
+    <h2>Le contexte aujourd'hui</h2>
+    <p class="big">Vous avez peut-être vu :</p>
+    <p>LangChain4j + <span class="accent-green">🃏 Quarkus</span> = 🤖 Chatbot Intelligent</p>
+    <div class="fragment" style="margin-top: 1em;">
+        <p class="big">Mais en production, vous avez :</p>
+        <div class="server-grid">
+            <div class="server-item">🐝 WildFly</div>
+            <div class="server-item">🐟 Payara</div>
+            <div class="server-item">🦅 Liberty</div>
+            <div class="server-item">☀️ Helidon</div>
+            <div class="server-item">🐠 GlassFish</div>
+            <div class="server-item">🃏 Quarkus</div>
+        </div>
+    </div>
+    <p class="fragment huge" style="margin-top: 0.5em;">Alors on fait quoi ? 🤔</p>
+    <aside class="notes">
+        Vous avez peut-être vu de super démos avec LangChain4j sur Quarkus. Propre, fluide, ça marchait du premier coup (enfin, presque).
+
+        Mais soyons honnêtes : combien d'entre vous ont WildFly en production ? (levez la main !) Payara ? Liberty ? ... GlassFish ? (moment de silence)
+
+        Bonne nouvelle : vous n'avez pas besoin de tout déchirer pour faire de l'IA. C'est exactement pour ça qu'on a créé langchain4j-cdi.
+    </aside>
+</section>
+
+<!-- Slide 4: La réponse -->
+<section data-background-gradient="linear-gradient(135deg, #1a1a2e, #16213e)">
+    <h2>La réponse :</h2>
+    <p class="huge"><span class="accent">@RegisterAIService</span></p>
+    <p class="big" style="margin-top: 0.5em;">
+        <span class="accent-blue">CDI</span> fait le pont entre
+        <span class="accent-green">LangChain4j</span> et votre serveur
+    </p>
+    <p class="fragment medium" style="margin-top: 1em; color: #999;">
+        <em>"Injecter un agent IA aussi naturellement qu'un EntityManager"</em>
+    </p>
+    <aside class="notes">
+        La réponse tient en une annotation : @RegisterAIService.
+
+        Pensez-y -- CDI injecte déjà tout dans vos applis. EntityManager, DataSource, clients REST... alors pourquoi pas un agent IA ?
+
+        C'est exactement ce qu'on a construit. Une extension CDI qui transforme une interface annotée en bean injectable, câblé à LangChain4j sous le capot. Même patterns que vous connaissez déjà, nouvelles capacités.
+    </aside>
+</section>
+
+<!-- Slide 5: Agenda -->
+<section>
+    <h2>Programme d'aujourd'hui</h2>
+    <div class="timeline">
+        <div class="step">
+            <strong>🏗️ Architecture</strong>
+            <span class="small"> — Comment ça fonctionne sous le capot</span>
+            <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+        </div>
+        <div class="step blue">
+            <strong>💉 @RegisterAIService</strong>
+            <span class="small"> — Injection en action</span>
+            <span class="speaker-tag speaker-yann">Yann</span>
+        </div>
+        <div class="step green">
+            <strong>🔧 Fonctionnalités progressives</strong>
+            <span class="small"> — Memory, RAG, Tools, MCP</span>
+            <span class="speaker-tag speaker-both">Les deux</span>
+        </div>
+        <div class="step purple">
+            <strong>🛡️ Prêt pour la production</strong>
+            <span class="small"> — Fault Tolerance & Telemetry</span>
+            <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+        </div>
+        <div class="step">
+            <strong>🚀 Démo WildFly en live</strong>
+            <span class="small"> — Le chatbot complet en production</span>
+            <span class="speaker-tag speaker-yann">Yann</span>
+        </div>
+        <div class="step blue">
+            <strong>🔮 Et la suite ?</strong>
+            <span class="small"> — A2A et feuille de route</span>
+            <span class="speaker-tag speaker-both">Les deux</span>
+        </div>
+    </div>
+    <aside class="notes">
+        Voilà le plan de bataille. On se relaye -- Emmanuel couvre l'architecture CDI et les aspects production, moi je gère les démos live.
+
+        On construit du simple au complexe. Si tout se passe bien, à la fin vous aurez un chatbot qui tourne sur WildFly. Si ça marche pas... eh bien, on aura une belle histoire de guerre pour le prochain podcast.
+    </aside>
+</section>
+
+<!-- ============================================= -->
+<!-- SECTION 2: ARCHITECTURE (Emmanuel)            -->
+<!-- ============================================= -->
+
+<!-- Slide 6: Le problème -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>Le problème</h2>
+    <pre><code class="language-java" data-trim>
+// Avec LangChain4j "vanille"... c'est verbeux
+ChatLanguageModel model = OpenAiChatModel.builder()
+    .apiKey(System.getenv("OPENAI_API_KEY"))
+    .modelName("gpt-4o")
+    .build();
+
+ChatMemory memory = MessageWindowChatMemory.builder()
+    .maxMessages(20)
+    .build();
+
+Assistant assistant = AiServices.builder(Assistant.class)
+    .chatLanguageModel(model)
+    .chatMemory(memory)
+    .tools(new BookingTools())
+    .build();
+    </code></pre>
+    <p class="fragment accent">Pas très... <em>enterprise</em>, non ? 😬</p>
+    <aside class="notes">
+        Emmanuel prend le relais ici.
+
+        Regardez ce code. Du LangChain4j pur. Ça marche, certes, mais... c'est procédural. On instancie tout à la main, on câble tout manuellement.
+
+        En tant que développeurs Jakarta EE, ça devrait vous faire grimacer. On est habitués à l'injection, à la config externalisée, au cycle de vie géré par le conteneur. Ce code fait penser à 2006.
+    </aside>
+</section>
+
+<!-- Slide 7: La solution -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>La solution CDI</h2>
+    <pre><code class="language-java" data-trim>
+@RegisterAIService(chatModelName = "my-model",
+                   tools = BookingTools.class)
+public interface Assistant {
+
+    @SystemMessage("You are a booking assistant")
+    String chat(@UserMessage String message);
+}
+    </code></pre>
+    <pre class="fragment"><code class="language-java" data-trim>
+// Et dans votre code métier :
+@Inject
+Assistant assistant;
+
+// C'est tout. Vraiment.
+String response = assistant.chat("Book me a table");
+    </code></pre>
+    <aside class="notes">
+        Et voilà à quoi ça ressemble avec langchain4j-cdi. Une interface, une annotation, un @Inject. Terminé.
+
+        Pas de builder, pas d'instanciation manuelle. Le conteneur CDI gère tout le câblage.
+
+        Si vous connaissez CDI, ce pattern est immédiatement familier -- c'est comme un repository JPA ou un client REST. Interface + annotation = bean injectable. Même mémoire musculaire, nouveaux super-pouvoirs.
+    </aside>
+</section>
+
+<!-- Slide 8: Humour - Injection -->
+<section class="joke-slide">
+    <p class="emoji-big">💉</p>
+    <h2>L'injection de dépendances<br>c'est comme la médecine :</h2>
+    <p class="fragment big" style="margin-top: 0.5em;">Bien faite, ça ne fait pas mal.</p>
+    <p class="fragment big">Mal faite, vous avez une <code>NullPointerException</code>.</p>
+    <p class="fragment medium" style="color: #999; margin-top: 1em;">
+        Et avec CDI 4.1, on a même l'injection... <em>à la compilation</em>.
+    </p>
+    <aside class="notes">
+        Petite pause humour pour laisser le slide d'architecture infuser. L'injection est un art -- et comme tout art, il y a les artistes et les bouchers.
+
+        Ça prépare la transition vers CDI 4.1 et les Build Compatible Extensions.
+    </aside>
+</section>
+
+<!-- Slide 9: CDI 4.1 Build Compatible Extensions -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>CDI 4.1 : Build Compatible Extensions</h2>
+    <div class="two-col">
+        <div class="box">
+            <h3>Portable Extension</h3>
+            <p class="medium">Traitement au runtime</p>
+            <p class="small">WildFly, Payara, GlassFish, Liberty</p>
+            <pre><code class="language-java" data-trim data-noescape>
+void processAnnotatedType(
+  @Observes
+  ProcessAnnotatedType&lt;?&gt; pat) {
+    // Scan au runtime
+}
+            </code></pre>
+        </div>
+        <div class="box box-blue">
+            <h3 style="color: var(--accent-blue);">Build Compatible Ext.</h3>
+            <p class="medium">Traitement à la compilation</p>
+            <p class="small">Quarkus, Helidon</p>
+            <pre><code class="language-java" data-trim data-noescape>
+@Enhancement(
+  types = RegisterAIService.class,
+  withAnnotations = RegisterAIService.class)
+void enhance(ClassConfig cfg) {
+    // Enrichissement au build
+}
+            </code></pre>
+        </div>
+    </div>
+    <p class="fragment medium" style="margin-top: 0.5em;">
+        <span class="accent">langchain4j-cdi</span> fournit <strong>les deux</strong> — c'est <em>transparent</em> pour vous 🎉
+    </p>
+    <p class="fragment medium" style="margin-top: 0.3em;">
+        Oui, ça tourne aussi sur <span class="accent-green">Quarkus</span>.
+        <span class="fragment">Ils peuvent mettre leur extension à la retraite. 😏</span>
+    </p>
+    <aside class="notes">
+        Emmanuel explique la dualité des extensions CDI ici.
+
+        CDI 4.1 a introduit les Build Compatible Extensions -- une API plus simple et performante pour créer des extensions. Quarkus et Helidon les utilisent pour le traitement à la compilation.
+
+        Les serveurs traditionnels comme WildFly utilisent les Portable Extensions, qui font le même travail au runtime.
+
+        langchain4j-cdi fournit les deux implémentations. C'est complètement transparent : vous ne changez rien dans votre code, le bon module s'active selon votre serveur.
+
+        Et oui, ça tourne aussi sur Quarkus ! Donc techniquement, ils pourraient mettre leur propre extension LangChain4j à la retraite... (pause, sourire) -- mais ne leur disons pas tout de suite. Attendons qu'ils nous paient un dîner d'abord.
+    </aside>
+</section>
+
+<!-- Slide 10: Architecture sous le capot -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>Sous le capot 🔧</h2>
+    <div style="font-size: 0.75em; text-align: left; max-width: 700px; margin: 0 auto;">
+        <p><strong>1.</strong> L'extension scanne pour <code>@RegisterAIService</code></p>
+        <p class="fragment"><strong>2.</strong> Pour chaque interface trouvée, elle lit les attributs :<br>
+            <code>chatModelName</code>, <code>tools</code>, <code>chatMemoryProviderName</code>, <code>retrievalAugmentorName</code>
+        </p>
+        <p class="fragment"><strong>3.</strong> Elle crée un <strong>bean CDI synthétique</strong> :<br>
+            → Proxy LangChain4j enrobé dans un bean CDI managé
+        </p>
+        <p class="fragment"><strong>4.</strong> Les composants sont résolus via un <strong>SPI</strong> (<code>LLMConfig</code>) :<br>
+            <code>dev.langchain4j.cdi.plugin.&lt;name&gt;.class=...</code><br>
+            <small style="color: #81c784;">→ Implémentation <strong>MicroProfile Config</strong> fournie par <code>langchain4j-cdi-config</code></small>
+            <small style="color: #81c784;">→ Implémentation <strong>WildFly</strong> fournie par <code>wildfly-ai-feature-pack</code></small>
+        </p>
+        <p class="fragment"><strong>5.</strong> <code>@Inject Assistant assistant;</code> → ✨ Ça marche !</p>
+    </div>
+    <aside class="notes">
+        Détaillons le mécanisme.
+
+        Au démarrage (ou à la compilation pour Quarkus), l'extension CDI scanne le classpath. Dès qu'elle trouve une interface annotée avec @RegisterAIService, elle crée un bean synthétique.
+
+        Ce bean est en fait un proxy LangChain4j enrobé dans un wrapper CDI. Quand vous faites @Inject, CDI vous donne ce proxy, et quand vous appelez une méthode, LangChain4j fait le reste : appel LLM, gestion mémoire, RAG, etc.
+
+        Point important : le cœur de langchain4j-cdi ne dépend PAS de MicroProfile Config. Il utilise un SPI -- LLMConfig -- qui est découvert via ServiceLoader. Ce SPI fournit les clés et valeurs de configuration. MicroProfile Config est juste UNE implémentation possible, fournie par le module langchain4j-cdi-config.
+    </aside>
+</section>
+
+<!-- Slide 11: Configuration MicroProfile Config -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>Configuration : MicroProfile Config</h2>
+    <pre><code class="language-properties" data-trim>
+# Configuration du modèle
+dev.langchain4j.cdi.plugin.my-model.class=\
+    dev.langchain4j.model.openai.OpenAiChatModel
+dev.langchain4j.cdi.plugin.my-model.config.api-key=${OPENAI_API_KEY}
+dev.langchain4j.cdi.plugin.my-model.config.model-name=gpt-4o
+
+# Configuration de la mémoire
+dev.langchain4j.cdi.plugin.my-memory.class=\
+    dev.langchain4j.memory.chat.MessageWindowChatMemory
+dev.langchain4j.cdi.plugin.my-memory.config.max-messages=20
+
+# Liaison vers d'autres beans : lookup:@default, lookup:@all, lookup:name
+dev.langchain4j.cdi.plugin.my-retriever.config.embeddingStore=\
+    lookup:@default
+    </code></pre>
+    <p class="fragment small">Pas de code, juste des properties. <span class="accent">On est en 2026.</span></p>
+    <p class="fragment small" style="margin-top: 0.5em; color: #999;">
+        <em>Alternative WildFly :</em> Le subsystem AI WildFly permet aussi la configuration via standalone.xml
+    </p>
+    <aside class="notes">
+        Toute la configuration est externalisée dans les properties MicroProfile Config.
+
+        Le pattern est simple : dev.langchain4j.cdi.plugin, le nom du bean, .class pour le type, puis .config.property pour les paramètres du builder.
+
+        Le truc puissant c'est le lookup : vous pouvez référencer d'autres beans CDI directement depuis la config. lookup:@default pour le bean par défaut, lookup:@all pour tous, ou lookup:name pour un bean nommé.
+
+        Zéro code pour la configuration. On est en 2026, les amis -- pas en 2006.
+
+        NOTE : Pour WildFly, il y a aussi le subsystem WildFly AI qui permet de configurer les modèles et MCP directement dans standalone.xml. C'est une intégration native au serveur, très puissante pour les déploiements enterprise. On le verra en démo 3.
+    </aside>
+</section>
+
+<!-- ============================================= -->
+<!-- SECTION 3: DEMO 1 - Basic injection (Yann)    -->
+<!-- ============================================= -->
+
+<!-- Slide 12: Intro Demo 1 -->
+<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
+    <span class="speaker-tag speaker-yann">Yann</span>
+    <p class="demo-banner">🎬 DEMO 1</p>
+    <h2>@RegisterAIService en action</h2>
+    <div style="font-size: 0.85em; text-align: left; max-width: 700px; margin: 0 auto;">
+        <p>✅ Chat simple avec @RegisterAIService</p>
+        <p class="fragment">✅ Streaming : réponses en temps réel 🎬</p>
+        <p class="fragment">✅ Vision : analyse d'images 📸</p>
+    </div>
+    <p class="fragment small" style="color: #999; margin-top: 1em;">
+        <em>On bascule sur IntelliJ...</em><br>
+        (Si IntelliJ refuse de coopérer, on a des slides de secours 😅)
+    </p>
+    <aside class="notes">
+        Bon, à mon tour ! On bascule sur IntelliJ -- croisons les doigts pour que les dieux de la démo soient avec nous.
+
+        Trois exemples qui montrent la puissance de langchain4j-cdi en action :
+        1. Chat basique avec injection CDI
+        2. Streaming pour des réponses en temps réel (l'effet ChatGPT)
+        3. Analyse d'images avec un modèle vision multimodal
+
+        CHECKLIST DEMO :
+        1. Ouvrir le projet demo-1-ai-agent dans IntelliJ
+        2. Montrer l'interface ChatAssistant avec @RegisterAIService
+        3. Montrer l'endpoint JAX-RS avec @Inject
+        4. Montrer ChatAssistantStreaming avec TokenStream
+        5. Montrer ImageAnalyzerServlet avec le modèle vision
+        6. Montrer le microprofile-config.properties
+        7. Démarrer WildFly
+        8. Tester le chat basique
+        9. Tester le streaming (stream.html) avec la saga Viking
+        10. Tester l'analyse d'image (image.html) avec une photo
+
+        Si la démo plante : les slides de secours suivent.
+    </aside>
+</section>
+
+<!-- Slide 13: Demo 1 - Slide de secours : Interface -->
+<section data-visibility="uncounted">
+    <h2>L'interface AI Service</h2>
+    <pre><code class="language-java" data-trim>
+package com.example.demo1;
+
+import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.cdi.RegisterAIService;
+
+@RegisterAIService(chatModelName = "my-model")
+public interface ChatAssistant {
+
+    @SystemMessage("""
+        You are a Viking skald performing in the great hall.
+        You tell jokes about warriors, longships, axes,
+        and the epic chaos of Viking raids. Your humor is sharp,
+        self-deprecating, and full of Norse bravado.
+        """)
+    String chat(@UserMessage String userMessage);
+}
+    </code></pre>
+    <aside class="notes">
+        SECOURS si la démo ne marche pas.
+
+        Voici l'interface. C'est un contrat : on définit ce que l'IA fait, pas comment. Le "comment" est géré par CDI et LangChain4j.
+
+        @SystemMessage définit le comportement de l'IA -- ici un skald Viking qui raconte des blagues. @UserMessage marque le paramètre de l'utilisateur. @RegisterAIService dit à CDI de créer un bean pour cette interface.
+
+        C'est volontairement léger et humoristique pour montrer qu'on peut créer N'IMPORTE QUEL type d'agent IA avec ce pattern -- un skald Viking, un bot de support technique, ce que vous voulez.
+    </aside>
+</section>
+
+<!-- Slide 14: Demo 1 - Secours : JAX-RS -->
+<section data-visibility="uncounted">
+    <h2>L'endpoint REST</h2>
+    <pre><code class="language-java" data-trim>
+@Path("/chat")
+@ApplicationScoped
+public class ChatResource {
+
+    @Inject
+    ChatAssistant assistant;  // ← Injection CDI, classique !
+
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String chat(String message) {
+        return assistant.chat(message);
+    }
+}
+    </code></pre>
+    <p class="fragment accent medium">Aucune dépendance LangChain4j dans votre code métier !</p>
+    <aside class="notes">
+        Et voilà l'endpoint REST. @Inject ChatAssistant -- c'est toute l'intégration.
+
+        Remarquez : le code métier a ZERO dépendance vers LangChain4j. Le seul import c'est votre propre interface. Vous changez de framework d'IA demain ? Changez l'implémentation, pas le code métier.
+
+        C'est l'inversion de contrôle poussée à sa conclusion logique.
+    </aside>
+</section>
+
+<!-- Slide 14.1: Demo 1 - Streaming -->
+<section>
+    <span class="speaker-tag speaker-yann">Yann</span>
+    <h2>Streaming : réponses en temps réel</h2>
+    <pre><code class="language-java" data-trim>
+@RegisterAIService(streamingChatModelName = "my-streaming-model")
+public interface ChatAssistantStreaming {
+
+    @SystemMessage("You are a creative assistant...")
+    TokenStream chatStream(@UserMessage String userMessage);
+}
+    </code></pre>
+    <pre class="fragment"><code class="language-java" data-trim>
+// Dans l'endpoint JAX-RS avec Server-Sent Events
+@GET
+@Path("/stream")
+@Produces(MediaType.SERVER_SENT_EVENTS)
+public void chatStream(@QueryParam("message") String message,
+                       @Context SseEventSink sink, @Context Sse sse) {
+    TokenStream tokenStream = streamingAssistant.chatStream(message);
+
+    tokenStream
+        .onPartialResponse(token -> sink.send(sse.newEvent("token", token)))
+        .onCompleteResponse(resp -> { sink.send(sse.newEvent("done", ""));
+                                       sink.close(); })
+        .onError(error -> { sink.send(sse.newEvent("error", error.getMessage()));
+                            sink.close(); })
+        .start();
+}
+    </code></pre>
+    <p class="fragment small accent">Effet ChatGPT : les tokens arrivent au fur et à mesure ! 🎬</p>
+    <aside class="notes">
+        Le streaming permet d'afficher les réponses token par token, comme dans ChatGPT.
+
+        La différence par rapport au mode classique : on utilise streamingChatModelName au lieu de chatModelName, et la méthode retourne un TokenStream au lieu d'un String.
+
+        Le TokenStream s'intègre parfaitement avec les Server-Sent Events de JAX-RS. Chaque token est envoyé au navigateur dès qu'il arrive du LLM.
+
+        L'expérience utilisateur est bien meilleure : l'utilisateur voit la réponse se construire en temps réel au lieu d'attendre 10 secondes pour tout recevoir d'un coup.
+
+        DEMO : montrer stream.html avec une saga Viking qui s'affiche progressivement.
+    </aside>
+</section>
+
+<!-- Slide 14.2: Demo 1 - Vision/Multimodal -->
+<section>
+    <span class="speaker-tag speaker-yann">Yann</span>
+    <h2>Vision : analyse d'images</h2>
+    <pre><code class="language-java" data-trim>
+@WebServlet("/uploadServlet")
+@MultipartConfig
+public class ImageAnalyzerServlet extends HttpServlet {
+
+    @Inject
+    @Named("vision-model")
+    ChatModel visionModel;  // ← Un simple ChatModel !
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                         HttpServletResponse response) throws ... {
+        Part file = request.getPart("file");
+
+        UserMessage userMessage = UserMessage.from(
+            TextContent.from("Describe this image in detail"),
+            ImageContent.from(encodeBase64(file.getInputStream()),
+                            file.getContentType())
+        );
+
+        ChatResponse answer = visionModel.chat(userMessage);
+        response.getWriter().write(answer.aiMessage().text());
+    }
+}
+    </code></pre>
+    <p class="fragment small"><span class="accent">Multimodal</span> = texte + image dans le même message</p>
+    <aside class="notes">
+        L'IA multimodale, c'est la capacité d'analyser des images en plus du texte.
+
+        Avec LangChain4j-CDI, c'est incroyablement simple : on injecte un ChatModel configuré pour utiliser un modèle vision (comme llama3.2-vision ou GPT-4 Vision).
+
+        Le point important : UserMessage.from() peut prendre plusieurs contents -- TextContent pour le texte, ImageContent pour l'image. L'image doit être encodée en base64.
+
+        Le modèle vision analyse l'image et répond en texte. Ça marche pour décrire des images, extraire du texte (OCR), identifier des objets, analyser des graphiques...
+
+        Configuration : dans microprofile-config.properties, on déclare le vision-model avec la classe de modèle vision appropriée.
+
+        DEMO : montrer image.html, uploader une photo, voir la description générée par l'IA.
+    </aside>
+</section>
+
+<!-- Slide 14.3: Config pour Streaming et Vision -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>Configuration : Streaming & Vision</h2>
+    <pre><code class="language-properties" data-trim>
+# Configuration du modèle streaming
+dev.langchain4j.cdi.plugin.my-streaming-model.class=\
+    dev.langchain4j.model.openai.OpenAiStreamingChatModel
+dev.langchain4j.cdi.plugin.my-streaming-model.config.api-key=${OPENAI_API_KEY}
+dev.langchain4j.cdi.plugin.my-streaming-model.config.model-name=gpt-4o
+
+# Configuration du modèle vision (via CDI @Named)
+dev.langchain4j.cdi.plugin.vision-model.class=\
+    dev.langchain4j.model.ollama.OllamaChatModel
+dev.langchain4j.cdi.plugin.vision-model.config.base-url=http://localhost:11434
+dev.langchain4j.cdi.plugin.vision-model.config.model-name=llama3.2-vision
+dev.langchain4j.cdi.plugin.vision-model.config.timeout=PT5M
+    </code></pre>
+    <p class="fragment small">
+        <span class="accent-blue">streamingChatModelName</span> pour le streaming<br>
+        <span class="accent-green">@Named + ChatModel</span> pour l'injection directe de modèle
+    </p>
+    <aside class="notes">
+        Emmanuel explique les configurations.
+
+        Pour le streaming : on utilise un StreamingChatModel au lieu d'un ChatModel classique. OpenAI, Ollama, et la plupart des providers supportent le streaming.
+
+        Pour la vision : vous pouvez soit utiliser @RegisterAIService avec un chatModelName, soit injecter le ChatModel directement avec @Named. Ici on montre l'injection directe, pratique dans une Servlet.
+
+        Point important : les modèles vision sont souvent plus lents, d'où le timeout de 5 minutes (PT5M). Pour Ollama, llama3.2-vision est un bon choix gratuit et local. Pour OpenAI, gpt-4o ou gpt-4-vision-preview.
+
+        Avec cette config, CDI crée automatiquement les beans nécessaires, et vous pouvez les injecter où vous voulez.
+    </aside>
+</section>
+
+<!-- Slide 14.4: Récap Demo 1 -->
+<section>
+    <span class="speaker-tag speaker-yann">Yann</span>
+    <h2>Ce qu'on vient de voir</h2>
+    <div class="two-col" style="font-size: 0.85em;">
+        <div class="box">
+            <h3>💬 Chat classique</h3>
+            <p class="small">@RegisterAIService<br>+ @Inject<br>= Skald Viking ⚔️🎤</p>
+        </div>
+        <div class="box box-blue">
+            <h3 style="color: var(--accent-blue);">🎬 Streaming</h3>
+            <p class="small">TokenStream<br>+ Server-Sent Events<br>= Saga Viking en live 🎵</p>
+        </div>
+    </div>
+    <div class="box" style="margin-top: 1em; font-size: 0.85em;">
+        <h3>📸 Vision multimodale</h3>
+        <p class="small">
+            TextContent + ImageContent<br>
+            = Analyse d'images avec l'IA
+        </p>
+    </div>
+    <p class="fragment accent medium" style="margin-top: 1em;">
+        Tout ça avec CDI. Zéro code de plomberie. 🎉
+    </p>
+    <aside class="notes">
+        Récap rapide de ce qu'on vient de montrer. Trois patterns, tous propulsés par CDI :
+
+        1. Chat classique avec @RegisterAIService et @Inject -- un skald Viking qui raconte des blagues (pattern de base)
+        2. Streaming avec TokenStream et SSE -- une saga Viking qui s'affiche progressivement (meilleure UX)
+        3. Vision avec ImageContent -- analyser des images avec l'IA multimodale
+
+        Le thème Viking c'est juste pour montrer qu'on peut créer N'IMPORTE QUEL type d'agent IA avec ce pattern. Un bot de support technique, un chatbot client, un générateur de code, un skald Viking... le pattern est le même.
+
+        Le vrai message : dans les trois cas, CDI gère tout. Pas de code de connexion, pas de config manuelle, pas de gestion de cycle de vie. Vous déclarez ce que vous voulez, CDI l'injecte.
+
+        Et maintenant qu'on a vu les bases, passons aux fonctionnalités avancées : Memory, RAG, Tools, MCP.
+    </aside>
+</section>
+
+<!-- ============================================= -->
+<!-- SECTION 4: PROGRESSIVE FEATURES (Alternating) -->
+<!-- ============================================= -->
+
+<!-- Slide 15: Transition humour -->
+<section class="joke-slide">
+    <p class="emoji-big">🧠</p>
+    <h2>Un LLM sans mémoire...</h2>
+    <p class="fragment big">...c'est comme un développeur le lundi matin.</p>
+    <p class="fragment medium" style="color: #999;">
+        Il a oublié tout ce qu'il savait vendredi.
+    </p>
+    <p class="fragment accent-blue">Heureusement, on a <code>ChatMemory</code> !</p>
+    <aside class="notes">
+        Transition rapide. Un LLM sans état c'est comme parler à quelqu'un qui a l'amnésie -- chaque message est un nouveau départ. Il vous faut de la mémoire pour des conversations cohérentes. Comme nous avant que le café du matin fasse effet.
+    </aside>
+</section>
+
+<!-- Slide 16: Mémoire -->
+<section>
+    <span class="speaker-tag speaker-yann">Yann</span>
+    <h2>Mémoire de conversation</h2>
+    <pre><code class="language-java" data-trim>
+@RegisterAIService(chatModelName = "my-model",
+                   chatMemoryProviderName = "my-memory")
+public interface ChatAssistant {
+    String chat(@MemoryId String sessionId,
+                @UserMessage String message);
+}
+    </code></pre>
+    <pre class="fragment"><code class="language-properties" data-trim>
+# microprofile-config.properties
+dev.langchain4j.cdi.plugin.my-memory.class=\
+    dev.langchain4j.memory.chat.MessageWindowChatMemory
+dev.langchain4j.cdi.plugin.my-memory.config.max-messages=20
+    </code></pre>
+    <p class="fragment small">
+        <code>@MemoryId</code> → une mémoire par session / utilisateur
+    </p>
+    <aside class="notes">
+        Ajouter de la mémoire c'est juste un attribut dans l'annotation plus une entrée de config.
+
+        @MemoryId permet d'avoir une mémoire par session utilisateur. Chaque utilisateur a son propre historique de conversation.
+
+        Vous pouvez utiliser MessageWindowChatMemory (les N derniers messages) ou TokenWindowChatMemory (basé sur le nombre de tokens).
+
+        Et si vous voulez persister la mémoire ? Redis, base de données... c'est juste un bean CDI à fournir.
+    </aside>
+</section>
+
+<!-- Slide 17: RAG -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>RAG : Retrieval Augmented Generation</h2>
+    <div class="box" style="text-align: left; font-size: 0.8em;">
+        <p>📄 Vos documents → 🔢 Embeddings → 💾 Vector Store</p>
+        <p>❓ Question utilisateur → 🔍 Recherche → 📋 Contexte → 🤖 LLM</p>
+    </div>
+    <pre class="fragment"><code class="language-java" data-trim>
+@RegisterAIService(chatModelName = "my-model",
+                   contentRetrieverName = "my-rag")
+public interface KnowledgeAssistant {
+
+    @SystemMessage("Answer based on the provided context")
+    String answer(@UserMessage String question);
+}
+    </code></pre>
+    <pre class="fragment"><code class="language-java" data-trim>
+@ApplicationScoped
+public class KnowledgeBaseProvider {
+    @Inject ConferenceRepository repository;
+
+    @Produces @Named("my-rag") @ApplicationScoped
+    public ContentRetriever contentRetriever() {
+        // EmbeddingModel + InMemoryEmbeddingStore + ingestion
+        return EmbeddingStoreContentRetriever.builder()
+                .embeddingStore(store)
+                .embeddingModel(embeddingModel)
+                .maxResults(3).build();
+    }
+}
+    </code></pre>
+    <aside class="notes">
+        Emmanuel prend le relais.
+
+        RAG c'est ce qui permet à votre IA de répondre sur VOS données -- pas les données d'entraînement du modèle, mais vos docs internes, votre base de connaissances. C'est là que l'IA enterprise devient réelle.
+
+        Le pattern : ajoutez contentRetrieverName dans @RegisterAIService, et fournissez un producer CDI @Named qui crée le ContentRetriever.
+
+        Le producer crée un EmbeddingModel (ici Ollama), un InMemoryEmbeddingStore, ingère les documents, et retourne un EmbeddingStoreContentRetriever.
+
+        Pour le store, vous avez le choix : Qdrant, Chroma, pgvector, ou même Infinispan si vous êtes dans la famille Red Hat (regard vers Emmanuel).
+    </aside>
+</section>
+
+<!-- Slide 18: Tools / Function Calling -->
+<section>
+    <span class="speaker-tag speaker-yann">Yann</span>
+    <h2>Tools : Function Calling</h2>
+    <pre><code class="language-java" data-trim>
+@ApplicationScoped
+public class ExpeditionTools {
+
+    @Inject
+    ExpeditionService expeditionService;
+
+    @Tool("List available Viking expeditions for a given date")
+    public List&lt;Expedition&gt; listExpeditions(
+            @P("Date in yyyy-MM-dd format") String date) {
+        return expeditionService.getExpeditions(LocalDate.parse(date));
+    }
+
+    @Tool("Enroll a warrior in an expedition")
+    public Enrollment enrollWarrior(
+            @P("Warrior name") String name,
+            @P("Desired date") String date) {
+        return expeditionService.enroll(name, LocalDate.parse(date));
+    }
+}
+    </code></pre>
+    <p class="fragment small">
+        Les Tools sont des <strong>beans CDI</strong> → injection de dépendances dans les tools ! 🎉
+    </p>
+    <aside class="notes">
+        Les Tools c'est LA fonctionnalité killer. Ils permettent à l'IA d'appeler votre vrai code métier -- pas des données mockées, vos vrais services.
+
+        Et comme les Tools sont des beans CDI, ils peuvent injecter d'autres services ! ExpeditionService, WarriorRepository, EmailSender... tout ce qui est dans votre conteneur CDI est utilisable.
+
+        C'est là que langchain4j-cdi brille vraiment par rapport à l'approche manuelle : vos tools sont managés, transactionnels, observables. Qualité enterprise dès le départ.
+    </aside>
+</section>
+
+<!-- ============================================= -->
+<!-- SECTION 5: PRODUCTION READY (Emmanuel)        -->
+<!-- ============================================= -->
+
+<!-- Slide 19: Transition humour -->
+<section class="joke-slide">
+    <p class="emoji-big">🔥</p>
+    <h2>Ça marche en local !</h2>
+    <p class="fragment big">Mais en prod, le LLM a décidé<br>de répondre en Klingon.</p>
+    <p class="fragment medium" style="color: #999;">
+        Et votre endpoint timeout après 30 secondes.
+    </p>
+    <p class="fragment accent-green">On a besoin de <strong>garde-fous</strong> !</p>
+    <aside class="notes">
+        On est tous passés par là. Ça marche en dev, chaos en prod. Les LLMs empirent le truc -- ils sont non-déterministes, dépendent de services externes, et coûtent de l'argent réel à chaque appel.
+
+        Mais bonne nouvelle : MicroProfile a déjà résolu exactement ces problèmes pour les microservices. On réutilise juste les mêmes patterns éprouvés au combat.
+    </aside>
+</section>
+
+<!-- Slide 20: Fault Tolerance -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>MicroProfile Fault Tolerance</h2>
+    <pre><code class="language-java" data-trim>
+@RegisterAIService(chatModelName = "my-model")
+public interface ResilientAssistant {
+
+    @Retry(maxRetries = 3, delay = 1000)
+    @Timeout(value = 30, unit = ChronoUnit.SECONDS)
+    @Fallback(fallbackMethod = "fallbackChat")
+    @CircuitBreaker(requestVolumeThreshold = 5,
+                    failureRatio = 0.5)
+    String chat(@UserMessage String message);
+
+    default String fallbackChat(String message) {
+        return "Service temporarily unavailable. "
+             + "Please try again in a moment.";
+    }
+}
+    </code></pre>
+    <aside class="notes">
+        Emmanuel ici. C'est le slide qui rend les équipes ops heureuses.
+
+        Regardez la beauté de CDI : les annotations MicroProfile Fault Tolerance fonctionnent directement sur vos AI Services. Pas de code de glue, pas d'adaptateurs.
+
+        @Retry : le LLM timeout ou retourne une erreur ? Retry 3 fois automatiquement.
+        @Timeout : plafond à 30 secondes -- pas de requêtes incontrôlées.
+        @CircuitBreaker : après 5 appels avec 50% d'échecs, on coupe le circuit. Protection de votre système.
+        @Fallback : dégradation gracieuse quand tout part en vrille.
+
+        Tout ça existe déjà dans MicroProfile. On n'a rien inventé de nouveau. On a juste... injecté.
+    </aside>
+</section>
+
+<!-- Slide 21: Telemetry -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>MicroProfile Telemetry</h2>
+    <div class="two-col">
+        <div class="box">
+            <h3>Traces</h3>
+            <p class="medium">OpenTelemetry natif</p>
+            <ul class="checklist">
+                <li>Latence LLM</li>
+                <li>Tokens in/out</li>
+                <li>Appels tools</li>
+                <li>Chaîne RAG</li>
+            </ul>
+        </div>
+        <div class="box box-blue">
+            <h3 style="color: var(--accent-blue);">Métriques</h3>
+            <p class="medium">Grafana LGTM</p>
+            <ul class="checklist">
+                <li>Coût par requête</li>
+                <li>Taux d'erreur</li>
+                <li>Temps de réponse</li>
+                <li>Circuit breaker</li>
+            </ul>
+        </div>
+    </div>
+    <pre class="fragment"><code class="language-xml" data-trim>
+&lt;!-- Il suffit d'ajouter la dépendance --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;dev.langchain4j.cdi.mp&lt;/groupId&gt;
+    &lt;artifactId&gt;langchain4j-cdi-telemetry&lt;/artifactId&gt;
+&lt;/dependency&gt;
+    </code></pre>
+    <aside class="notes">
+        La télémétrie -- c'est ce qui vous permet de dormir la nuit quand l'IA tourne en production.
+
+        Le module langchain4j-cdi-telemetry s'intègre avec MicroProfile Telemetry / OpenTelemetry. Une dépendance Maven et c'est bon.
+
+        Vous avez des traces distribuées : chaque appel LLM, chaque recherche RAG, chaque appel tool est tracé. Vous voyez les tokens consommés, la latence, les erreurs.
+
+        Pour la visualisation, on utilise Grafana LGTM (Loki + Grafana + Tempo + Mimir) -- un stack tout-en-un. Une seule commande podman et vous avez tout : traces, métriques, logs, et Grafana pour tout visualiser.
+    </aside>
+</section>
+
+<!-- Slide 21.1: Configuration OpenTelemetry -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>Configuration OpenTelemetry</h2>
+    <pre><code class="language-properties" data-trim>
+# MicroProfile OpenTelemetry - OTLP Exporter
+otel.exporter.otlp.endpoint=http://localhost:4318
+otel.service.name=demo-2-langchain4j-cdi
+otel.traces.exporter=otlp
+otel.metrics.exporter=otlp
+
+# LangChain4j-CDI Telemetry - Listeners
+dev.langchain4j.cdi.plugin.my-model.config.listeners=\
+    dev.langchain4j.cdi.telemetry.SpanChatModelListener,\
+    dev.langchain4j.cdi.telemetry.MetricsChatModelListener
+    </code></pre>
+    <p class="fragment medium" style="margin-top: 1em;">
+        Les listeners capturent automatiquement toutes les interactions IA
+    </p>
+    <aside class="notes">
+        Configuration en deux parties.
+
+        Première partie : MicroProfile Telemetry. On configure l'endpoint OTLP (port 4318 HTTP), le nom du service, et les exporters pour les traces et métriques.
+
+        Deuxième partie : les listeners LangChain4j-CDI. On les ajoute à la config du modèle. Il y en a deux : SpanChatModelListener pour créer des spans de trace distribuée, et MetricsChatModelListener pour capturer les métriques (tokens, durée, etc.).
+
+        Ces listeners sont des intercepteurs qui capturent automatiquement chaque appel LLM : prompt, réponse, tokens, durée, erreurs, tout. Zéro code à écrire, juste de la configuration.
+    </aside>
+</section>
+
+<!-- Slide 21.2: Démarrer Grafana LGTM -->
+<section>
+    <span class="speaker-tag speaker-yann">Yann</span>
+    <h2>Grafana LGTM : une seule commande</h2>
+    <pre><code class="language-bash" data-trim>
+# Démarrer le stack d'observabilité complet
+podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 \
+           --rm -ti grafana/otel-lgtm
+    </code></pre>
+    <div class="fragment" style="margin-top: 1em;">
+        <p class="medium">🎁 <span class="accent">LGTM</span> = Loki + Grafana + Tempo + Mimir</p>
+        <div class="box" style="font-size: 0.8em; text-align: left; margin-top: 0.5em;">
+            <p>✅ <strong>Tempo</strong> : stockage des traces</p>
+            <p>✅ <strong>Loki</strong> : agrégation des logs</p>
+            <p>✅ <strong>Mimir</strong> : métriques time-series</p>
+            <p>✅ <strong>Grafana</strong> : visualisation unifiée</p>
+            <p>✅ <strong>OTLP Collector</strong> : intégré sur les ports 4317/4318</p>
+        </div>
+    </div>
+    <p class="fragment accent medium" style="margin-top: 1em;">
+        Ouvrir http://localhost:3000 → Explore → Tempo 📊
+    </p>
+    <aside class="notes">
+        Pour la démo, on a besoin de visualiser les traces. Grafana LGTM c'est LA solution tout-en-un.
+
+        Une seule commande podman run (ou docker run), trois ports exposés, et vous avez un stack d'observabilité complet.
+
+        LGTM = Loki, Grafana, Tempo, Mimir. Tout est pré-configuré : datasources, connexions, tout marche out of the box.
+
+        Port 3000 pour l'UI Grafana, ports 4317 et 4318 pour recevoir les traces OTLP (gRPC et HTTP).
+
+        Dans Grafana, allez dans Explore, sélectionnez Tempo, cherchez votre service "demo-2-langchain4j-cdi", et boom : vous voyez toutes les traces avec latence, tokens, appels tools, circuit breaker en action.
+
+        C'est magique pour les démos parce que c'est zéro config, zéro YAML à écrire, juste une commande.
+    </aside>
+</section>
+
+<!-- ============================================= -->
+<!-- SECTION 6: DEMO 2 (Yann)                      -->
+<!-- ============================================= -->
+
+<!-- Slide 22: Demo 2 -->
+<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
+    <span class="speaker-tag speaker-yann">Yann</span>
+    <p class="demo-banner">🎬 DEMO 2</p>
+    <h2>L'assistant d'expédition Viking</h2>
+    <p class="medium" style="color: #ccc;">Memory + RAG + Tools + Fault Tolerance + Telemetry</p>
+    <div style="font-size: 0.85em; text-align: left; max-width: 600px; margin: 0.8em auto;">
+        <p class="fragment">🧠 Mémoire par session (<code>@MemoryId</code>)</p>
+        <p class="fragment">📄 RAG sur les expéditions (<code>contentRetrieverName</code>)</p>
+        <p class="fragment">🔧 Tools d'inscription (<code>@Tool</code> + CDI)</p>
+        <p class="fragment">🛡️ Fault Tolerance via live coding !</p>
+    </div>
+    <aside class="notes">
+        Démo 2 ! C'est là que tout se réunit -- un assistant d'expédition Viking complet avec toutes les fonctionnalités.
+
+        CHECKLIST DEMO :
+        1. cd demo-project/demo-2-ft-telemetry/base && mvn clean wildfly:dev
+        2. Montrer que Memory + RAG + Tools marchent déjà
+        3. Test : curl -X POST -H "Content-Type: text/plain" -H "X-Session-Id: test" -d "What does the LangChain4j-CDI session cover?" http://localhost:8080/demo-2/api/chat
+        4. Ajouter les annotations FT en live : @Retry, @Timeout, @Fallback, @CircuitBreaker
+        5. Hot-reload, tuer Ollama, montrer le fallback
+        6. Redémarrer Ollama, montrer le retry
+
+        SECOURS : cd demo-2-ft-telemetry/solution && mvn clean wildfly:dev
+    </aside>
+</section>
+
+<!-- Slide 23: Récap des modules -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>Les modules langchain4j-cdi</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8em; font-size: 0.8em;">
+        <div class="box">
+            <span class="badge badge-orange">core</span>
+            <p>langchain4j-cdi</p>
+            <p class="small">API + annotations</p>
+        </div>
+        <div class="box">
+            <span class="badge badge-blue">portable</span>
+            <p>langchain4j-cdi-portable-ext</p>
+            <p class="small">WildFly, Payara, GlassFish, Liberty</p>
+        </div>
+        <div class="box">
+            <span class="badge badge-green">build</span>
+            <p>langchain4j-cdi-build-compatible-ext</p>
+            <p class="small">Quarkus, Helidon</p>
+        </div>
+        <div class="box">
+            <span class="badge badge-purple">résilience</span>
+            <p>langchain4j-cdi-fault-tolerance</p>
+            <p class="small">Retry, Timeout, CircuitBreaker...</p>
+        </div>
+        <div class="box">
+            <span class="badge badge-orange">observabilité</span>
+            <p>langchain4j-cdi-telemetry</p>
+            <p class="small">OpenTelemetry, métriques</p>
+        </div>
+        <div class="box" style="border: 1px dashed #555;">
+            <span class="badge" style="background: #555; color: #fff;">bientôt ?</span>
+            <p>langchain4j-cdi-security</p>
+            <p class="small">JWT, RBAC pour agents ?</p>
+        </div>
+    </div>
+    <aside class="notes">
+        Voici la carte des modules. Le core contient l'API et les annotations. Ensuite vous choisissez votre extension selon votre serveur.
+
+        Par-dessus : fault-tolerance et telemetry sont des modules optionnels. Vous ajoutez ce dont vous avez besoin, rien de plus.
+
+        Le dernier en pointillés... c'est une idée pour le futur. Sécurité pour les agents : qui a le droit d'appeler quel tool, quel LLM, etc. On y pense.
+    </aside>
+</section>
+
+<!-- Slide 24: Protocole MCP -->
+<section>
+    <span class="speaker-tag speaker-yann">Yann</span>
+    <h2>MCP : Model Context Protocol</h2>
+    <!-- Graphe de flux -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 0.4em; font-size: 0.75em; margin: 0.8em 0;">
+        <div class="box" style="padding: 0.6em 0.8em; text-align: center; border: 2px solid var(--accent-orange);">
+            <strong>🤖 Agent CDI</strong><br>
+            <code style="font-size: 0.8em;">@RegisterAIService</code>
+        </div>
+        <span style="font-size: 1.8em; color: var(--accent-orange);">→</span>
+        <div class="box" style="padding: 0.6em 0.8em; text-align: center; border: 2px solid var(--accent-purple);">
+            <strong>🔌 McpToolProvider</strong><br>
+            <code style="font-size: 0.8em;">toolProviderName</code>
+        </div>
+        <span style="font-size: 1.8em; color: var(--accent-purple);">→</span>
+        <div style="display: flex; flex-direction: column; gap: 0.3em;">
+            <div class="box" style="padding: 0.3em 0.6em; text-align: center; border: 1px solid var(--accent-blue);">
+                <span class="badge badge-blue" style="font-size: 0.8em;">stdio</span> 🔧 Processus local
+            </div>
+            <div class="box" style="padding: 0.3em 0.6em; text-align: center; border: 2px solid var(--accent-green); background: rgba(129, 199, 132, 0.1);">
+                <span class="badge badge-green" style="font-size: 0.8em;">HTTP streamable</span> 🌐 Serveur distant
+            </div>
+        </div>
+    </div>
+    <!-- Code -->
+    <pre class="fragment"><code class="language-java" data-trim>
+@RegisterAIService(chatModelName = "my-model",
+                   toolProviderName = "mcp-tools")
+public interface AgentWithMCP {
+    String execute(@UserMessage String task);
+}
+    </code></pre>
+    <pre class="fragment"><code class="language-properties" data-trim>
+# MicroProfile Config → McpToolProvider via HTTP streamable
+dev.langchain4j.cdi.plugin.mcp-tools.class=\
+    dev.langchain4j.mcp.McpToolProvider
+dev.langchain4j.cdi.plugin.mcp-tools.config.transport-type=http
+dev.langchain4j.cdi.plugin.mcp-tools.config.url=\
+    http://localhost:8081/mcp
+    </code></pre>
+    <p class="fragment small accent">
+        Zéro code de plomberie -- tout passe par les properties 🌍
+    </p>
+    <aside class="notes">
+        MCP -- Model Context Protocol -- c'est le standard ouvert pour connecter les agents IA aux outils externes. Pensez-y comme JDBC pour l'IA. Un protocole, n'importe quel serveur d'outils.
+
+        Le point important ici c'est le toolProviderName dans @RegisterAIService. C'est ce qui lie l'agent au McpToolProvider.
+
+        Configuration : deux approches possibles
+        1. Via MicroProfile Config (properties) -- exemple montré ici
+        2. Via le subsystem AI WildFly (standalone.xml) -- utilisé en démo 3
+
+        Deux transports principaux : stdio pour lancer un processus local (comme un jar MCP), ou HTTP streamable/SSE pour un serveur distant (c'est ce qu'on utilise dans notre démo 3).
+
+        Encore une fois, zéro code de plomberie : vous déclarez le serveur MCP (properties ou XML), CDI injecte le McpToolProvider, et l'agent découvre automatiquement les tools exposés par le serveur.
+
+        Ça ouvre la porte à tout l'écosystème des outils MCP : bases de données, APIs, filesystem, navigateurs web...
+    </aside>
+</section>
+
+<!-- ============================================= -->
+<!-- SECTION 7: DEMO 3 - MCP live (Yann)            -->
+<!-- ============================================= -->
+
+<!-- Slide 25: Demo 3 -->
+<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
+    <span class="speaker-tag speaker-yann">Yann</span>
+    <p class="demo-banner">🎬 DEMO 3</p>
+    <h2>Jeu de dés 421 avec MCP sur WildFly</h2>
+    <div style="font-size: 0.85em; text-align: left; max-width: 700px; margin: 0 auto;">
+        <p>🎲 <strong>Olaf le Chanceux</strong>, le maître des dés qui anime le jeu de 421</p>
+        <p class="fragment">✅ <span class="accent">Serveur MCP HTTP SSE</span> externe pour les lancers de dés</p>
+        <p class="fragment">✅ Agent IA avec <span class="accent-blue">@RegisterAIService</span> + McpToolProvider</p>
+        <p class="fragment">✅ Configuration via le <span class="accent-green">subsystem AI WildFly</span></p>
+        <p class="fragment">✅ Tout configuré dans <code>standalone.xml</code></p>
+    </div>
+    <p class="fragment medium accent" style="margin-top: 1em;">
+        Valhalla attend ! 421 sur WildFly ! 🐝⚔️
+    </p>
+    <aside class="notes">
+        Démo 3 : le jeu de dés 421 avec MCP sur WildFly !
+
+        Cette démo montre comment MCP connecte un agent IA à un serveur de lancer de dés externe via HTTP SSE (Server-Sent Events). C'est du vrai -- intégration d'outils au niveau protocole.
+
+        POINT CLÉ : Configuration via le subsystem AI WildFly
+
+        Le WildFly AI Feature Pack fournit un subsystem AI qui permet de configurer :
+        - Les modèles de chat (Ollama, OpenAI, etc.)
+        - Les clients MCP (SSE, stdio)
+        - Tout ça dans standalone.xml, pas dans microprofile-config.properties !
+
+        CHECKLIST DEMO :
+        1. Montrer standalone.xml - subsystem AI avec ollama-chat-model
+        2. Montrer standalone.xml - mcp-client-sse avec socket-binding mcp-sse (localhost:8090)
+        3. Montrer VikingDiceAI.java avec @RegisterAIService(chatModelName="ollama", toolProviderName="mcp")
+        4. Démarrer le serveur MCP HTTP SSE sur le port 8090
+        5. Builder l'application : mvn clean install
+        6. Démarrer WildFly provisionné : ./target/server/bin/standalone.sh
+        7. Ouvrir l'UI Viking à http://localhost:8080/demo-3/
+        8. Jouer une partie de 421 : "Roll the dice" -> Olaf utilise roll_multiple via MCP SSE
+        9. Montrer les logs WildFly avec les appels tools MCP
+
+        421 : chaque joueur lance 3 dés, meilleure combinaison gagne (421 > Brelan > Suite > Paire > Rien)
+
+        Si ça plante : "On dirait qu'Odin a d'autres plans !"
+    </aside>
+</section>
+
+<!-- Slide 25.1: Subsystem AI WildFly -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>Subsystem AI WildFly</h2>
+    <pre><code class="language-xml" data-trim data-noescape style="font-size: 0.65em;">
+&lt;!-- standalone.xml - Configuration du subsystem AI WildFly --&gt;
+&lt;subsystem xmlns="urn:jboss:domain:ai:1.0"&gt;
+    &lt;!-- Configuration du modèle Ollama --&gt;
+    &lt;chat-language-models&gt;
+        &lt;ollama-chat-model name="ollama"
+            base-url="http://127.0.0.1:11434"
+            model-name="llama3.1:8b"
+            temperature="0.9"
+            connect-timeout="600000"
+            log-requests="true"
+            log-responses="true"/&gt;
+    &lt;/chat-language-models&gt;
+
+    &lt;!-- Configuration du client MCP SSE --&gt;
+    &lt;mcp&gt;
+        &lt;mcp-tool-provider name="mcp" mcp-clients="mcp-sse"/&gt;
+        &lt;mcp-client-sse name="mcp-sse"
+            socket-binding="mcp-sse"
+            sse-path="/sse"
+            connect-timeout="6000000"
+            log-requests="true"
+            log-responses="true"/&gt;
+    &lt;/mcp&gt;
+&lt;/subsystem&gt;
+
+&lt;!-- Socket binding pour le serveur MCP --&gt;
+&lt;outbound-socket-binding name="mcp-sse"&gt;
+    &lt;remote-destination host="localhost" port="8090"/&gt;
+&lt;/outbound-socket-binding&gt;
+    </code></pre>
+    <p class="fragment small accent" style="margin-top: 0.8em;">
+        Configuration WildFly native -- Zéro properties ! 🚀
+    </p>
+    <aside class="notes">
+        Emmanuel explique le subsystem AI WildFly.
+
+        Le WildFly AI Feature Pack ajoute un nouveau subsystem "ai" à WildFly. C'est une extension native qui permet de configurer :
+
+        1. Les modèles de chat (chat-language-models) :
+           - ollama-chat-model : connexion vers Ollama avec base-url, model-name, temperature
+           - Supporte aussi OpenAI et d'autres providers
+
+        2. Les clients MCP :
+           - mcp-tool-provider : expose les tools MCP aux agents CDI
+           - mcp-client-sse : client MCP utilisant Server-Sent Events (HTTP SSE)
+           - socket-binding : pointe vers le serveur MCP distant (localhost:8090)
+
+        Tout est configuré dans standalone.xml. Pas besoin de microprofile-config.properties, pas de code Java pour la config.
+
+        Les agents CDI référencent simplement les noms : chatModelName="ollama" et toolProviderName="mcp".
+
+        C'est une vraie intégration Jakarta EE/WildFly, pas juste un wrapper autour de LangChain4j.
+    </aside>
+</section>
+
+<!-- Slide 25.2: Flux Demo 3 avec MCP SSE -->
+<section>
+    <span class="speaker-tag speaker-yann">Yann</span>
+    <h2>Flux : Lancer de dés via MCP SSE</h2>
+    <div style="font-size: 0.75em; text-align: left; max-width: 900px; margin: 0 auto;">
+        <div class="timeline">
+            <div class="step">
+                <strong>1. Guerrier</strong> : "Roll the dice"
+            </div>
+            <div class="step blue">
+                <strong>2. Endpoint JAX-RS</strong> → <code>VikingDiceAI.play()</code>
+            </div>
+            <div class="step green">
+                <strong>3. LLM (Ollama)</strong> via subsystem AI WildFly → décide d'utiliser <code>roll_multiple(count=3, sides=6)</code>
+            </div>
+            <div class="step purple">
+                <strong>4. McpToolProvider</strong> → JSON-RPC → <strong>Serveur MCP Dice</strong> (HTTP SSE sur localhost:8090)
+            </div>
+            <div class="step">
+                <strong>5. Serveur MCP</strong> lance 3d6 → retourne <code>{"rolls": [4, 2, 1], "total": 7}</code> via SSE
+            </div>
+            <div class="step blue">
+                <strong>6. LLM</strong> analyse le résultat → identifie "421" → répond au guerrier
+            </div>
+            <div class="step green">
+                <strong>7. Olaf le Chanceux</strong> : "PAR ODIN! Un 421 parfait ! 🎲⚔️"
+            </div>
+        </div>
+    </div>
+    <p class="fragment small accent" style="margin-top: 1em;">
+        Le serveur MCP est accessible via socket-binding configuré dans standalone.xml 🔧
+    </p>
+    <aside class="notes">
+        Voici le flux complet d'un lancer de dés dans la démo 3. Passons étape par étape -- c'est le slide clé pour comprendre MCP.
+
+        L'utilisateur clique "Roll the dice" dans l'UI web. L'endpoint JAX-RS injecte VikingDiceAI (l'agent IA) et appelle sa méthode play().
+
+        L'agent utilise le modèle de chat "ollama" configuré dans le subsystem AI WildFly. Le LLM comprend qu'il doit lancer 3 dés à 6 faces, donc il décide d'appeler le tool roll_multiple avec les paramètres count=3 et sides=6.
+
+        Le McpToolProvider (configuré dans le subsystem AI) intercepte cet appel tool et le traduit en appel JSON-RPC 2.0 vers le serveur MCP.
+
+        La connexion utilise HTTP SSE (Server-Sent Events) via le socket-binding "mcp-sse" qui pointe vers localhost:8090. Le mcp-client-sse établit la connexion SSE avec le path /sse.
+
+        Le serveur MCP lance réellement 3 dés (aléatoire), calcule le total, et retourne le résultat en format JSON via le flux SSE.
+
+        Le McpToolProvider retourne le résultat au LLM. Le LLM analyse les dés [4, 2, 1], identifie la combinaison "421" (la meilleure du jeu !), et génère une réponse humoristique dans le style d'Olaf le Chanceux.
+
+        La réponse remonte jusqu'au navigateur, et Olaf annonce : "PAR ODIN! Un 421 parfait !"
+
+        Le point clé à retenir : tout est configuré dans standalone.xml via le subsystem AI WildFly. C'est une vraie intégration WildFly native -- pas juste des properties externes.
+    </aside>
+</section>
+
+<!-- ============================================= -->
+<!-- SECTION 8: FUTURE AND CLOSING                  -->
+<!-- ============================================= -->
+
+<!-- Slide 26: A2A -->
+<section>
+    <span class="speaker-tag speaker-both">Les deux</span>
+    <h2>Et la suite ? A2A 🤝</h2>
+    <p class="big">Agent-to-Agent Protocol</p>
+    <div class="box" style="margin-top: 1em; font-size: 0.85em; text-align: left;">
+        <p>🤖 Agent 1 <span style="color: var(--accent-orange)">⟷</span> 🤖 Agent 2 <span style="color: var(--accent-orange)">⟷</span> 🤖 Agent 3</p>
+        <p class="fragment" style="margin-top: 0.5em;">
+            Imaginez : votre agent Jakarta EE <strong>délègue</strong> des tâches<br>
+            à d'autres agents, chacun spécialisé, chacun sur son propre serveur.
+        </p>
+        <p class="fragment" style="margin-top: 0.5em;">
+            <span class="accent">MCP</span> connecte les agents aux <em>outils</em>.<br>
+            <span class="accent-blue">A2A</span> connecte les agents <em>entre eux</em>.
+        </p>
+    </div>
+    <p class="fragment small" style="margin-top: 0.5em;">
+        <em>"Si on a du temps, on peut parler d'A2A"</em> -- c'est maintenant 😄
+    </p>
+    <aside class="notes">
+        Si on a le temps, jetons un œil vers le futur.
+
+        A2A -- Agent-to-Agent -- c'est le prochain standard après MCP. MCP connecte les agents aux outils. A2A connecte les agents entre eux.
+
+        Imaginez ça : un agent Jakarta EE qui gère les réservations, un autre qui gère l'inventaire, un troisième sur le support client. Ils se parlent, délèguent des tâches, chacun tournant sur son propre serveur. C'est les microservices, mais pour les agents IA.
+
+        C'est encore en développement, mais langchain4j-cdi sera prêt. CDI a littéralement été construit pour ça : communication managée entre composants.
+    </aside>
+</section>
+
+<!-- Slide 27: Récap -->
+<section>
+    <h2>Ce qu'on a vu aujourd'hui</h2>
+    <div style="font-size: 0.85em;">
+        <p class="fragment">🏗️ Une <span class="accent">extension CDI</span> qui transforme les interfaces en agents IA</p>
+        <p class="fragment">💉 <span class="accent-blue">@Inject</span> un agent aussi simplement qu'un EntityManager</p>
+        <p class="fragment">📋 Configuration 100% <span class="accent-green">MicroProfile Config</span></p>
+        <p class="fragment">🧠 Memory, RAG, Tools, <span class="accent-purple">MCP</span> -- tout injectable</p>
+        <p class="fragment">🛡️ <span class="accent">Fault Tolerance</span> + <span class="accent-blue">Telemetry</span> out of the box</p>
+        <p class="fragment">🐝 Compatible avec <strong>tous</strong> les serveurs CDI</p>
+    </div>
+    <aside class="notes">
+        Récap rapide -- les points clés.
+
+        Le message à retenir : vous n'avez PAS besoin de changer votre stack pour faire de l'IA. Votre serveur Jakarta EE, vos patterns CDI, vos outils MicroProfile -- tout fonctionne avec l'IA maintenant.
+
+        langchain4j-cdi est le pont entre le monde Java enterprise et le monde de l'IA générative. Pas de migration requise.
+    </aside>
+</section>
+
+<!-- Slide 28: Contribuer -->
+<section>
+    <h2>Rejoignez-nous !</h2>
+    <p class="big" style="margin-bottom: 1em;">
+        🌟 <a href="https://github.com/langchain4j/langchain4j-cdi" style="color: var(--accent-blue);">github.com/langchain4j/langchain4j-cdi</a>
+    </p>
+    <div style="font-size: 0.85em;">
+        <p>🐛 Issues bienvenues -- même les demandes de fonctionnalités folles</p>
+        <p>🔀 PRs encouragées -- on review vite (promis)</p>
+        <p>💬 GitHub Discussions -- pour les questions</p>
+    </div>
+    <div class="fragment" style="margin-top: 1.5em;">
+        <p class="medium">Merci aussi à <span class="accent-green">Buhake Sindi</span>, co-créateur 🙏</p>
+    </div>
+    <aside class="notes">
+        Le projet est open source et on cherche activement des contributeurs !
+
+        Même si vous n'avez jamais contribué à l'open source avant, c'est un excellent endroit pour commencer. Issues, PRs, ou juste une étoile GitHub -- tout aide à la visibilité et nous motive.
+
+        Un grand merci à Buhake Sindi, notre troisième co-créateur.
+    </aside>
+</section>
+
+<!-- Slide 29: Humour final -->
+<section class="joke-slide">
+    <p class="emoji-big">🎤</p>
+    <h2>Questions ?</h2>
+    <p class="fragment big" style="margin-top: 0.5em;">
+        <em>"L'IA va-t-elle remplacer les développeurs Java ?"</em>
+    </p>
+    <p class="fragment medium">Non. Mais un développeur Java <span class="accent">avec</span> l'IA<br>remplacera celui <span style="color: #999;">sans</span>.</p>
+    <p class="fragment small" style="margin-top: 1.5em; color: #999;">
+        Et avec CDI, l'IA c'est juste un <code>@Inject</code> de plus. 😉
+    </p>
+    <aside class="notes">
+        Session Q&A ! On est ouverts à tout.
+
+        Si quelqu'un pose LA question sur l'IA qui remplace les développeurs, on a la réponse toute prête.
+
+        Sinon, on sera ravis de parler CDI, WildFly, feuille de route Jakarta EE, ou débattre pourquoi le Wi-Fi des conférences ne marche jamais pendant les démos live.
+    </aside>
+</section>
+
+<!-- Slide 30: Merci -->
+<section data-background-gradient="linear-gradient(135deg, #1a1a2e, #16213e)">
+    <h1>Merci ! 🙏</h1>
+    <div style="margin-top: 1em; font-size: 0.8em;">
+        <p>
+            <span class="accent">Yann Blazart</span> —
+            <a href="https://twitter.com/yblazart" style="color: var(--accent-blue);">@yblazart</a>
+        </p>
+        <p>
+            <span class="accent-blue">Emmanuel Hugonnet</span> —
+            <a href="https://twitter.com/ehugonnet" style="color: var(--accent-blue);">@ehugonnet</a>
+        </p>
+    </div>
+    <p style="margin-top: 1.5em;">
+        <a href="https://github.com/langchain4j/langchain4j-cdi" style="color: var(--accent-green); font-size: 0.85em;">
+            🌟 github.com/langchain4j/langchain4j-cdi
+        </a>
+    </p>
+    <p class="small" style="margin-top: 2em;">
+        Devoxx France 2026<br>
+        Slides : Reveal.js | Démos : WildFly + IntelliJ
+    </p>
+    <aside class="notes">
+        Merci à tous d'être restés avec nous ! Venez nous voir après -- on adore parler de tout ça.
+
+        Les slides et tout le code des démos seront sur GitHub.
+
+        Et si vous avez apprécié la session, mettez-nous une étoile sur le repo langchain4j-cdi. Ça prend deux secondes et ça nous fait super plaisir.
+    </aside>
+</section>
+
+<!-- Slide 31: QR Code repo -->
+<section data-background-gradient="linear-gradient(135deg, #1a1a2e, #16213e)">
+    <h2>Slides & Code</h2>
+    <p style="margin-top: 1em;">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=e0e0e0&bgcolor=0a0a1a&data=https%3A%2F%2Fgithub.com%2Fyblazart%2Fconfs-langchain4j-cdi-javaone2026"
+             alt="QR Code vers le dépôt GitHub"
+             style="border-radius: 12px;">
+    </p>
+    <p style="margin-top: 0.8em;">
+        <a href="https://github.com/yblazart/confs-langchain4j-cdi-javaone2026"
+           style="color: var(--accent-green); font-size: 0.6em;">
+            github.com/yblazart/confs-langchain4j-cdi-javaone2026
+        </a>
+    </p>
+</section>
+
+</div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/zoom/zoom.js"></script>
+<script>
+    Reveal.initialize({
+        hash: true,
+        slideNumber: 'c/t',
+        showSlideNumber: 'speaker',
+        width: 1280,
+        height: 720,
+        margin: 0.08,
+        transition: 'slide',
+        transitionSpeed: 'default',
+        backgroundTransition: 'fade',
+        // Speaker notes config (for iPad Sidecar)
+        showNotes: false, // notes visible only in speaker view
+        plugins: [ RevealNotes, RevealHighlight, RevealZoom ]
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+[
+  {
+    "id": "raid-angleterre",
+    "destination": "Raid sur l'Angleterre",
+    "departureDate": "2026-05-15",
+    "warriorSlots": 50,
+    "chief": "Erik le Rouge",
+    "description": "Une expédition audacieuse vers les côtes anglaises riches en monastères et en trésors. Les guerriers affronteront les défenses saxonnes et ramèneront gloire et butin. Naviguerons par la mer du Nord, avec escales stratégiques.",
+    "requirements": "Expérience au combat requise. Savoir nager recommandé. Armes personnelles obligatoires. Durée: 3 mois."
+  },
+  {
+    "id": "expedition-islande",
+    "destination": "Expédition en Islande",
+    "departureDate": "2026-05-20",
+    "warriorSlots": 40,
+    "chief": "Bjorn Côtes-de-Fer",
+    "description": "Exploration et colonisation des terres volcaniques d'Islande. Mission d'établissement d'une nouvelle colonie viking avec construction de fermes et de ports. Territoire vierge offrant de nouvelles opportunités.",
+    "requirements": "Compétences en construction et agriculture appréciées. Convient à tous niveaux. Durée: 6 mois."
+  },
+  {
+    "id": "conquete-normandie",
+    "destination": "Conquête de Normandie",
+    "departureDate": "2026-06-01",
+    "warriorSlots": 35,
+    "chief": "Ragnar Lodbrok",
+    "description": "Campagne majeure de conquête des terres franques. Objectif: établir un royaume permanent en Normandie. Combats intenses prévus contre les armées carolingiennes. Grande opportunité de terres et de titres.",
+    "requirements": "Guerriers expérimentés uniquement. Formation en tactique de bataille requise. Durée: 12 mois."
+  },
+  {
+    "id": "exploration-groenland",
+    "destination": "Exploration du Groenland",
+    "departureDate": "2026-06-10",
+    "warriorSlots": 30,
+    "chief": "Lagertha",
+    "description": "Voyage d'exploration vers les terres glacées du Groenland. Découverte de nouvelles routes commerciales et établissement de comptoirs. Navigation en eaux dangereuses avec icebergs. Pour les plus aventureux.",
+    "requirements": "Résistance au froid extrême. Âge recommandé: 18 ans et plus. Durée: 4 mois."
+  },
+  {
+    "id": "raid-irlande",
+    "destination": "Raid sur l'Irlande",
+    "departureDate": "2026-05-25",
+    "warriorSlots": 45,
+    "chief": "Harald aux Beaux Cheveux",
+    "description": "Expédition vers les monastères irlandais célèbres pour leurs richesses en or et manuscrits. Îles verdoyantes offrant un climat favorable. Attaques rapides et retour avec butin important.",
+    "requirements": "Tous niveaux acceptés. Formation fournie. Durée: 2 mois."
+  },
+  {
+    "id": "route-constantinople",
+    "destination": "Route de Constantinople",
+    "departureDate": "2026-07-01",
+    "warriorSlots": 25,
+    "chief": "Ivar le Désossé",
+    "description": "Voyage épique vers Byzance via les rivières de Russie. Commerce de fourrures et d'ambre avec l'Empire byzantin. Rencontre avec la Garde varangienne. Longue expédition culturelle et commerciale.",
+    "requirements": "Tous âges. Expérience en commerce appréciée. Longue durée: 18 mois. Interprétation interdite."
+  },
+  {
+    "id": "pillage-paris",
+    "destination": "Pillage de Paris",
+    "departureDate": "2026-06-15",
+    "warriorSlots": 40,
+    "chief": "Rollo",
+    "description": "Remontée de la Seine jusqu'aux portes de Paris. Siège de la cité franque et négociation de tributs massifs. Action spectaculaire combinant navigation fluviale et assauts coordonnés.",
+    "requirements": "Tous niveaux. Formation en navigation fluviale fournie. Durée: 3 mois."
+  },
+  {
+    "id": "razzia-frise",
+    "destination": "Razzia en Frise",
+    "departureDate": "2026-05-30",
+    "warriorSlots": 20,
+    "chief": "Sigurd Œil-de-Serpent",
+    "description": "Spectacle de raids coordonnés sur les côtes frisonnes. Opération adulte uniquement avec combats intenses et stratégies audacieuses. Petite troupe d'élite pour maximum d'efficacité et de butin par guerrier.",
+    "requirements": "Réservé aux 21 ans et plus. Durée: 6 semaines. Contient violence intense et langage brutal."
+  },
+  {
+    "id": "vinland-amerique",
+    "destination": "Découverte du Vinland",
+    "departureDate": "2026-08-01",
+    "warriorSlots": 30,
+    "chief": "Leif Erikson",
+    "description": "Expédition légendaire vers les terres mystérieuses à l'ouest. Première exploration du Vinland (Amérique). Navigation en haute mer, découverte de vignes sauvages et de terres fertiles. Pour les explorateurs intrépides.",
+    "requirements": "Tous niveaux. Après-midi de départ. Durée: 12 mois."
+  },
+  {
+    "id": "ecosse-orcades",
+    "destination": "Conquête des Orcades",
+    "departureDate": "2026-05-18",
+    "warriorSlots": 45,
+    "chief": "Torstein le Fort",
+    "description": "Établissement d'un royaume viking dans les îles Orcades et Hébrides. Mélange de colonisation, de raids et de commerce. Îles stratégiques pour le contrôle de la mer du Nord. Musique de guerre et célébrations garanties.",
+    "requirements": "Tous niveaux acceptés. Durée: 8 mois."
+  }
+]

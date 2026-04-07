@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Debug Interface</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #00ff00; }
+        #log { border: 1px solid #00ff00; padding: 10px; margin: 10px 0; height: 400px; overflow-y: auto; background: #000; }
+        button { background: #00ff00; color: #000; border: none; padding: 10px 20px; margin: 5px; cursor: pointer; font-weight: bold; }
+        input { background: #333; color: #00ff00; border: 1px solid #00ff00; padding: 10px; width: 500px; }
+        .timestamp { color: #666; }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .info { color: #00aaff; }
+    </style>
+</head>
+<body>
+    <h1>Debug Interface - API Test</h1>
+
+    <div>
+        <button onclick="testHealth()">Test Health</button>
+        <button onclick="testStart()">Test Start</button>
+        <button onclick="testPlay()">Test Play</button>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <div>
+        <input type="text" id="customMsg" placeholder="Custom message" value="Roll the dice">
+        <button onclick="testCustom()">Send Custom</button>
+    </div>
+
+    <div id="log"></div>
+
+    <script>
+        function log(msg, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = type;
+            entry.innerHTML = `<span class="timestamp">[${time}]</span> ${msg}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        async function testHealth() {
+            log('Testing /api/game/health...', 'info');
+            try {
+                const resp = await fetch('api/game/health');
+                const text = await resp.text();
+                log(`OK Health OK: ${text}`, 'success');
+            } catch (e) {
+                log(`FAIL Health Error: ${e.message}`, 'error');
+            }
+        }
+
+        async function testStart() {
+            log('Testing /api/game/start...', 'info');
+            try {
+                const start = Date.now();
+                const resp = await fetch('api/game/start');
+                const text = await resp.text();
+                const duration = Date.now() - start;
+                log(`OK Start OK (${duration}ms)`, 'success');
+                log(`Response: ${text.substring(0, 200)}...`, 'info');
+            } catch (e) {
+                log(`FAIL Start Error: ${e.message}`, 'error');
+            }
+        }
+
+        async function testPlay() {
+            log('Testing /api/game/play with "Roll the dice"...', 'info');
+            try {
+                const start = Date.now();
+                const resp = await fetch('api/game/play', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: 'Roll the dice'
+                });
+                const text = await resp.text();
+                const duration = Date.now() - start;
+                log(`OK Play OK (${duration}ms)`, 'success');
+                log(`Response: ${text}`, 'info');
+            } catch (e) {
+                log(`FAIL Play Error: ${e.message}`, 'error');
+            }
+        }
+
+        async function testCustom() {
+            const msg = document.getElementById('customMsg').value;
+            log(`Testing /api/game/play with "${msg}"...`, 'info');
+            try {
+                const start = Date.now();
+                const resp = await fetch('api/game/play', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: msg
+                });
+                const text = await resp.text();
+                const duration = Date.now() - start;
+                log(`OK Custom OK (${duration}ms)`, 'success');
+                log(`Response: ${text}`, 'info');
+            } catch (e) {
+                log(`FAIL Custom Error: ${e.message}`, 'error');
+            }
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            log('=== Debug Interface Loaded ===', 'success');
+            log('Click the buttons to test the endpoints', 'info');
+        });
+    </script>
+</body>
+</html>
