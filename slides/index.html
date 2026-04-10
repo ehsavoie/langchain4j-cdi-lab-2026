@@ -375,6 +375,11 @@
             <span class="small"> — Le chatbot complet en production</span>
             <span class="speaker-tag speaker-yann">Yann</span>
         </div>
+        <div class="step purple">
+            <strong>🛡️ Guardrails</strong>
+            <span class="small"> — Valider l'entrée et la sortie de vos agents</span>
+            <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+        </div>
         <div class="step blue">
             <strong>🔮 Et la suite ?</strong>
             <span class="small"> — A2A et feuille de route</span>
@@ -595,7 +600,7 @@ dev.langchain4j.cdi.plugin.my-retriever.config.embeddingStore=\
 <section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
     <span class="speaker-tag speaker-yann">Yann</span>
     <p class="demo-banner">🎬 DEMO 1</p>
-    <h2>@RegisterAIService en action</h2>
+    <h2>@RegisterAIService EN ACTION</h2>
     <div style="font-size: 0.85em; text-align: left; max-width: 700px; margin: 0 auto;">
         <p>✅ Chat simple avec @RegisterAIService</p>
         <p class="fragment">✅ Streaming : réponses en temps réel 🎬</p>
@@ -1451,7 +1456,205 @@ dev.langchain4j.cdi.plugin.mcp-tools.config.url=\
 </section>
 
 <!-- ============================================= -->
-<!-- SECTION 8: FUTURE AND CLOSING                  -->
+<!-- SECTION 8: DEMO 4 - GUARDRAILS (Emmanuel)     -->
+<!-- ============================================= -->
+
+<!-- Transition humour -->
+<section class="joke-slide">
+    <p class="emoji-big">🧝</p>
+    <h2>Le skald a chanté en anglais...</h2>
+    <p class="fragment big">...avec des elfes <em>et</em> des nains dans la saga.</p>
+    <p class="fragment medium" style="color: #999;">
+        Le LLM est non-déterministe. Il fait ce qu'il veut.
+    </p>
+    <p class="fragment accent-green">
+        La solution : <strong>Guardrails</strong> — les garde-fous de vos agents IA
+    </p>
+    <aside class="notes">
+        Transition vers les guardrails. C'est une problématique réelle en production : les LLMs peuvent répondre dans la mauvaise langue, glisser du contenu hors sujet, ou ignorer vos contraintes métier.
+
+        Dans notre démo Viking, le skald est censé chanter en français des chants héroïques nordiques. Sans guardrails, rien ne l'empêche de chanter en anglais, de parler d'elfes ou de nains de Tolkien, ou de produire n'importe quoi.
+
+        Les guardrails sont là pour ça : valider l'entrée de l'utilisateur AVANT d'appeler le LLM, et valider la réponse du LLM AVANT de la renvoyer au client.
+    </aside>
+</section>
+
+<!-- Guardrails concept -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>Guardrails : Valider l'entrée et la sortie</h2>
+    <div class="two-col">
+        <div class="box box-accent">
+            <h3>InputGuardrail</h3>
+            <p class="medium">Filtre les requêtes <em>avant</em> le LLM</p>
+            <p class="small">
+                ✅ Langue valide ?<br>
+                ✅ Contenu approprié ?<br>
+                ✅ Pas de mots interdits ?
+            </p>
+        </div>
+        <div class="box box-blue">
+            <h3 style="color: var(--accent-blue);">OutputGuardrail</h3>
+            <p class="medium">Valide les réponses <em>après</em> le LLM</p>
+            <p class="small">
+                ✅ Langue de la réponse ?<br>
+                ✅ Contenu conforme ?<br>
+                ✅ Format attendu ?
+            </p>
+        </div>
+    </div>
+    <pre class="fragment"><code class="language-java" data-trim>
+@RegisterAIService(
+    chatModelName        = "my-model",
+    inputGuardrailNames  = {"french-input",  "fantasy-input"},
+    outputGuardrailNames = {"french-output", "fantasy-output"})
+public interface SkaldAssistant {
+
+    @SystemMessage("Tu es un skald viking qui compose des chants épiques en FRANÇAIS...")
+    String composeSong(@UserMessage String request);
+}
+    </code></pre>
+    <aside class="notes">
+        Les guardrails s'intègrent directement dans @RegisterAIService. Deux listes : inputGuardrailNames et outputGuardrailNames.
+
+        Les noms correspondent à des beans CDI annotés @Named. L'ordre dans la liste est important : les guardrails sont exécutés dans l'ordre déclaré.
+
+        Si un guardrail d'entrée échoue, le LLM n'est jamais appelé. Si un guardrail de sortie échoue, une exception est lancée — le code appelant doit la gérer.
+
+        C'est élégant : on garde les contraintes métier séparées de la logique de l'assistant. Chaque guardrail a une responsabilité unique.
+    </aside>
+</section>
+
+<!-- Guardrails CDI implementation -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>Guardrails = Beans CDI nommés</h2>
+    <pre><code class="language-java" data-trim>
+@ApplicationScoped
+@Named("french-input")    // ← Nom référencé dans @RegisterAIService
+public class FrenchInputGuardrail implements InputGuardrail {
+
+    private LanguageDetector detector;
+
+    @PostConstruct
+    void init() {
+        detector = new OptimaizeLangDetector().loadModels();
+    }
+
+    @Override
+    public InputGuardrailResult validate(UserMessage userMessage) {
+        String text = userMessage.singleText();
+        LanguageResult result;
+        synchronized (detector) {       // ← Thread-safe !
+            result = detector.detect(text);
+        }
+        if (result.isReasonablyCertain() && !"fr".equals(result.getLanguage())) {
+            return failure("Seul le français est accepté !");
+        }
+        return success();
+    }
+}
+    </code></pre>
+    <p class="fragment small">
+        <span class="accent">Apache Tika</span> pour la détection de langue —
+        benefit of the doubt pour les textes courts ou ambigus
+    </p>
+    <aside class="notes">
+        Un guardrail c'est un bean CDI — rien de plus. @ApplicationScoped pour partager le détecteur de langue. @Named pour le lier à @RegisterAIService.
+
+        L'interface InputGuardrail n'a qu'une méthode : validate(). Elle retourne success() ou failure("message").
+
+        Point important : le LanguageDetector d'Apache Tika n'est pas thread-safe. Puisque le bean est @ApplicationScoped, plusieurs requêtes peuvent appeler validate() en parallèle. D'où le synchronized.
+
+        La logique "benefit of the doubt" : si Tika n'est pas raisonnablement certain de la langue (texte trop court, un seul mot comme "Odin"), on laisse passer. On ne bloque que quand on est sûr que ce n'est pas du français.
+    </aside>
+</section>
+
+<!-- Demo 4 -->
+<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <p class="demo-banner">🎬 DEMO 4</p>
+    <h2>Skald Viking avec Guardrails</h2>
+    <div style="font-size: 0.85em; text-align: left; max-width: 700px; margin: 0 auto;">
+        <p>🛡️ <strong>4 guardrails</strong> autour d'un agent de composition de chants vikings</p>
+        <p class="fragment">✅ <span class="accent">InputGuardrail</span> : langue française uniquement</p>
+        <p class="fragment">✅ <span class="accent">InputGuardrail</span> : pas de races fantastiques dans la requête</p>
+        <p class="fragment">✅ <span class="accent-blue">OutputGuardrail</span> : le chant généré est bien en français</p>
+        <p class="fragment">✅ <span class="accent-blue">OutputGuardrail</span> : pas de nains ni d'elfes dans le chant</p>
+    </div>
+    <p class="fragment medium accent" style="margin-top: 1em;">
+        Les guardrails sont des beans CDI — injection de dépendances possible ! 🎉
+    </p>
+    <aside class="notes">
+        Démo 4 ! Live coding de 4 guardrails autour du skald viking.
+
+        On part du module base qui a les squelettes des guardrails avec les TODOs. On implémente en live :
+        1. @Named sur chaque guardrail
+        2. init() avec OptimaizeLangDetector().loadModels()
+        3. validate() pour chaque guardrail
+        4. @RegisterAIService avec inputGuardrailNames et outputGuardrailNames
+
+        CHECKLIST DEMO :
+        1. cd demo-project/demo-4-guardrails/base && mvn clean wildfly:dev
+        2. Ouvrir index.html du navigateur (localhost:8080/demo-4)
+        3. Tester sans guardrails : envoyer "Sing me a Viking song" → ça passe (skald en anglais ?)
+        4. Ajouter @Named("french-input") sur FrenchInputGuardrail
+        5. Implémenter init() et validate() sur FrenchInputGuardrail
+        6. Faire pareil pour les 3 autres guardrails
+        7. Ajouter inputGuardrailNames + outputGuardrailNames dans @RegisterAIService de SkaldAssistant
+        8. Hot-reload, tester avec "Sing me a Viking song" → rejeté !
+        9. Tester avec "Compose un chant sur les nains vikings" → rejeté !
+        10. Tester avec "Compose un chant sur la gloire d'Odin" → accepté !
+
+        SECOURS : cd demo-4-guardrails/solution && mvn clean wildfly:dev
+    </aside>
+</section>
+
+<!-- Demo 4 - Backup slide : Guardrail de sortie -->
+<section data-visibility="uncounted">
+    <h2>OutputGuardrail : valider la réponse</h2>
+    <pre><code class="language-java" data-trim>
+@ApplicationScoped
+@Named("fantasy-output")
+public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
+
+    private static final Set&lt;String&gt; FORBIDDEN_WORDS =
+        Set.of("nain", "nains", "elfe", "elf", "elfes");
+
+    @Override
+    public OutputGuardrailResult validate(AiMessage responseFromLLM) {
+        String text = responseFromLLM.text().toLowerCase();
+
+        for (String word : FORBIDDEN_WORDS) {
+            if (text.contains(word)) {
+                return failure(
+                    "Le chant du skald ne doit pas évoquer "
+                    + "les nains ni les elfes ! C'est une saga viking pure.");
+            }
+        }
+        return success();
+    }
+}
+    </code></pre>
+    <p class="fragment small">
+        L'<code>OutputGuardrail</code> reçoit l'<code>AiMessage</code> complète —
+        même pattern que l'<code>InputGuardrail</code>
+    </p>
+    <aside class="notes">
+        SECOURS si la démo live ne marche pas.
+
+        L'OutputGuardrail valide la réponse du LLM. Même structure que l'InputGuardrail, mais on reçoit un AiMessage au lieu d'un UserMessage.
+
+        Ici on vérifie que le chant généré ne contient pas de mots fantastiques. Simple mais efficace.
+
+        Si un OutputGuardrail échoue, une exception GuardrailException est lancée. Le ChatResource la catch et extrait le message d'erreur pour l'afficher à l'utilisateur.
+
+        Note : on pourrait aussi configurer le nombre de retry pour les guardrails de sortie — LangChain4j peut réessayer automatiquement en informant le LLM de son erreur.
+    </aside>
+</section>
+
+<!-- ============================================= -->
+<!-- SECTION 9: FUTURE AND CLOSING                  -->
 <!-- ============================================= -->
 
 <!-- Slide 26: A2A -->
@@ -1493,6 +1696,7 @@ dev.langchain4j.cdi.plugin.mcp-tools.config.url=\
         <p class="fragment">📋 Configuration 100% <span class="accent-green">MicroProfile Config</span></p>
         <p class="fragment">🧠 Memory, RAG, Tools, <span class="accent-purple">MCP</span> -- tout injectable</p>
         <p class="fragment">🛡️ <span class="accent">Fault Tolerance</span> + <span class="accent-blue">Telemetry</span> out of the box</p>
+        <p class="fragment">🔒 <span class="accent-purple">Guardrails</span> -- valider entrée et sortie avec des beans CDI</p>
         <p class="fragment">🐝 Compatible avec <strong>tous</strong> les serveurs CDI</p>
     </div>
     <aside class="notes">

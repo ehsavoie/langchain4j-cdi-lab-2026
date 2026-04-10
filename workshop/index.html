@@ -735,6 +735,28 @@
     </div>
 
     <div class="sidebar-section">
+        <div class="sidebar-section-title">Exercice 4 &mdash; Guardrails</div>
+        <a href="#ex4-intro" class="sidebar-link">
+            <span class="step-num purple">1</span> Introduction aux guardrails
+        </a>
+        <a href="#ex4-step1" class="sidebar-link">
+            <span class="step-num purple">2</span> Nommer les guardrails
+        </a>
+        <a href="#ex4-step2" class="sidebar-link">
+            <span class="step-num purple">3</span> Initialiser le détecteur
+        </a>
+        <a href="#ex4-step3" class="sidebar-link">
+            <span class="step-num purple">4</span> Implémenter validate()
+        </a>
+        <a href="#ex4-step4" class="sidebar-link">
+            <span class="step-num purple">5</span> Câbler @RegisterAIService
+        </a>
+        <a href="#ex4-test" class="sidebar-link">
+            <span class="step-num purple">&#10003;</span> Test et validation
+        </a>
+    </div>
+
+    <div class="sidebar-section">
         <div class="sidebar-section-title">Conclusion</div>
         <a href="#whats-next" class="sidebar-link">
             <span class="icon">&#128302;</span> Et après ?
@@ -796,6 +818,11 @@
         <div class="card-icon">&#128268;</div>
         <h4>Exercice 3 : Intégration MCP</h4>
         <p>Connectez votre agent IA à des outils externes via le Model Context Protocol (MCP) &mdash; « JDBC pour l'IA ».</p>
+    </div>
+    <div class="card">
+        <div class="card-icon">&#128274;</div>
+        <h4>Exercice 4 : Guardrails</h4>
+        <p>Ajoutez des garde-fous sur l'entrée et la sortie de votre skald viking : langue française obligatoire et sans races fantastiques.</p>
     </div>
 </div>
 
@@ -1008,9 +1035,12 @@ Assistant assistant;</code></pre>
 &#9500;&#9472;&#9472; <span class="dir">demo-2-ft-telemetry/</span> <span class="comment">&larr; Memory + RAG + Tools + FT + Telemetry</span><br>
 &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="highlight">base/</span><br>
 &#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">solution/</span><br>
-&#9492;&#9472;&#9472; <span class="dir">demo-3-mcp/</span> <span class="comment">&larr; MCP Integration</span><br>
-&nbsp;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="dir">mcp-server/</span> <span class="comment">&larr; Standalone MCP server (fat JAR)</span><br>
-&nbsp;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="highlight">base/</span><br>
+&#9500;&#9472;&#9472; <span class="dir">demo-3-mcp/</span> <span class="comment">&larr; MCP Integration</span><br>
+&#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="dir">mcp-server/</span> <span class="comment">&larr; Standalone MCP server (fat JAR)</span><br>
+&#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="highlight">base/</span><br>
+&#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">solution/</span><br>
+&#9492;&#9472;&#9472; <span class="dir">demo-4-guardrails/</span> <span class="comment">&larr; Input &amp; Output Guardrails</span><br>
+&nbsp;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="highlight">base/</span> <span class="comment">&larr; Squelette avec TODOs (votre espace de travail)</span><br>
 &nbsp;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">solution/</span>
 </div>
 </section>
@@ -1725,6 +1755,309 @@ curl -X POST -H "Content-Type: text/plain" \
 </section>
 
 <!-- ============================================================ -->
+<!-- EXERCISE 4: GUARDRAILS                                        -->
+<!-- ============================================================ -->
+<section id="ex4-intro" class="section-anchor">
+<h2>Exercice 4 : Guardrails — Garde-fous pour votre agent</h2>
+
+<p><strong>Message clé</strong> : « Les guardrails sont des beans CDI — ils bénéficient de l'injection de dépendances comme tous vos composants »</p>
+
+<div class="callout info">
+    <div class="callout-title">&#128204; Objectif</div>
+    <p>Ajoutez quatre guardrails autour de votre skald viking : deux sur l'entrée (valider la requête avant d'appeler le LLM) et deux sur la sortie (valider la réponse avant de la renvoyer). L'agent n'accepte que le français et refuse toute mention de races fantastiques.</p>
+</div>
+
+<pre><code>cd demo-project/demo-4-guardrails/base
+# Ouvrir ce répertoire dans votre IDE</code></pre>
+
+<h3>Concept : InputGuardrail vs OutputGuardrail</h3>
+
+<div class="compare-grid">
+    <div class="compare-box">
+        <h4 style="color: var(--accent-orange);">InputGuardrail</h4>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">S'exécute <strong>avant</strong> d'appeler le LLM. Si le guardrail échoue, le LLM n'est jamais appelé — économie de temps et de tokens.</p>
+        <pre><code>InputGuardrailResult validate(
+    UserMessage userMessage)</code></pre>
+    </div>
+    <div class="compare-box">
+        <h4 style="color: var(--accent-blue);">OutputGuardrail</h4>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">S'exécute <strong>après</strong> la réponse du LLM. Si le guardrail échoue, une exception est levée — le code appelant doit la gérer.</p>
+        <pre><code>OutputGuardrailResult validate(
+    AiMessage responseFromLLM)</code></pre>
+    </div>
+</div>
+
+<h3>Fichiers clés</h3>
+
+<table>
+    <thead><tr><th>Fichier</th><th>Rôle</th><th>TODO</th></tr></thead>
+    <tbody>
+        <tr><td><code>SkaldAssistant.java</code></td><td>Interface du service IA</td><td>Ajouter <code>@RegisterAIService</code> avec les noms de guardrails</td></tr>
+        <tr><td><code>FrenchInputGuardrail.java</code></td><td>Vérifie que la requête est en français</td><td>Nommer, initialiser, implémenter</td></tr>
+        <tr><td><code>FrenchOutputGuardrail.java</code></td><td>Vérifie que le chant est en français</td><td>Nommer, initialiser, implémenter</td></tr>
+        <tr><td><code>NoFantasyRacesInputGuardrail.java</code></td><td>Rejette les mentions de nains/elfes en entrée</td><td>Nommer, implémenter</td></tr>
+        <tr><td><code>NoFantasyRacesOutputGuardrail.java</code></td><td>Rejette les mentions de nains/elfes en sortie</td><td>Nommer, implémenter</td></tr>
+        <tr><td><code>ChatResource.java</code></td><td>Point d'accès REST (déjà câblé)</td><td>Rien — gère déjà les exceptions guardrail</td></tr>
+    </tbody>
+</table>
+
+<div class="callout warning">
+    <div class="callout-title">&#9888; Prérequis</div>
+    <p>Cet exercice utilise <strong>Mistral AI</strong> (comme l'exercice 1). Assurez-vous que <code>MISTRAL_API_KEY</code> est exporté dans votre terminal.</p>
+</div>
+</section>
+
+<!-- Step 1: Nommer les guardrails -->
+<section id="ex4-step1" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-purple);">1</span>
+        <span class="step-title">Nommer les guardrails avec <code>@Named</code></span>
+    </div>
+    <p>Les guardrails sont des beans CDI référencés par leur nom dans <code>@RegisterAIService</code>. Ajoutez <code>@Named</code> sur chaque classe de guardrail.</p>
+
+    <h4>FrenchInputGuardrail.java</h4>
+    <pre><code>import jakarta.inject.Named;
+
+@ApplicationScoped
+@Named("french-input")   // ← Ajouter cette annotation
+public class FrenchInputGuardrail implements InputGuardrail {
+    // ...
+}</code></pre>
+
+    <h4>FrenchOutputGuardrail.java</h4>
+    <pre><code>@ApplicationScoped
+@Named("french-output")
+public class FrenchOutputGuardrail implements OutputGuardrail {
+    // ...
+}</code></pre>
+
+    <h4>NoFantasyRacesInputGuardrail.java</h4>
+    <pre><code>@ApplicationScoped
+@Named("fantasy-input")
+public class NoFantasyRacesInputGuardrail implements InputGuardrail {
+    // ...
+}</code></pre>
+
+    <h4>NoFantasyRacesOutputGuardrail.java</h4>
+    <pre><code>@ApplicationScoped
+@Named("fantasy-output")
+public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
+    // ...
+}</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">&#128161; Pourquoi @Named ?</div>
+        <p>LangChain4j-CDI résout les guardrails par leur nom CDI au moment du démarrage. Le nom dans <code>@Named("...")</code> doit correspondre exactement aux chaînes dans <code>inputGuardrailNames</code> et <code>outputGuardrailNames</code>.</p>
+    </div>
+</div>
+</section>
+
+<!-- Step 2: Initialiser le détecteur -->
+<section id="ex4-step2" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-purple);">2</span>
+        <span class="step-title">Initialiser le détecteur de langue (Apache Tika)</span>
+    </div>
+    <p>Les guardrails de langue (<code>FrenchInputGuardrail</code> et <code>FrenchOutputGuardrail</code>) utilisent Apache Tika pour détecter automatiquement la langue d'un texte. Initialisez le détecteur dans <code>@PostConstruct</code> :</p>
+
+    <pre><code>import org.apache.tika.langdetect.optimaize.OptimaizeLangDetector;
+import org.apache.tika.language.detect.LanguageDetector;
+
+@ApplicationScoped
+@Named("french-input")
+public class FrenchInputGuardrail implements InputGuardrail {
+
+    private LanguageDetector detector;
+
+    @PostConstruct
+    void init() {
+        detector = new OptimaizeLangDetector().loadModels();
+        //        ↑ Charge les modèles de détection de langue depuis le classpath
+    }
+
+    // ...
+}</code></pre>
+
+    <p>Faites de même dans <code>FrenchOutputGuardrail</code>.</p>
+
+    <div class="callout info">
+        <div class="callout-title">&#128161; Thread-safety</div>
+        <p>Le bean est <code>@ApplicationScoped</code> : une seule instance partagée entre toutes les requêtes. Le <code>LanguageDetector</code> d'Apache Tika n'est <strong>pas thread-safe</strong> — vous devrez utiliser <code>synchronized (detector) { ... }</code> lors de la détection.</p>
+    </div>
+</div>
+</section>
+
+<!-- Step 3: Implémenter validate() -->
+<section id="ex4-step3" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-purple);">3</span>
+        <span class="step-title">Implémenter la méthode <code>validate()</code></span>
+    </div>
+
+    <h4>FrenchInputGuardrail — accepter uniquement le français</h4>
+    <pre><code>@Override
+public InputGuardrailResult validate(UserMessage userMessage) {
+    String text = userMessage.singleText();
+    LanguageResult result;
+    synchronized (detector) {
+        result = detector.detect(text);
+    }
+    // Benefit of the doubt : si Tika n'est pas sûr (texte trop court), on laisse passer
+    if (result.isReasonablyCertain() && !"fr".equals(result.getLanguage())) {
+        return failure("Seul le français est accepté ! Parlez français pour invoquer le skald.");
+    }
+    return success();
+}</code></pre>
+
+    <h4>FrenchOutputGuardrail — vérifier que le chant est en français</h4>
+    <pre><code>@Override
+public OutputGuardrailResult validate(AiMessage responseFromLLM) {
+    String text = responseFromLLM.text();
+    LanguageResult result;
+    synchronized (detector) {
+        result = detector.detect(text);
+    }
+    // Pour la sortie, on est strict : si pas certain ou pas français → échec
+    if (!result.isReasonablyCertain() || !"fr".equals(result.getLanguage())) {
+        return failure("Le chant doit être en français ! Le skald doit chanter dans la langue de Molière.");
+    }
+    return success();
+}</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">&#128161; Différence entrée / sortie</div>
+        <p>Pour l'<strong>entrée</strong> : on applique le <em>benefit of the doubt</em> — un seul mot comme « Odin » n'est pas détectable avec certitude, donc on accepte. Pour la <strong>sortie</strong> : le chant est long, Tika est fiable — on rejette si non certain ou si ce n'est pas du français.</p>
+    </div>
+
+    <h4>NoFantasyRacesInputGuardrail — rejeter les mots interdits en entrée</h4>
+    <pre><code>private static final Set&lt;String&gt; FORBIDDEN_WORDS =
+    Set.of("nain", "nains", "elfe", "elf", "elfes");
+
+@Override
+public InputGuardrailResult validate(UserMessage userMessage) {
+    String text = userMessage.singleText().toLowerCase();
+    for (String word : FORBIDDEN_WORDS) {
+        if (text.contains(word)) {
+            return failure("Les Vikings ne connaissent ni les nains ni les elfes ! "
+                         + "Gardez votre requête purement nordique.");
+        }
+    }
+    return success();
+}</code></pre>
+
+    <h4>NoFantasyRacesOutputGuardrail — rejeter les mots interdits en sortie</h4>
+    <pre><code>@Override
+public OutputGuardrailResult validate(AiMessage responseFromLLM) {
+    String text = responseFromLLM.text().toLowerCase();
+    for (String word : FORBIDDEN_WORDS) {
+        if (text.contains(word)) {
+            return failure("Le chant du skald ne doit pas évoquer les nains ni les elfes ! "
+                         + "C'est une saga viking pure.");
+        }
+    }
+    return success();
+}</code></pre>
+</div>
+</section>
+
+<!-- Step 4: Câbler @RegisterAIService -->
+<section id="ex4-step4" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-purple);">4</span>
+        <span class="step-title">Câbler les guardrails dans <code>@RegisterAIService</code></span>
+    </div>
+    <p>Ouvrez <code>SkaldAssistant.java</code> et décommentez / remplacez le TODO par l'annotation complète :</p>
+
+    <pre><code>import dev.langchain4j.cdi.RegisterAIService;
+import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage;
+
+@RegisterAIService(
+    chatModelName        = "my-model",
+    inputGuardrailNames  = {"french-input",  "fantasy-input"},
+    outputGuardrailNames = {"french-output", "fantasy-output"})
+public interface SkaldAssistant {
+
+    @SystemMessage("""
+        Tu es un skald viking qui compose des chants épiques en FRANÇAIS.
+        Le chant doit célébrer les thèmes nordiques héroïques : batailles, raids,
+        Valhalla, Thor, Odin, drakkars.
+        Format : 3-4 couplets avec un refrain puissant.
+        Ton : épique, héroïque, guerrier.
+        """)
+    String composeSong(@UserMessage String request);
+}</code></pre>
+
+    <div class="callout info">
+        <div class="callout-title">&#128161; Ordre d'exécution</div>
+        <p>Les guardrails sont exécutés dans l'ordre des tableaux. Ici, <code>french-input</code> est évalué avant <code>fantasy-input</code>. Si le premier échoue, le second n'est pas évalué. Le LLM n'est appelé que si <strong>tous</strong> les guardrails d'entrée passent.</p>
+    </div>
+
+    <h4>Déployer</h4>
+    <pre><code>mvn clean wildfly:dev</code></pre>
+
+    <div class="callout warning">
+        <div class="callout-title">&#9888; Configuration déjà fournie</div>
+        <p>Le fichier <code>microprofile-config.properties</code> est déjà configuré avec le modèle Mistral AI. Assurez-vous que <code>MISTRAL_API_KEY</code> est défini dans votre environnement.</p>
+    </div>
+</div>
+</section>
+
+<!-- Test Ex4 -->
+<section id="ex4-test" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-green);">&#10003;</span>
+        <span class="step-title">Tester et valider l'exercice 4</span>
+    </div>
+
+    <h4>Via curl</h4>
+    <pre><code># ✅ Requête valide en français
+curl -X POST -H "Content-Type: text/plain" \
+  -d "Compose un chant sur la gloire d'Odin et les batailles vikings" \
+  http://localhost:8080/demo-4/api/song
+
+# ❌ InputGuardrail langue : requête en anglais rejetée
+curl -X POST -H "Content-Type: text/plain" \
+  -d "Sing me a heroic Viking song about Odin" \
+  http://localhost:8080/demo-4/api/song
+
+# ❌ InputGuardrail races : mention de nains rejetée
+curl -X POST -H "Content-Type: text/plain" \
+  -d "Compose un chant sur les nains qui forgeaient des armes vikings" \
+  http://localhost:8080/demo-4/api/song
+
+# Vérification santé
+curl http://localhost:8080/demo-4/api/song/health</code></pre>
+
+    <h4>Via l'interface web</h4>
+    <p>Ouvrez <a href="http://localhost:8080/demo-4/" target="_blank">http://localhost:8080/demo-4/</a> pour accéder à l'interface interactive qui affiche les guardrails actifs et leurs messages d'erreur.</p>
+
+    <ul class="checklist">
+        <li>Une requête en français sur un thème nordique produit un chant épique</li>
+        <li>Une requête en anglais retourne <em>« Seul le français est accepté ! »</em></li>
+        <li>Une requête mentionnant des nains ou des elfes est rejetée</li>
+        <li>Un seul mot ambigu comme « Odin » passe (benefit of the doubt)</li>
+        <li>Le code HTTP 400 est retourné avec le message du guardrail qui a échoué</li>
+    </ul>
+
+    <div class="callout tip">
+        <div class="callout-title">&#128161; Bloqué ?</div>
+        <p>Passez à la solution : <code>cd ../solution && mvn clean wildfly:dev</code></p>
+    </div>
+
+    <div class="callout success">
+        <div class="callout-title">&#127881; Félicitations !</div>
+        <p>Vous avez construit quatre applications alimentées par l'IA avec LangChain4j-CDI : un skald viking, un guide d'expéditions résilient, un jeu de dés avec MCP, et maintenant un skald avec guardrails. Tous avec les patterns Jakarta EE que vous connaissez déjà.</p>
+    </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
 <!-- WHAT'S NEXT                                                   -->
 <!-- ============================================================ -->
 <section id="whats-next" class="section-anchor">
@@ -1802,13 +2135,35 @@ curl -X POST -H "Content-Type: text/plain" \
             <td>Variable d'environnement non définie</td>
             <td><code>export MISTRAL_API_KEY=your-key</code></td>
         </tr>
+        <tr>
+            <td>Guardrail jamais déclenché</td>
+            <td><code>@Named</code> manquant ou nom différent</td>
+            <td>Vérifier que le nom dans <code>@Named("...")</code> correspond exactement à <code>inputGuardrailNames</code></td>
+        </tr>
+        <tr>
+            <td><code>NullPointerException</code> dans le guardrail</td>
+            <td>Détecteur non initialisé</td>
+            <td>Vérifier que <code>@PostConstruct</code> appelle bien <code>new OptimaizeLangDetector().loadModels()</code></td>
+        </tr>
+        <tr>
+            <td>Texte français rejeté par <code>french-input</code></td>
+            <td>Texte trop court pour Tika</td>
+            <td>Normal — la logique <code>isReasonablyCertain()</code> donne le benefit of the doubt aux textes ambigus</td>
+        </tr>
+        <tr>
+            <td>Réponse 400 sans message lisible</td>
+            <td>Exception guardrail non parsée</td>
+            <td>Le <code>ChatResource</code> extrait le message avec <code>extractGuardrailMessage()</code> — vérifier l'implémentation</td>
+        </tr>
     </tbody>
 </table>
 
 <div class="callout danger">
     <div class="callout-title">&#9888; Secours d'urgence</div>
     <p>Si quelque chose ne va pas, passez au module solution :</p>
-    <pre><code>cd demo-N-xxx/solution && mvn clean wildfly:dev</code></pre>
+    <pre><code>cd demo-N-xxx/solution && mvn clean wildfly:dev
+# Exemple pour l'exercice 4 :
+cd demo-4-guardrails/solution && mvn clean wildfly:dev</code></pre>
 </div>
 </section>
 

@@ -16,6 +16,7 @@
         <module>demo-1-ai-agent</module>
         <module>demo-2-ft-telemetry</module>
         <module>demo-3-mcp</module>
+        <module>demo-4-guardrails</module>
     </modules>
 
     <properties>
@@ -34,6 +35,9 @@
 
         <!-- LangChain4j MCP (beta versioning) -->
         <langchain4j-mcp.version>1.11.0-beta19</langchain4j-mcp.version>
+
+        <!-- Apache Tika language detection -->
+        <tika.version>2.9.2</tika.version>
     </properties>
 
     <dependencyManagement>
@@ -102,6 +106,18 @@
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-mcp</artifactId>
                 <version>${langchain4j-mcp.version}</version>
+            </dependency>
+
+            <!-- Apache Tika language detection -->
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId>
+                <version>${tika.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-langdetect-optimaize</artifactId>
+                <version>${tika.version}</version>
             </dependency>
 
             <!-- JSON processing -->

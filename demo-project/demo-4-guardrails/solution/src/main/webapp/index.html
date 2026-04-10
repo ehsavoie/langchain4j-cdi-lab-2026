@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo 4 — Guardrails</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+            background: #0d1117; color: #c9d1d9;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        }
+        header {
+            background: #161b22; border-bottom: 1px solid #30363d;
+            padding: 1rem 2rem; display: flex; align-items: center; gap: 1rem;
+            flex-shrink: 0;
+        }
+        header h1 { font-size: 1.2rem; color: #58a6ff; }
+        .badge {
+            background: #238636; color: #fff; font-size: 0.7rem;
+            padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: 600;
+        }
+        header .subtitle { color: #8b949e; font-size: 0.8rem; margin-left: auto; }
+        #content {
+            flex: 1; overflow-y: auto; padding: 1.5rem 2rem;
+            display: flex; flex-direction: column; gap: 1.2rem;
+        }
+        .welcome {
+            text-align: center; color: #8b949e; margin: auto;
+            font-size: 0.9rem; line-height: 2;
+        }
+        .welcome code {
+            background: #21262d; padding: 0.15rem 0.4rem; border-radius: 4px;
+            color: #f0883e; font-size: 0.85rem;
+        }
+        .guardrail-info {
+            background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+            padding: 1rem 1.5rem; font-size: 0.85rem; line-height: 1.8;
+        }
+        .guardrail-info h3 { color: #58a6ff; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .guardrail-info .tag {
+            display: inline-block; font-size: 0.7rem; font-weight: 600;
+            padding: 0.15rem 0.5rem; border-radius: 10px; margin-right: 0.4rem;
+        }
+        .tag.input { background: #1f6feb44; color: #58a6ff; border: 1px solid #1f6feb; }
+        .tag.output { background: #38863644; color: #3fb950; border: 1px solid #238636; }
+        .examples { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .example-btn {
+            background: #21262d; border: 1px solid #30363d; color: #c9d1d9;
+            padding: 0.3rem 0.8rem; border-radius: 6px; cursor: pointer;
+            font-family: inherit; font-size: 0.8rem; transition: border-color 0.2s;
+        }
+        .example-btn:hover { border-color: #58a6ff; }
+        .example-btn.blocked { border-color: #da3633; color: #f85149; }
+        .result-box {
+            background: #21262d; border: 1px solid #30363d; border-radius: 8px;
+            padding: 1rem 1.5rem; white-space: pre-wrap; font-size: 0.9rem;
+            line-height: 1.6; display: none;
+        }
+        .result-box.success { border-color: #238636; }
+        .result-box.error { border-color: #da3633; color: #f85149; }
+        #input-bar {
+            background: #161b22; border-top: 1px solid #30363d;
+            padding: 1rem 2rem; display: flex; gap: 0.8rem; flex-shrink: 0;
+        }
+        #message {
+            flex: 1; background: #0d1117; border: 1px solid #30363d;
+            color: #c9d1d9; padding: 0.7rem 1rem; border-radius: 6px;
+            font-family: inherit; font-size: 0.95rem; outline: none;
+        }
+        #message:focus { border-color: #58a6ff; }
+        #message::placeholder { color: #484f58; }
+        button#send-btn {
+            background: #238636; color: #fff; border: none;
+            padding: 0.7rem 1.5rem; border-radius: 6px; cursor: pointer;
+            font-family: inherit; font-weight: 600; font-size: 0.95rem;
+        }
+        button#send-btn:hover { background: #2ea043; }
+        button#send-btn.loading { pointer-events: none; background: #21262d; }
+        .spinner { display: none; }
+        .loading .spinner { display: inline-flex; gap: 3px; align-items: center; }
+        .loading .label { display: none; }
+        .dot { width: 6px; height: 6px; background: #fff; border-radius: 50%; animation: bounce 1.2s infinite ease-in-out; }
+        .dot:nth-child(2) { animation-delay: 0.15s; }
+        .dot:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0.4); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚔️ Demo 4 — Guardrails</h1>
+        <span class="badge">SOLUTION</span>
+        <span class="subtitle">@InputGuardrails + @OutputGuardrails</span>
+    </header>
+
+    <div id="content">
+        <div class="welcome">
+            <p>🛡️ <code>@InputGuardrails</code> + <code>@OutputGuardrails</code> sur <code>SkaldAssistant</code></p>
+            <p>Demandez un chant viking en français — les gardrails feront respecter les règles.</p>
+        </div>
+
+        <div class="guardrail-info">
+            <h3>Guardrails actifs</h3>
+            <p>
+                <span class="tag input">INPUT</span>
+                <strong>FrenchInputGuardrail</strong> — accepte uniquement les requêtes en français
+            </p>
+            <p>
+                <span class="tag input">INPUT</span>
+                <strong>NoFantasyRacesInputGuardrail</strong> — bloque les requêtes mentionnant des nains ou des elfes
+            </p>
+            <p>
+                <span class="tag output">OUTPUT</span>
+                <strong>FrenchOutputGuardrail</strong> — rejette les chants non écrits en français
+            </p>
+            <p>
+                <span class="tag output">OUTPUT</span>
+                <strong>NoFantasyRacesOutputGuardrail</strong> — rejette les chants mentionnant des nains ou des elfes
+            </p>
+            <div class="examples">
+                <span style="color:#8b949e; font-size:0.8rem; align-self:center;">Essayez :</span>
+                <button class="example-btn" onclick="setMessage(this.textContent)">Chante les exploits d'Erik le Rouge</button>
+                <button class="example-btn" onclick="setMessage(this.textContent)">Un chant sur le marteau de Thor</button>
+                <button class="example-btn blocked" onclick="setMessage(this.textContent)">Sing about Erik the Red</button>
+                <button class="example-btn blocked" onclick="setMessage(this.textContent)">A song about Thor's hammer</button>
+                <button class="example-btn blocked" onclick="setMessage(this.textContent)">Un chant sur les nains forgeurs</button>
+            </div>
+        </div>
+
+        <div id="result" class="result-box"></div>
+    </div>
+
+    <div id="input-bar">
+        <input type="text" id="message" autocomplete="off"
+               placeholder="Demandez un chant viking en français…">
+        <button id="send-btn" onclick="composeSong()">
+            <span class="label">Composer</span>
+            <span class="spinner">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </span>
+        </button>
+    </div>
+
+    <script>
+        function setMessage(text) {
+            document.getElementById('message').value = text;
+            document.getElementById('message').focus();
+        }
+
+        document.getElementById('message').addEventListener('keydown', e => {
+            if (e.key === 'Enter') composeSong();
+        });
+
+        async function composeSong() {
+            const input = document.getElementById('message');
+            const btn = document.getElementById('send-btn');
+            const result = document.getElementById('result');
+            const message = input.value.trim();
+            if (!message) return;
+
+            btn.classList.add('loading');
+            result.style.display = 'none';
+            result.className = 'result-box';
+
+            try {
+                const response = await fetch('/demo-4/api/song', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: message
+                });
+                const text = await response.text();
+                result.style.display = 'block';
+                if (response.ok) {
+                    result.classList.add('success');
+                    result.textContent = text;
+                } else {
+                    result.classList.add('error');
+                    result.textContent = 'Guardrail bloqué : ' + text;
+                }
+            } catch (err) {
+                result.style.display = 'block';
+                result.classList.add('error');
+                result.textContent = 'Erreur : ' + err.message;
+            } finally {
+                btn.classList.remove('loading');
+            }
+        }
+    </script>
+</body>
+</html>
