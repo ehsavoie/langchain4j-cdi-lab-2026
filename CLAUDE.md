@@ -18,10 +18,12 @@ Java 21, Maven 3.8+, Jakarta EE 10, MicroProfile 6.1, WildFly 39 (Galleon), Lang
 ## Commandes Essentielles
 
 ```bash
-# Prérequis : Ollama
+# Prérequis : Ollama (dans un terminal séparé, laisser tourner)
+ollama serve
+
+# Dans un autre terminal, télécharger les modèles
 ollama pull ministral-3:3b    # demo-1, demo-3
 ollama pull qwen2.5:7b        # demo-2 (tool calling + embeddings)
-ollama serve
 
 # Lancer une démo (remplacer N et le nom du module)
 cd demo-project/demo-1-ai-agent/solution && mvn clean wildfly:dev

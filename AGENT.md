@@ -58,9 +58,10 @@ Seules les annotations/config faisant l'objet du live coding diffèrent (TODOs d
 ## Lancer les Démos
 
 ```bash
-# Prérequis : Ollama en cours d'exécution avec ministral-3:3b
-ollama pull ministral-3:3b
+# Prérequis : Ollama (dans un terminal séparé, laisser tourner)
 ollama serve
+# Dans un autre terminal :
+ollama pull ministral-3:3b
 
 # Demo 1
 cd demo-project/demo-1-ai-agent/solution

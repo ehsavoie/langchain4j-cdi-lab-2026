@@ -849,7 +849,7 @@
         <tr><td><strong>Maven</strong></td><td>3.9+</td><td>Outil de build</td></tr>
         <tr><td><strong>IDE</strong></td><td>Apache NetBeans / IntelliJ IDEA / VS Code</td><td>Éditeur de code</td></tr>
         <tr><td><strong>curl</strong></td><td>n'importe quelle</td><td>Test d'API</td></tr>
-        <tr><td><strong>Clé API Mistral AI</strong></td><td>&mdash;</td><td>Fournisseur LLM (niveau gratuit disponible)</td></tr>
+        <tr><td><strong>Clé API Mistral AI</strong> <em>ou</em> <strong>Ollama</strong></td><td>&mdash;</td><td>Fournisseur LLM &mdash; distant (Mistral AI, gratuit) ou local (Ollama)</td></tr>
         <tr><td><strong>Docker / Podman</strong></td><td>n'importe quelle</td><td>Stack Grafana LGTM (Exercice 2 uniquement)</td></tr>
     </tbody>
 </table>
@@ -859,7 +859,44 @@
 <pre><code>git clone https://github.com/yblazart/confs-langchain4j-cdi-javaone2026.git
 cd confs-langchain4j-cdi-javaone2026/demo-project</code></pre>
 
-<h3>2. Configurer Mistral AI</h3>
+<h3>2. Choisir votre fournisseur LLM</h3>
+
+<div class="callout info">
+    <div class="callout-title">&#127922; Deux options au choix</div>
+    <p><strong>Option A &mdash; Mistral AI (distant)</strong> : inscrivez-vous gratuitement sur <a href="https://console.mistral.ai/" target="_blank">console.mistral.ai</a> pour obtenir une clé API. Aucune installation locale requise.</p>
+    <p><strong>Option B &mdash; Ollama (local)</strong> : installez <a href="https://ollama.ai" target="_blank">Ollama</a>, puis téléchargez le modèle :</p>
+    <pre><code># Dans un premier terminal (laisser tourner) :
+ollama serve
+
+# Dans un second terminal :
+ollama pull ministral-3:3b</code></pre>
+    <p>Ollama doit rester actif sur <code>http://localhost:11434</code> pendant tout l'atelier.</p>
+</div>
+
+<div class="callout warning">
+    <div class="callout-title">&#9881; Comment configurer le fournisseur dans chaque exercice</div>
+    <p>Chaque module contient un fichier <code>microprofile-config.properties</code> structuré ainsi :</p>
+    <pre><code># ---- Option A : Mistral AI (distant) ----
+dev.langchain4j.cdi.plugin.my-model.class=...MistralAiChatModel
+dev.langchain4j.cdi.plugin.my-model.config.api-key=${MISTRAL_API_KEY}
+dev.langchain4j.cdi.plugin.my-model.config.model-name=mistral-small-latest
+
+# ---- Option B : Ollama (local) ----
+# dev.langchain4j.cdi.plugin.my-model.class=...OllamaChatModel
+# dev.langchain4j.cdi.plugin.my-model.config.base-url=http://localhost:11434
+# dev.langchain4j.cdi.plugin.my-model.config.model-name=ministral-3:3b
+
+dev.langchain4j.cdi.plugin.my-model.config.temperature=0.9
+dev.langchain4j.cdi.plugin.my-model.config.log-requests=true</code></pre>
+    <p><strong>Par défaut, l'Option A (Mistral AI) est active.</strong> Pour passer à Ollama :</p>
+    <ol>
+        <li><strong>Commentez</strong> les 3 lignes de l'Option A (ajoutez <code>#</code> devant)</li>
+        <li><strong>Décommentez</strong> les 3 lignes de l'Option B (retirez les <code>#</code>)</li>
+    </ol>
+    <p>Les propriétés communes (<code>temperature</code>, <code>log-requests</code>, etc.) sont en dessous et <strong>restent inchangées</strong> &mdash; elles s'appliquent quel que soit le fournisseur choisi.</p>
+</div>
+
+<h4>Option A : Configurer Mistral AI (distant)</h4>
 
 <p>Inscrivez-vous sur <a href="https://console.mistral.ai/" target="_blank">console.mistral.ai</a> et suivez ces étapes pour obtenir une clé API gratuite :</p>
 
@@ -899,8 +936,8 @@ export MISTRAL_API_KEY=your-api-key-here
 $env:MISTRAL_API_KEY="your-api-key-here"</code></pre>
 
 <div class="callout tip">
-    <div class="callout-title">&#128161; Alternative : Ollama local</div>
-    <p>Si vous préférez exécuter les modèles en local, installez <a href="https://ollama.ai" target="_blank">Ollama</a> et téléchargez un modèle : <code>ollama pull qwen2.5:7b</code>. Vous devrez ajuster le fichier <code>microprofile-config.properties</code> pour utiliser OllamaChatModel au lieu de MistralAiChatModel.</p>
+    <div class="callout-title">&#128161; Option B : Ollama local</div>
+    <p>Si vous avez choisi Ollama, <strong>ignorez toute la section Mistral AI ci-dessus</strong>. Pas besoin de clé API &mdash; il suffit de commenter/décommenter les blocs dans <code>microprofile-config.properties</code> comme expliqué plus haut.</p>
 </div>
 
 <h3>3. WildFly (automatique)</h3>
@@ -1192,6 +1229,11 @@ dev.langchain4j.cdi.plugin.my-model.config.api-key=${MISTRAL_API_KEY}
 dev.langchain4j.cdi.plugin.my-model.config.model-name=mistral-small-latest
 dev.langchain4j.cdi.plugin.my-model.config.temperature=0.9</code></pre>
 
+    <div class="callout tip">
+        <div class="callout-title">🏠 Ollama local</div>
+        <p>Dans <code>microprofile-config.properties</code>, commentez les 3 lignes de l'<strong>Option A</strong> et décommentez les 3 lignes de l'<strong>Option B</strong>. Les propriétés communes (<code>temperature</code>, <code>log-requests</code>...) restent inchangées.</p>
+    </div>
+
     <div class="callout warning">
         <div class="callout-title">&#9888; Critique : le préfixe .config.</div>
         <p>Les propriétés du builder <strong>doivent</strong> utiliser le préfixe <code>.config.</code> : <code>dev.langchain4j.cdi.plugin.&lt;name&gt;.config.&lt;prop&gt;=value</code>. Sans <code>.config.</code>, la propriété est <strong>ignorée silencieusement</strong>.</p>
@@ -1254,6 +1296,11 @@ public void chatStream(@QueryParam("message") String message,
     dev.langchain4j.model.mistralai.MistralAiStreamingChatModel
 dev.langchain4j.cdi.plugin.my-streaming-model.config.api-key=${MISTRAL_API_KEY}
 dev.langchain4j.cdi.plugin.my-streaming-model.config.model-name=mistral-small-latest</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">🏠 Ollama local</div>
+        <p>Même principe : commentez l'<strong>Option A</strong> du streaming model et décommentez l'<strong>Option B</strong> dans <code>microprofile-config.properties</code>.</p>
+    </div>
 </div>
 </section>
 
@@ -1296,6 +1343,11 @@ public class ImageAnalyzerServlet extends HttpServlet {
     dev.langchain4j.model.mistralai.MistralAiChatModel
 dev.langchain4j.cdi.plugin.vision-model.config.api-key=${MISTRAL_API_KEY}
 dev.langchain4j.cdi.plugin.vision-model.config.model-name=pixtral-large-latest</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">🏠 Ollama local</div>
+        <p>Même principe : commentez l'<strong>Option A</strong> du vision model et décommentez l'<strong>Option B</strong>. Prérequis : <code>ollama pull llama3.2-vision:11b</code> (attention : ~7 Go).</p>
+    </div>
 </div>
 </section>
 
@@ -1651,7 +1703,7 @@ public interface VikingGameMasterAI {
     </div>
     <p>Open <code>microprofile-config.properties</code> and uncomment the MCP configuration:</p>
 
-    <pre><code># Chat Model (Mistral AI)
+    <pre><code># Chat Model (Mistral AI distant)
 dev.langchain4j.cdi.plugin.mistral.class=\
     dev.langchain4j.model.mistralai.MistralAiChatModel
 dev.langchain4j.cdi.plugin.mistral.config.api-key=${MISTRAL_API_KEY}
@@ -1672,6 +1724,11 @@ dev.langchain4j.cdi.plugin.mcpclient.config.transport=lookup:@ssetransport
 dev.langchain4j.cdi.plugin.mcp.class=\
     dev.langchain4j.mcp.McpToolProvider
 dev.langchain4j.cdi.plugin.mcp.config.mcpClients=lookup:@mcpclient</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">🏠 Ollama local</div>
+        <p>Même principe : commentez l'<strong>Option A</strong> du Chat Model et décommentez l'<strong>Option B</strong>. La config MCP (transport, client, tool provider) reste identique.</p>
+    </div>
 
     <div class="callout info">
         <div class="callout-title">&#128161; The lookup: pattern</div>
