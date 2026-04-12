@@ -1424,6 +1424,8 @@ curl http://localhost:8080/demo-1/api/chat/health</code></pre>
 <pre><code>cd demo-project/demo-2-ft-telemetry/base
 mvn clean wildfly:dev</code></pre>
 
+<p>Ouvrez votre navigateur vers <a href="http://localhost:8080/demo-2" target="_blank">http://localhost:8080/demo-2</a> pour tester l'application.</p>
+
 <h3>Ce qui fonctionne déjà</h3>
 
 <p>Le module base est pré-câblé avec ces fonctionnalités :</p>
@@ -1536,7 +1538,7 @@ String chat(@MemoryId String sessionId,
 
     <div class="callout success">
         <div class="callout-title">&#10003; Tester la résilience</div>
-        <p>Simulez une panne : changez temporairement la clé API par une valeur invalide, puis envoyez des requêtes. Vous devriez voir les tentatives de retry, puis le message de fallback. Restaurez la clé et le circuit breaker se rétablit automatiquement.</p>
+        <p>Simulez une panne : coupez le wifi pour simuler un souci réseau, puis envoyez des requêtes. Si vous utilisez Ollama, coupez simplement le serveur. Vous devriez voir les tentatives de retry, puis le message de fallback. Rétablissez la connexion (ou relancez Ollama) et le circuit breaker se rétablit automatiquement.</p>
     </div>
 </div>
 </section>
@@ -1550,9 +1552,12 @@ String chat(@MemoryId String sessionId,
     </div>
     <p>Démarrez la stack Grafana LGTM (Loki + Grafana + Tempo + Mimir) :</p>
 
-    <pre><code># Démarrer la stack d'observabilité
-podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 \
-           --rm -ti grafana/otel-lgtm</code></pre>
+    <pre><code># Démarrer la stack LGTM complète (Loki + Grafana + Tempo + Mimir)
+# avec le collecteur OpenTelemetry intégré
+podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
+
+# Ou avec Docker
+docker run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm</code></pre>
 
     <p>La configuration de télémétrie est déjà dans <code>microprofile-config.properties</code> :</p>
 
