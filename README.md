@@ -82,8 +82,8 @@ curl -X POST -H "Content-Type: text/plain" \
 ### Démo 3 — MCP Integration
 
 ```bash
-# Construire le serveur MCP d'abord
-cd demo-project/demo-3-mcp/mcp-server && mvn clean package
+# Démarrer le serveur MCP d'abord (Helidon 4, port 8090)
+cd demo-project/demo-3-mcp/mcp-server && mvn clean package && java -jar target/casino-dice-roller.jar
 
 # Lancer la démo
 cd demo-project/demo-3-mcp/solution && mvn clean wildfly:dev

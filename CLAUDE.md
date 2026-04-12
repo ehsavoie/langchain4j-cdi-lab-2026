@@ -30,7 +30,7 @@ cd demo-project/demo-1-ai-agent/solution && mvn clean wildfly:dev
 cd demo-project/demo-2-ft-telemetry/solution && mvn clean wildfly:dev
 
 # Demo 3 : compiler d'abord le serveur MCP
-cd demo-project/demo-3-mcp/mcp-server && mvn clean package
+cd demo-project/demo-3-mcp/mcp-server && mvn clean package && java -jar target/casino-dice-roller.jar
 cd demo-project/demo-3-mcp/solution && mvn clean wildfly:dev
 
 # Tester
@@ -56,7 +56,7 @@ demo-project/
 │   ├── base/
 │   └── solution/
 └── demo-3-mcp/                <- Intégration MCP (Model Context Protocol)
-    ├── mcp-server/            <- Serveur MCP standalone (fat JAR)
+    ├── mcp-server/            <- Serveur MCP standalone (Helidon 4)
     ├── base/
     └── solution/
 ```

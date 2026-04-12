@@ -34,7 +34,7 @@
         <mistral.model>mistral-small-latest</mistral.model>
 
         <!-- LangChain4j MCP (beta versioning) -->
-        <langchain4j-mcp.version>1.11.0-beta19</langchain4j-mcp.version>
+        <langchain4j-mcp.version>1.13.0-beta23</langchain4j-mcp.version>
 
         <!-- Apache Tika language detection -->
         <tika.version>2.9.2</tika.version>

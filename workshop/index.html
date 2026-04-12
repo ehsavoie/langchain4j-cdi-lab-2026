@@ -1095,7 +1095,7 @@ Assistant assistant;</code></pre>
 &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="highlight">base/</span><br>
 &#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">solution/</span><br>
 &#9500;&#9472;&#9472; <span class="dir">demo-3-mcp/</span> <span class="comment">&larr; MCP Integration</span><br>
-&#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="dir">mcp-server/</span> <span class="comment">&larr; Standalone MCP server (fat JAR)</span><br>
+&#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="dir">mcp-server/</span> <span class="comment">&larr; Serveur MCP standalone (Helidon 4)</span><br>
 &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="highlight">base/</span><br>
 &#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">solution/</span><br>
 &#9492;&#9472;&#9472; <span class="dir">demo-4-guardrails/</span> <span class="comment">&larr; Input &amp; Output Guardrails</span><br>
@@ -1648,28 +1648,30 @@ curl "http://localhost:8080/demo-2/api/chat/memory?sessionId=test-456"</code></p
     </div>
     <p>D'abord, compilez et démarrez le serveur MCP de dés externe :</p>
 
-    <pre><code># Compiler le serveur MCP
+    <pre><code># Compiler et démarrer le serveur MCP avec Helidon 4 (écoute sur le port 8090)
 cd demo-project/demo-3-mcp/mcp-server
 mvn clean package
+java -jar target/casino-dice-roller.jar</code></pre>
 
-# Le démarrer (écoute sur le port 8090)
-java -jar target/mcp-server-1.0-SNAPSHOT-jar-with-dependencies.jar</code></pre>
-
-    <p>Le serveur MCP expose un outil <code>roll</code> qui génère des résultats de dés aléatoires pour le jeu viking. Il communique via HTTP SSE (Server-Sent Events) avec JSON-RPC 2.0.</p>
+    <p>Le serveur MCP est une application MicroProfile propulsée par <strong>LangChain4j-CDI MCP Server</strong> et <strong>Helidon 4</strong>. Il expose automatiquement un endpoint <code>/mcp</code> qui parle le protocole MCP (JSON-RPC 2.0 sur HTTP Streamable). L'outil <code>roll</code> génère des résultats de dés aléatoires pour le jeu viking.</p>
 
     <div class="callout info">
         <div class="callout-title">&#128161; Laissez-le tourner</div>
-        <p>Laissez le serveur MCP tourner dans un terminal séparé. L'agent IA s'y connectera via HTTP SSE sur <code>localhost:8090/sse</code>.</p>
+        <p>Laissez le serveur MCP tourner dans un terminal séparé. L'agent IA s'y connectera via l'endpoint MCP sur <code>localhost:8090/mcp</code>.</p>
     </div>
 
     <h3 style="margin-top: 1.5em;">Tester avec MCP Inspector</h3>
     <p>Avant de connecter le serveur MCP à l'agent IA, vous pouvez vérifier qu'il fonctionne en utilisant le <strong>MCP Inspector</strong> &mdash; un outil de débogage visuel pour les serveurs MCP. Dans un nouveau terminal :</p>
 
-    <pre><code># Depuis le répertoire demo-3-mcp
-cd demo-project/demo-3-mcp
-./run-mcp-inspector.sh</code></pre>
+    <pre><code># Lancer le MCP Inspector
+npx @modelcontextprotocol/inspector</code></pre>
 
-    <p>Ceci ouvre une interface web (généralement sur <code>http://localhost:6274</code>) connectée à votre serveur MCP. Cliquez sur l'onglet <strong>Tools</strong>, puis sur l'outil <code>roll</code> pour l'inspecter et le tester interactivement :</p>
+    <p>Ceci ouvre une interface web (généralement sur <code>http://localhost:6274</code>). Configurez la connexion :</p>
+    <ul>
+        <li><strong>Transport Type</strong> : <code>Streamable HTTP</code></li>
+        <li><strong>URL</strong> : <code>http://localhost:8090/mcp</code></li>
+    </ul>
+    <p>Cliquez sur <strong>Connect</strong>, puis sur l'onglet <strong>Tools</strong> et sur l'outil <code>roll</code> pour l'inspecter et le tester interactivement :</p>
 
     <img src="mcp-inspector.png" alt="MCP Inspector showing the roll tool" style="max-width: 100%; border-radius: 12px; margin: 1em 0; border: 1px solid var(--border);">
 
