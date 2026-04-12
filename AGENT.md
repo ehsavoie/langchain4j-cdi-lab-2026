@@ -28,7 +28,7 @@ Licence : Apache 2.0.
 ├── LICENSE                  <- Apache 2.0
 ├── slides/
 │   ├── index.html           <- Présentation Reveal.js (tout-en-un)
-│   └── start.sh             <- python3 -m http.server 8000
+│   └── start.sh             <- jbang HttpServer.java
 └── demo-project/
     ├── pom.xml              <- POM parent (versions centralisées)
     ├── README.md            <- Stratégie globale des démos
@@ -85,7 +85,7 @@ Le context-root est défini par `<name>` dans le `wildfly-maven-plugin` de chaqu
 ## Slides
 
 ```bash
-cd slides && python3 -m http.server 8000
+cd slides && jbang HttpServer.java
 # -> http://localhost:8000
 # Touche S = Vue présentateur (notes), F = plein écran, O = vue d'ensemble
 ```
@@ -272,7 +272,7 @@ Chaque démo possède un `index.html` dans `src/main/webapp/` avec :
 curl http://localhost:11434/api/tags
 
 # Lancer les slides
-cd slides && python3 -m http.server 8000
+cd slides && jbang HttpServer.java
 
 # Lancer une démo (remplacer N et le module)
 cd demo-project/demo-N-xxx/solution && mvn clean wildfly:dev

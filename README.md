@@ -6,24 +6,7 @@
 |------|---------|---------|
 | **Java** | 21+ | Compiler et exécuter les démos |
 | **Maven** | 3.8+ | Système de build |
-| **Python 3** | 3.x | Servir les slides et le workshop localement |
 | **Ollama** | latest | Inférence LLM locale |
-
-### Installer Python 3
-
-**macOS** (Homebrew):
-```bash
-brew install python3
-```
-
-**Linux** (Debian/Ubuntu):
-```bash
-sudo apt update && sudo apt install python3
-```
-
-**Windows**:
-
-Télécharger depuis https://www.python.org/downloads/ et lancer l'installateur. Assurez-vous de cocher **"Add Python to PATH"** pendant l'installation.
 
 ### Installer Ollama
 
@@ -31,33 +14,6 @@ Télécharger depuis https://ollama.com et récupérer les modèles requis :
 ```bash
 ollama pull mistral-small3.1
 ```
-
-## Lancer les slides
-
-```bash
-cd slides
-chmod +x start.sh
-./start.sh
-```
-
-Ou simplement :
-```bash
-cd slides && python3 -m http.server 8000
-```
-
-Ouvrir http://localhost:8000 dans le navigateur.
-
-**Vue présentateur (iPad Sidecar)** : appuyer sur `S` pour ouvrir la vue présentateur dans une nouvelle fenêtre, puis déplacer cette fenêtre vers l'iPad en Sidecar.
-
-## Raccourcis Reveal.js
-
-| Touche | Action |
-|-----|--------|
-| `S` | Vue présentateur (notes) |
-| `F` | Plein écran |
-| `O` / `Esc` | Vue d'ensemble |
-| `B` / `.` | Écran noir (pause) |
-| `←` `→` | Navigation |
 
 ## Workshop
 
