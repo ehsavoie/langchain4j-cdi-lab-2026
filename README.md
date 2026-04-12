@@ -19,30 +19,15 @@ ollama pull mistral-small3.1
 
 Un guide pratique en autonomie couvrant les 3 démos étape par étape.
 
-```bash
-cd workshop
-chmod +x start.sh
-./start.sh
-```
-
-Windows :
-```cmd
-cd workshop
-start.bat
-```
-
-Ouvrir http://localhost:8001 dans le navigateur.
+Ouvrir directement `workshop/index.html` dans le navigateur.
 
 ## Structure
 
 ```
 slides/          → Présentation Reveal.js
   index.html     → Slides + notes présentateur
-  start.sh       → Script de lancement
 workshop/        → Guide pratique du workshop
   index.html     → Tutoriel en autonomie
-  start.sh       → Script de lancement (macOS/Linux)
-  start.bat      → Script de lancement (Windows)
 demo-project/    → Projet Maven pour les démos IntelliJ
 ```
 

@@ -28,7 +28,7 @@ Licence : Apache 2.0.
 ├── LICENSE                  <- Apache 2.0
 ├── slides/
 │   ├── index.html           <- Présentation Reveal.js (tout-en-un)
-│   └── start.sh             <- jbang HttpServer.java
+│   └── (ouvrir index.html directement dans le navigateur)
 └── demo-project/
     ├── pom.xml              <- POM parent (versions centralisées)
     ├── README.md            <- Stratégie globale des démos
@@ -84,11 +84,8 @@ Le context-root est défini par `<name>` dans le `wildfly-maven-plugin` de chaqu
 
 ## Slides
 
-```bash
-cd slides && jbang HttpServer.java
-# -> http://localhost:8000
-# Touche S = Vue présentateur (notes), F = plein écran, O = vue d'ensemble
-```
+Ouvrir `slides/index.html` directement dans le navigateur.
+Touche S = Vue présentateur (notes), F = plein écran, O = vue d'ensemble.
 
 Les slides constituent un fichier unique `slides/index.html`. Les notes pour le présentateur sont dans les balises `<aside class="notes">`.
 
@@ -271,8 +268,7 @@ Chaque démo possède un `index.html` dans `src/main/webapp/` avec :
 # Vérifier qu'Ollama est en cours d'exécution
 curl http://localhost:11434/api/tags
 
-# Lancer les slides
-cd slides && jbang HttpServer.java
+# Lancer les slides : ouvrir slides/index.html dans le navigateur
 
 # Lancer une démo (remplacer N et le module)
 cd demo-project/demo-N-xxx/solution && mvn clean wildfly:dev

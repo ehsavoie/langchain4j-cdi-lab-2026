@@ -171,7 +171,7 @@ curl -X POST http://localhost:8080/demo3/api/conference/query \
 - [ ] Terminal ready for curl commands
 - [ ] Solutions tested the day before (`solution/` of each demo)
 - [ ] iPad in Sidecar for speaker notes
-- [ ] Reveal.js slides launched (`cd slides && ./start.sh`)
+- [ ] Reveal.js slides launched (ouvrir `slides/index.html` dans le navigateur)
 
 ## In case of emergency
 

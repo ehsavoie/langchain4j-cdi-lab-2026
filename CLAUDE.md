@@ -36,7 +36,7 @@ curl -X POST -H "Content-Type: text/plain" -d "Raconte-moi une blague viking" ht
 curl -X POST -H "Content-Type: text/plain" -H "X-Session-Id: test-123" -d "Quelles expéditions sont disponibles ?" http://localhost:8080/demo-2/api/chat
 
 # Slides
-cd slides && jbang HttpServer.java
+# Ouvrir slides/index.html directement dans le navigateur
 ```
 
 Il n'y a pas de tests unitaires dans ce projet. La validation est faite manuellement via curl ou les IUs web.
