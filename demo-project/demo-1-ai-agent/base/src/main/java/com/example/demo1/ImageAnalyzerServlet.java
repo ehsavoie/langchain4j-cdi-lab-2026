@@ -1,6 +1,6 @@
 package com.example.demo1;
 
-// TODO STEP 1 : Import LangChain4j classes for image analysis
+// TODO ÉTAPE 1 : Importer les classes LangChain4j pour l'analyse d'image
 // import dev.langchain4j.data.image.Image;
 // import dev.langchain4j.data.message.ImageContent;
 // import dev.langchain4j.data.message.TextContent;
@@ -22,8 +22,8 @@ import java.io.InputStream;
 import java.util.Base64;
 
 /**
- * Servlet to analyze uploaded images using AI
- * Uses a vision model (e.g.: llama3.2-vision, llama-3.2-11b-vision-preview)
+ * Servlet pour analyser des images téléchargées avec l'IA.
+ * Utilise un modèle de vision (ex. : llama3.2-vision, llama-3.2-11b-vision-preview)
  *
  * @author JavaOne Demo
  */
@@ -31,10 +31,10 @@ import java.util.Base64;
 @WebServlet("/uploadServlet")
 public class ImageAnalyzerServlet extends HttpServlet {
 
-    // TODO STEP 2 : Inject the ChatLanguageModel dedicated to image analysis
-    // IMPORTANT : Use @Named("vision-model") to inject the configured vision model
-    // This model MUST support image analysis (vision)
-    // See microprofile-config.properties for the vision-model configuration
+    // TODO ÉTAPE 2 : Injecter le ChatLanguageModel dédié à l'analyse d'image
+    // IMPORTANT : Utiliser @Named("vision-model") pour injecter le modèle de vision configuré
+    // Ce modèle DOIT supporter l'analyse d'image (vision)
+    // Voir microprofile-config.properties pour la configuration du vision-model
     // @Inject
     // @Named("vision-model")
     // ChatLanguageModel visionModel;
@@ -43,27 +43,27 @@ public class ImageAnalyzerServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // TODO STEP 3 : Retrieve the uploaded file
+        // TODO ÉTAPE 3 : Récupérer le fichier téléchargé
         // Part file = request.getPart("file");
 
-        // TODO STEP 4 : Create a UserMessage with the image and a question
+        // TODO ÉTAPE 4 : Créer un UserMessage avec l'image et une question
         // UserMessage userMessage = UserMessage.from(
-        //     TextContent.from("Decrit cette image en détails."),
+        //     TextContent.from("Décris cette image en détails."),
         //     ImageContent.from(encodeBase64(file.getInputStream()), file.getContentType())
         // );
 
-        // TODO STEP 5 : Call the vision model to analyze the image
+        // TODO ÉTAPE 5 : Appeler le modèle de vision pour analyser l'image
         // ChatResponse answer = visionModel.chat(userMessage);
 
-        // TODO STEP 6 : Send back the response
+        // TODO ÉTAPE 6 : Renvoyer la réponse
         response.setContentType("text/plain");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("TODO: Wire image analysis here");
+        response.getWriter().write("TODO: Intégrer l'analyse d'image ici");
         // response.getWriter().write(answer.aiMessage().text());
     }
 
     /**
-     * Extracts the filename from the HTTP headers
+     * Extrait le nom du fichier depuis les en-têtes HTTP
      */
     private static String getFilename(Part part) {
         for (String cd : part.getHeader("content-disposition").split(";")) {
@@ -77,7 +77,7 @@ public class ImageAnalyzerServlet extends HttpServlet {
     }
 
     /**
-     * Encodes an InputStream to Base64 (required to send the image to the AI)
+     * Encode un InputStream en Base64 (nécessaire pour envoyer l'image à l'IA)
      */
     private static String encodeBase64(InputStream in) throws IOException {
         try (ByteArrayOutputStream tempBuffer = new ByteArrayOutputStream()) {

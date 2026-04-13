@@ -9,15 +9,16 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * A ChatMemory that retains the last two dice roll exchanges.
+ * Une ChatMemory qui conserve les deux derniers échanges de lancer de runes.
  *
- * The model always sees:
+ * Le modèle voit toujours :
  *   [SystemMessage]
- *   + [previous UserMessage] + [AiMessage(tool call)] + [ToolResult] + [AiMessage(response)]
- *   + [current  UserMessage] + ... (in-progress)
+ *   + [UserMessage précédent] + [AiMessage(appel outil)] + [ToolResult] + [AiMessage(réponse)]
+ *   + [UserMessage courant] + ... (en cours)
  *
- * This lets the LLM compare the current roll result with the previous one.
- * Eviction triggers only when a third UserMessage arrives, dropping the oldest exchange.
+ * Ceci permet au LLM de comparer le résultat du lancer actuel avec le précédent.
+ * L'éviction ne se déclenche que lorsqu'un troisième UserMessage arrive,
+ * en supprimant l'échange le plus ancien.
  */
 public class LastDiceRollChatMemory implements ChatMemory {
 
@@ -28,7 +29,7 @@ public class LastDiceRollChatMemory implements ChatMemory {
 
     public LastDiceRollChatMemory(Object id) {
         this.id = id;
-        LOG.fine("[memory:%s] Created".formatted(id));
+        LOG.fine("[mémoire:%s] Créée".formatted(id));
     }
 
     @Override
@@ -38,18 +39,18 @@ public class LastDiceRollChatMemory implements ChatMemory {
 
     @Override
     public void add(ChatMessage message) {
-        LOG.fine("[memory:%s] Adding message type=%s".formatted(id, message.type()));
+        LOG.fine("[mémoire:%s] Ajout du message type=%s".formatted(id, message.type()));
         messages.add(message);
         evict();
     }
 
     /**
-     * Keeps the SystemMessage (if any) + the last two exchanges (previous roll + current roll).
-     * Eviction only triggers when a third UserMessage is present.
-     * Called after every add() so the window is always enforced.
+     * Conserve le SystemMessage (si présent) + les deux derniers échanges (lancer précédent + lancer courant).
+     * L'éviction ne se déclenche que lorsqu'un troisième UserMessage est présent.
+     * Appelé après chaque add() pour toujours faire respecter la fenêtre.
      */
     private void evict() {
-        // Collect indices of all USER messages
+        // Récupérer les indices de tous les messages USER
         List<Integer> userIndices = new ArrayList<>();
         for (int i = 0; i < messages.size(); i++) {
             if (messages.get(i).type() == ChatMessageType.USER) {
@@ -57,16 +58,16 @@ public class LastDiceRollChatMemory implements ChatMemory {
             }
         }
 
-        // Keep up to 2 exchanges: nothing to evict with <= 2 user messages
+        // Garder jusqu'à 2 échanges : rien à évincer avec <= 2 messages utilisateur
         if (userIndices.size() <= 2) {
             return;
         }
 
-        // Cut from the second-to-last UserMessage so the model sees:
-        //   previous exchange (roll N-1) + current exchange (roll N)
+        // Couper à partir de l'avant-dernier UserMessage pour que le modèle voie :
+        //   échange précédent (lancer N-1) + échange courant (lancer N)
         int keepFromIndex = userIndices.get(userIndices.size() - 2);
 
-        // Find the SystemMessage at the head (there is at most one)
+        // Trouver le SystemMessage en tête (il n'y en a qu'un au maximum)
         ChatMessage systemMessage = null;
         if (messages.get(0).type() == ChatMessageType.SYSTEM) {
             systemMessage = messages.get(0);
@@ -78,7 +79,7 @@ public class LastDiceRollChatMemory implements ChatMemory {
         }
         retained.addAll(messages.subList(keepFromIndex, messages.size()));
 
-        LOG.fine("[memory:%s] Evicting oldest roll: kept %d messages (dropped %d)"
+        LOG.fine("[mémoire:%s] Éviction du lancer le plus ancien : %d messages conservés (%d supprimés)"
                 .formatted(id, retained.size(), messages.size() - retained.size()));
         messages.clear();
         messages.addAll(retained);
@@ -91,7 +92,7 @@ public class LastDiceRollChatMemory implements ChatMemory {
 
     @Override
     public void clear() {
-        LOG.fine("[memory:%s] Cleared".formatted(id));
+        LOG.fine("[mémoire:%s] Effacée".formatted(id));
         messages.clear();
     }
 }

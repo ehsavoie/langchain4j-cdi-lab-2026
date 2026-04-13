@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test - Debug Interface</title>
+    <title>Test - Interface de Débogage</title>
     <style>
         body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #00ff00; }
         #log { border: 1px solid #00ff00; padding: 10px; margin: 10px 0; height: 400px; overflow-y: auto; background: #000; }
@@ -16,18 +16,18 @@
     </style>
 </head>
 <body>
-    <h1>Debug Interface - API Test</h1>
+    <h1>Interface de Débogage - Test API</h1>
 
     <div>
-        <button onclick="testHealth()">Test Health</button>
-        <button onclick="testStart()">Test Start</button>
-        <button onclick="testPlay()">Test Play</button>
-        <button onclick="clearLog()">Clear Log</button>
+        <button onclick="testHealth()">Tester Santé</button>
+        <button onclick="testStart()">Tester Démarrage</button>
+        <button onclick="testPlay()">Tester Jeu</button>
+        <button onclick="clearLog()">Effacer</button>
     </div>
 
     <div>
-        <input type="text" id="customMsg" placeholder="Custom message" value="Roll the dice">
-        <button onclick="testCustom()">Send Custom</button>
+        <input type="text" id="customMsg" placeholder="Message personnalisé" value="Lance les runes">
+        <button onclick="testCustom()">Envoyer</button>
     </div>
 
     <div id="log"></div>
@@ -48,51 +48,51 @@
         }
 
         async function testHealth() {
-            log('Testing /api/game/health...', 'info');
+            log('Test de /api/game/health...', 'info');
             try {
                 const resp = await fetch('api/game/health');
                 const text = await resp.text();
-                log(`OK Health OK: ${text}`, 'success');
+                log(`OK Santé OK : ${text}`, 'success');
             } catch (e) {
-                log(`FAIL Health Error: ${e.message}`, 'error');
+                log(`ÉCHEC Erreur santé : ${e.message}`, 'error');
             }
         }
 
         async function testStart() {
-            log('Testing /api/game/start...', 'info');
+            log('Test de /api/game/start...', 'info');
             try {
                 const start = Date.now();
                 const resp = await fetch('api/game/start');
                 const text = await resp.text();
                 const duration = Date.now() - start;
-                log(`OK Start OK (${duration}ms)`, 'success');
-                log(`Response: ${text.substring(0, 200)}...`, 'info');
+                log(`OK Démarrage OK (${duration}ms)`, 'success');
+                log(`Réponse : ${text.substring(0, 200)}...`, 'info');
             } catch (e) {
-                log(`FAIL Start Error: ${e.message}`, 'error');
+                log(`ÉCHEC Erreur démarrage : ${e.message}`, 'error');
             }
         }
 
         async function testPlay() {
-            log('Testing /api/game/play with "Roll the dice"...', 'info');
+            log('Test de /api/game/play avec "Lance les runes"...', 'info');
             try {
                 const start = Date.now();
                 const resp = await fetch('api/game/play', {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
-                    body: 'Roll the dice'
+                    body: 'Lance les runes'
                 });
                 const text = await resp.text();
                 const duration = Date.now() - start;
-                log(`OK Play OK (${duration}ms)`, 'success');
-                log(`Response: ${text}`, 'info');
+                log(`OK Jeu OK (${duration}ms)`, 'success');
+                log(`Réponse : ${text}`, 'info');
             } catch (e) {
-                log(`FAIL Play Error: ${e.message}`, 'error');
+                log(`ÉCHEC Erreur jeu : ${e.message}`, 'error');
             }
         }
 
         async function testCustom() {
             const msg = document.getElementById('customMsg').value;
-            log(`Testing /api/game/play with "${msg}"...`, 'info');
+            log(`Test de /api/game/play avec "${msg}"...`, 'info');
             try {
                 const start = Date.now();
                 const resp = await fetch('api/game/play', {
@@ -102,17 +102,17 @@
                 });
                 const text = await resp.text();
                 const duration = Date.now() - start;
-                log(`OK Custom OK (${duration}ms)`, 'success');
-                log(`Response: ${text}`, 'info');
+                log(`OK Personnalisé OK (${duration}ms)`, 'success');
+                log(`Réponse : ${text}`, 'info');
             } catch (e) {
-                log(`FAIL Custom Error: ${e.message}`, 'error');
+                log(`ÉCHEC Erreur personnalisé : ${e.message}`, 'error');
             }
         }
 
-        // Auto-test on load
+        // Test automatique au chargement
         window.addEventListener('load', () => {
-            log('=== Debug Interface Loaded ===', 'success');
-            log('Click the buttons to test the endpoints', 'info');
+            log('=== Interface de Débogage Chargée ===', 'success');
+            log('Cliquez sur les boutons pour tester les endpoints', 'info');
         });
     </script>
 </body>

@@ -1,165 +1,129 @@
-# Demo 3 - 421 Dice Game at the Casino with MCP
+# Démo 3 - Hnefatafl au Grand Thing avec MCP
 
-Fourth demo for Devoxx France: play **421** (traditional French dice game) against an AI that uses the **MCP** protocol to manage dice rolls on WildFly.
+Troisième démo pour Devoxx France : jouez au **Hnefatafl** (jeu de pierres runiques nordique) contre une IA qui utilise le protocole **MCP** pour gérer les lancers sur WildFly.
 
-## Overview
+## Vue d'ensemble
 
-1. A **standalone MCP server** exposes a dice rolling tool (roll_multiple for 3d6)
-2. An **AI casino dealer agent** (Lucky Jack Diamond) connects to this server via `McpToolProvider`
-3. The agent runs a 421 game: rolls dice via MCP, evaluates combinations, and announces the winner
-4. A **casino-themed web interface** lets you play in real time
+1. Un **serveur MCP autonome** expose un outil de lancer de dés (`roll` pour 2d6)
+2. Un **agent IA Jarl** (Ragnar le Skald) se connecte à ce serveur via `McpToolProvider`
+3. L'agent anime une partie de Hnefatafl : lance les runes via MCP, applique les règles, et annonce le destin du guerrier
+4. Une **interface web thème viking** permet de jouer en temps réel
 
-**MCP for gaming**: Your Jakarta EE agents can drive external game mechanics through standardized tools!
+**MCP pour le jeu** : Vos agents Jakarta EE peuvent piloter des mécaniques de jeu externes via des outils standardisés !
 
-## Prerequisites
+## Prérequis
 
 - **Java 21+**, **Maven 3.8+**
-- **Ollama** with `ministral-3:3b`:
+- **Ollama** avec `ministral-3:3b` :
   ```bash
   ollama pull ministral-3:3b
   ollama serve
   ```
 
-## What is 421?
+## Règles du Hnefatafl (lancer de pierres runiques)
 
-**421** is a very popular traditional French dice game:
-- Each player rolls **3 six-sided dice**
-- The goal is to get the **best combination**
-- **Ranking** (best to worst):
-  1. **421** (4-2-1): The ultimate combination!
-  2. **Three of a Kind**: 3 identical dice (6-6-6 > 5-5-5 > ... > 1-1-1)
-  3. **Straight**: 3 consecutive dice (1-2-3, 2-3-4, etc.)
-  4. **Pair**: 2 identical dice (6-6-X > 5-5-X > ...)
-  5. **Nothing**: No combination
+Le **Hnefatafl** utilise 2 pierres runiques à six faces :
 
-## Project Structure
+**Lancer d'ouverture (premier lancer d'un tour) :**
+- **7 ou 11** : Faveur d'Odin — le guerrier **GAGNE** immédiatement !
+- **2, 3 ou 12** : Malédiction des Nornes — le guerrier **PERD** immédiatement !
+- **Tout autre nombre** (4, 5, 6, 8, 9, 10) : ce nombre devient la **Rune Marquée**
+
+**Phase de la Rune (si une rune a été marquée) :**
+- Le guerrier continue de lancer
+- S'il relance **la Rune Marquée** : il **GAGNE** !
+- S'il lance un **7** : Ragnarök — il **PERD** !
+- Tout autre nombre : pas de décision, on relance
+
+## Structure du Projet
 
 ```
-demo-3-casino-dice/
-├── pom.xml                          # Aggregator POM
-├── mcp-server/                      # MCP dice rolling server (JAR)
-│   └── src/main/java/com/example/mcp/
-│       └── DiceServer.java          # JSON-RPC 2.0 server over stdio
-├── base/                            # Base for live coding
-│   ├── src/main/java/com/example/demo4/
+demo-3-mcp/
+├── pom.xml                          # POM agrégateur
+├── mcp-server/                      # Serveur MCP de lancer de dés (JAR)
+│   └── src/main/java/org/acme/
+│       └── DiceRoller.java          # Outil MCP : lance N dés à 6 faces
+├── base/                            # Base pour le live coding
+│   ├── src/main/java/com/example/demo3/
 │   │   ├── JaxRsActivator.java
-│   │   ├── McpConfig.java           # TODO: CDI producer
-│   │   ├── CasinoDealerAI.java      # TODO: @RegisterAIService (casino dealer)
-│   │   └── GameResource.java        # TODO: @Inject + call
+│   │   ├── CasinoDealerAI.java      # TODO : @RegisterAIService (Jarl du Thing)
+│   │   └── GameResource.java        # TODO : @Inject + appel
 │   └── src/main/webapp/
 │       ├── WEB-INF/beans.xml
-│       └── index.html               # Casino UI (ready!)
-└── solution/                        # Complete solution
-    ├── src/main/java/com/example/demo4/
-    │   ├── McpConfig.java           # Complete
-    │   ├── CasinoDealerAI.java      # Complete (Lucky Jack the casino dealer)
-    │   └── GameResource.java        # Complete
+│       └── index.html               # Interface viking (prête !)
+└── solution/                        # Solution complète
+    ├── src/main/java/com/example/demo3/
+    │   ├── CasinoDealerAI.java      # Complet (Ragnar le Skald, Jarl)
+    │   ├── ChatMemoryProviderBean.java
+    │   ├── LastDiceRollChatMemory.java
+    │   └── GameResource.java        # Complet
     └── src/main/webapp/
         ├── WEB-INF/beans.xml
-        └── index.html               # Casino UI
+        └── index.html               # Interface viking
 ```
 
-## Getting Started
+## Démarrage
 
-### Option 1: Quick start with wildfly:dev (recommended for live coding)
+### Option 1 : Démarrage rapide avec wildfly:dev (recommandé pour le live coding)
 
 ```bash
-# 1. Build the MCP dice server
-cd demo-3-casino-dice/mcp-server
+# 1. Compiler le serveur MCP de dés
+cd demo-3-mcp/mcp-server
 mvn clean package
 
-# 2. Launch the app with hot reload (base or solution)
-cd ../base    # or ../solution
+# 2. Lancer l'application avec hot reload (base ou solution)
+cd ../base    # ou ../solution
 mvn clean wildfly:dev
 ```
 
-The app is available at **http://localhost:8080/demo-3/** with an immersive game UI.
+L'application est disponible sur **http://localhost:8080/demo-3/** avec l'interface viking.
 
-### Option 2: Full build and startup with provisioned server
+### Option 2 : Build complet avec serveur provisionné
 
 ```bash
-# 1. Build the entire project (MCP server + WAR with provisioned WildFly)
-cd demo-3-casino-dice/solution  # or base
+# 1. Builder l'ensemble (serveur MCP + WAR avec WildFly provisionné)
+cd demo-3-mcp/solution  # ou base
 mvn clean install
 
-# 2. Start the provisioned WildFly server
+# 2. Démarrer le serveur WildFly provisionné
 ./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=10
 ```
 
-The app is then available at **http://localhost:8090/** (port 8080 + offset 10).
+L'application est alors disponible sur **http://localhost:8090/** (port 8080 + décalage 10).
 
-**Note**: The port offset avoids conflicts if another WildFly instance is already running on port 8080.
+### Vérification
 
-### Verification
-
-The UI automatically starts the adventure and displays the available MCP tools.
-
-To test manually:
 ```bash
-# Health check
+# Vérification de santé
 curl http://localhost:8080/demo-3/api/game/health
-# or with offset
+# ou avec décalage
 curl http://localhost:8090/api/game/health
 ```
 
-## Live Coding Walkthrough
+## Guide du Live Coding
 
-### Step 1: Understand the MCP dice server
+### Étape 1 : Comprendre le serveur MCP de dés
 
-Explore `DiceServer.java`: JSON-RPC 2.0 over stdio, 5 exposed tools.
+Examiner `DiceRoller.java` : outil MCP qui lance N dés à 6 faces via stdio/JSON-RPC 2.0.
 
-For 421, we mainly use:
-- `roll_multiple`: Rolls multiple dice of the same type (e.g., 3d6 for 421)
+L'outil principal :
+- `roll` : Lance N dés avec `{"numberOfDice": 2}`
 
-### Step 2: Create the CDI producer for MCP
-
-In `McpConfig.java`:
-```java
-@Produces
-@ApplicationScoped
-public McpToolProvider mcpToolProvider() {
-    McpTransport transport = new StdioMcpTransport.Builder()
-        .command(List.of("java", "-jar",
-            "mcp-server/target/demo-3-mcp-dice-server.jar"))
-        .build();
-
-    return McpToolProvider.builder()
-        .transport(transport)
-        .build();
-}
-```
-
-### Step 3: Annotate CasinoDealerAI (the casino dealer)
+### Étape 2 : Annoter CasinoDealerAI (le Jarl du Thing)
 
 ```java
-@RegisterAIService(chatModelName = "ollama", toolProviderName = "mcp")
+@RegisterAIService(chatModelName = "mistral", toolProviderName = "mcp")
 public interface CasinoDealerAI {
     @SystemMessage("""
-        You are Lucky Jack Diamond, the dealer at "The Golden Ace Casino".
-        You host a game of 421, the casino's favorite dice game!
-
-        RULES OF 421:
-        - Each player rolls 3 six-sided dice
-        - Ranking: 421 > Three of a Kind > Straight > Pair > Nothing
-
-        YOUR TOOLS:
-        - roll_multiple: Roll 3d6 with {"count": 3, "sides": 6}
-
-        FLOW:
-        1. The player says "Roll the dice"
-        2. You roll 3d6 for the player with roll_multiple
-        3. You announce the combination
-        4. You roll 3d6 for yourself
-        5. You compare and announce the winner
-
-        STYLE: Smooth and charismatic Vegas dealer, uses "Jackpot!"
-        IMPORTANT: ALWAYS roll the dice with roll_multiple, NEVER make them up!
+        Tu es Ragnar le Skald, le Jarl qui anime le Hnefatafl au Grand Thing...
+        [règles du Hnefatafl]
+        [format : RUNES: [X, Y] / TOTAL: [somme] / DESTIN: [résultat]]
         """)
     String play(@UserMessage String playerAction);
 }
 ```
 
-### Step 4: Wire up the REST endpoint
+### Étape 3 : Câbler le endpoint REST
 
 ```java
 @Inject CasinoDealerAI gameMaster;
@@ -170,143 +134,111 @@ public String play(String playerAction) {
 }
 ```
 
-### Step 5: Configure and test
+### Étape 4 : Configurer et tester
 
-Uncomment in `microprofile-config.properties`:
+Décommenter dans `microprofile-config.properties` :
 ```properties
-dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.ollama.OllamaChatModel
-dev.langchain4j.cdi.plugin.my-model.config.base-url=http://localhost:11434
-dev.langchain4j.cdi.plugin.my-model.config.model-name=ministral-3:3b
+dev.langchain4j.cdi.plugin.mistral.class=dev.langchain4j.model.ollama.OllamaChatModel
+dev.langchain4j.cdi.plugin.mistral.config.base-url=http://localhost:11434
+dev.langchain4j.cdi.plugin.mistral.config.model-name=ministral-3:3b
 ```
 
-Open **http://localhost:8080/demo-3/** and play:
+Ouvrir **http://localhost:8080/demo-3/** et jouer :
 
-**To roll your dice:**
-- "Roll the dice"
-- "My turn"
-- "I roll"
+**Pour lancer les runes :**
+- `Lance les runes`
+- `Jette`
+- `Nouvelle partie`
 
-**To have Lucky Jack roll:**
-- "Roll for yourself"
-- "Your turn"
+**Pour continuer (phase de la rune) :**
+- `Relance`
+- `Continue`
 
-## Execution Flow (simplified)
+## Flux d'Exécution (simplifié)
 
 ```
-REST endpoint -> CasinoDealerAI.play()
-    -> LLM receives: "Roll the dice"
-    -> LLM decides to use roll_multiple(count=3, sides=6)
-    -> McpToolProvider -> JSON-RPC -> MCP Dice Server
-    -> Server rolls 3d6 and returns {"rolls": [4, 2, 1], "total": 7}
-    -> LLM receives the raw result
-    -> LLM analyzes and identifies: "421"
-    -> LLM formats the response with the REQUIRED FORMAT:
-       RESULT: [4, 2, 1]
-       COMBINATION: 421 - The best one!
-    -> LLM adds a comment: "JACKPOT! A 421!"
-    -> Complete response sent back to the player
+Endpoint REST -> CasinoDealerAI.play()
+    -> Le LLM reçoit : "Lance les runes"
+    -> Le LLM décide d'utiliser roll(numberOfDice=2)
+    -> McpToolProvider -> JSON-RPC -> Serveur MCP de dés
+    -> Le serveur lance 2d6 et retourne [4, 3]
+    -> Le LLM reçoit le résultat brut
+    -> Le LLM affiche le FORMAT OBLIGATOIRE :
+       RUNES: [4, 3]
+       TOTAL: 7
+       DESTIN: Faveur d'Odin ! Le guerrier gagne !
+    -> Réponse complète renvoyée au guerrier
 ```
 
-**Key points:**
-- Each roll is **visible** with the emoji format
-- Results are **clear** and **separated**
-- The player **controls** when to roll (no automatic rolling)
-- Easy to **compare** results visually
+## Exemples d'Interaction
 
-## Interaction Examples (simplified mode)
+### Exemple 1 : Faveur d'Odin
 
-### Example 1: Player's turn
+**Guerrier :** `Lance les runes`
 
-**Player:** "Roll the dice"
-
-**Lucky Jack:**
+**Ragnar le Skald :**
 ```
-Jackpot! Here we go, let's roll!
+Skál ! Que les runes décident !
 
-RESULT: [4, 2, 1]
-COMBINATION: 421 - The best one!
+RUNES: [4, 3]
+TOTAL: 7
+DESTIN: Faveur d'Odin ! Le guerrier gagne !
 
-Ladies and gentlemen, we have a winner! A perfect 421! You have the luck of the gods!
+Par les dieux du Nord, un 7 ! La victoire est tienne !
 ```
 
-### Example 2: Lucky Jack's turn
+### Exemple 2 : Malédiction des Nornes
 
-**Player:** "Your turn"
+**Guerrier :** `Nouvelle partie`
 
-**Lucky Jack:**
+**Ragnar le Skald :**
 ```
-My turn now!
+RUNES: [1, 1]
+TOTAL: 2
+DESTIN: Yeux de serpent ! Malédiction des Nornes — le guerrier perd !
 
-RESULT: [6, 6, 6]
-COMBINATION: Three of a Kind - sixes
-
-Holy smokes! A magnificent three of a kind! But your 421 is unbeatable.
-You win this round!
+Les Nornes n'ont pas été clémentes... Tente ta chance à nouveau !
 ```
 
-### Example 3: Full game
+### Exemple 3 : Rune marquée puis atteinte
 
-**Player:** "My turn"
+**Guerrier :** `Lance les runes`
 
-**Lucky Jack:**
+**Ragnar :**
 ```
-RESULT: [3, 4, 5]
-COMBINATION: Straight
-
-A nice straight! Not bad at all!
-```
-
-**Player:** "Your turn"
-
-**Lucky Jack:**
-```
-RESULT: [5, 5, 2]
-COMBINATION: Pair of fives
-
-Just a pair... Your straight is better! You win the round!
-Drinks are on the house!
+RUNES: [3, 5]
+TOTAL: 8
+DESTIN: La rune marquée est 8. Continue de lancer, guerrier !
 ```
 
-### Example 4: Average result
+**Guerrier :** `Relance`
 
-**Player:** "Roll the dice"
-
-**Lucky Jack:**
+**Ragnar :**
 ```
-RESULT: [6, 3, 1]
-COMBINATION: Nothing
+RUNES: [2, 6]
+TOTAL: 8
+DESTIN: Rune atteinte ! Le guerrier gagne !
 
-Well... nothing good this time. No luck!
+La rune t'a souri — tu es digne de Valhalla !
 ```
 
-## Key Points
+## Points Clés
 
-1. **MCP for gaming**: Game mechanics (dice, scoring, etc.) are externalized in an MCP server
-2. **AI as referee**: The LLM rolls dice via MCP, evaluates combinations and announces the winner
-3. **Separation of concerns**: The MCP server handles random rolls, the AI handles game logic
-4. **Extensibility**: Easy to add other dice games (Yahtzee, Poker Dice, etc.)
+1. **MCP pour le jeu** : Les mécaniques de jeu sont externalisées dans un serveur MCP
+2. **L'IA comme Jarl** : Le LLM lance les runes via MCP, applique les règles et annonce le destin
+3. **Séparation des responsabilités** : Le serveur MCP gère le hasard, l'IA gère la logique de jeu
+4. **Extensibilité** : Facile d'ajouter d'autres jeux de dés nordiques
 
-## Troubleshooting
+## Résolution de Problèmes
 
-- **MCP server won't start**: Check that the JAR is compiled (`cd mcp-server && mvn package`)
-- **Agent not responding**: Check that CasinoDealerAI is annotated and McpConfig exposes the producer with `@Named("mcp")`
-- **No dice rolled**: Check WildFly logs for MCP tool calls
-- **Combinations miscalculated**: The LLM may make mistakes with smaller models - use `qwen2.5:3b` or larger
-- **Deploy the solution**: `cd solution && mvn clean wildfly:dev`
+- **Le serveur MCP ne démarre pas** : Vérifier que le JAR est compilé (`cd mcp-server && mvn package`)
+- **L'agent ne répond pas** : Vérifier que `CasinoDealerAI` est annoté avec `@RegisterAIService`
+- **Les runes ne sont pas lancées** : Vérifier les logs WildFly pour les appels d'outils MCP
+- **Lancer la solution** : `cd solution && mvn clean wildfly:dev`
 
-## Resources
+## Ressources
 
-- **MCP Protocol**: https://modelcontextprotocol.io
-- **LangChain4j-CDI**: https://github.com/langchain4j/langchain4j-cdi
-- **LangChain4j**: https://docs.langchain4j.dev
-- **WildFly**: https://www.wildfly.org
-
-## Extension Ideas
-
-- **421 variants**: Add the re-roll rule (player can re-roll 1 or 2 dice)
-- **Tournament mode**: Play multiple rounds, keep score
-- **Other games**: Yahtzee, Poker Dice, 10000
-- **Multiplayer**: Multiple players against Lucky Jack
-- **Betting**: Wager casino chips on each game
-- **Statistics**: Track wins/losses, best combinations
-- **Multiple casino dealers**: Different characters with different play styles
+- **Protocole MCP** : https://modelcontextprotocol.io
+- **LangChain4j-CDI** : https://github.com/langchain4j/langchain4j-cdi
+- **LangChain4j** : https://docs.langchain4j.dev
+- **WildFly** : https://www.wildfly.org

@@ -6,8 +6,8 @@ import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 
 /**
- * AI Service for the Viking expedition assistant.
- * The agent already works with Tools + Memory -- now we add resilience!
+ * Service IA pour l'assistant des expéditions vikings.
+ * L'agent fonctionne déjà avec Tools + Memory -- on y ajoute maintenant la résilience !
  */
 @SuppressWarnings("CdiManagedBeanInconsistencyInspection")
 @RegisterAIService(chatModelName = "my-model",
@@ -16,10 +16,10 @@ import dev.langchain4j.service.UserMessage;
                    tools = ExpeditionTools.class)
 public interface ChatAssistant {
 
-    // TODO STEP 1: Add @Retry(maxRetries = 3, delay = 1000)
-    // TODO STEP 2: Add @Timeout(value = 30, unit = ChronoUnit.SECONDS)
-    // TODO STEP 3: Add @Fallback(fallbackMethod = "chatFallback")
-    // TODO STEP 4: Add @CircuitBreaker(requestVolumeThreshold = 5, failureRatio = 0.5)
+    // TODO ÉTAPE 1 : Ajouter @Retry(maxRetries = 3, delay = 1000)
+    // TODO ÉTAPE 2 : Ajouter @Timeout(value = 30, unit = ChronoUnit.SECONDS)
+    // TODO ÉTAPE 3 : Ajouter @Fallback(fallbackMethod = "chatFallback")
+    // TODO ÉTAPE 4 : Ajouter @CircuitBreaker(requestVolumeThreshold = 5, failureRatio = 0.5)
     @SystemMessage("""
         Tu es l'assistant des expéditions vikings.
         Tu as accès à une base de connaissances sur les expéditions, les chefs et les destinations.
@@ -43,8 +43,8 @@ public interface ChatAssistant {
         """)
     String chat(@MemoryId String sessionId, @UserMessage String message);
 
-    // TODO STEP 5: Implement the fallback
+    // TODO ÉTAPE 5 : Implémenter le fallback
     // default String chatFallback(String sessionId, String message) {
-    //     return "Oops! The LLM is taking a nap. Please try again in a moment.";
+    //     return "Oups ! Le LLM fait une sieste. Veuillez réessayer dans un moment.";
     // }
 }

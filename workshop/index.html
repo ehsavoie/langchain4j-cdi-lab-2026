@@ -1627,7 +1627,7 @@ curl "http://localhost:8080/demo-2/api/chat/memory?sessionId=test-456"</code></p
 
 <div class="callout info">
     <div class="callout-title">&#128204; Objectif</div>
-    <p>Connectez un agent IA à un serveur MCP (Model Context Protocol) externe. Le serveur MCP fournit des outils de lancer de dés, et votre agent IA anime un jeu de Craps au casino via le protocole.</p>
+    <p>Connectez un agent IA à un serveur MCP (Model Context Protocol) externe. Le serveur MCP fournit des outils de lancer de runes, et votre agent IA anime un jeu de Hnefatafl au Grand Thing via le protocole.</p>
 </div>
 
 <h3>Qu'est-ce que MCP ?</h3>
@@ -1691,34 +1691,38 @@ npx @modelcontextprotocol/inspector</code></pre>
 <div class="step-box">
     <div class="step-header">
         <span class="step-number" style="background: var(--accent-green);">1</span>
-        <span class="step-title">Créer le service IA du Maître de Jeu Viking</span>
+        <span class="step-title">Créer le service IA du Jarl du Grand Thing</span>
     </div>
-    <p>Ouvrez <code>CasinoDealerAI.java</code> dans <code>demo-3-mcp/base/</code> :</p>
+    <p>Ouvrez <code>HnefataflJarlAI.java</code> dans <code>demo-3-mcp/base/</code> :</p>
 
     <pre><code>@RegisterAIService(chatModelName = "mistral",
                    toolProviderName = "mcp")
-public interface CasinoDealerAI {
+public interface HnefataflJarlAI {
 
     @SystemMessage("""
-        Tu es Lucky Jack Diamond, le croupier au "Golden Ace Casino".
-        Tu animes des parties de Craps !
+        You are Ragnar the Skald, the Jarl hosting Hnefatafl
+        at the Grand Thing of the Northern warriors.
 
-        RÈGLES : Lance 2 dés avec roll(numberOfDice=2).
-        - 7 ou 11 au premier lancer = VICTOIRE (Natural)
-        - 2, 3 ou 12 au premier lancer = DÉFAITE (Craps)
-        - Autre nombre = c'est LE POINT, on continue
+        RULES: Cast 2 rune stones with roll(numberOfDice=2).
+        OPENING CAST:
+        - 7 or 11: Odin's Favour -- warrior WINS!
+        - 2, 3 or 12: Curse of the Norns -- warrior LOSES!
+        - Other: that number becomes THE MARKED RUNE.
+        RUNE PHASE: hit the rune = WIN, roll 7 = Ragnarök = LOSE.
 
-        FORMAT OBLIGATOIRE :
-        DÉS: [X, Y]
-        TOTAL: [somme]
-        RÉSULTAT: [ce qui s'est passé]
+        REQUIRED FORMAT:
+        RUNES: [X, Y]
+        TOTAL: [sum]
+        DESTIN: [what happened]
+
+        Respond in French.
         """)
     String play(@UserMessage String playerAction);
 }</code></pre>
 
     <div class="callout tip">
         <div class="callout-title">&#128161; toolProviderName</div>
-        <p><code>toolProviderName = "mcp"</code> connecte cet agent au bean <code>McpToolProvider</code>, qui découvre automatiquement les outils de lancer de dés depuis le serveur MCP externe.</p>
+        <p><code>toolProviderName = "mcp"</code> connecte cet agent au bean <code>McpToolProvider</code>, qui découvre automatiquement les outils de lancer de runes depuis le serveur MCP externe.</p>
     </div>
 </div>
 </section>
@@ -1779,7 +1783,7 @@ dev.langchain4j.cdi.plugin.mcp.config.mcpClients=lookup:@mcpclient</code></pre>
 public class GameResource {
 
     @Inject
-    CasinoDealerAI gameMaster;
+    HnefataflJarlAI gameMaster;
 
     @POST
     @Path("/play")
@@ -1794,7 +1798,7 @@ public class GameResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String start() {
         return gameMaster.play(
-            "Salut ! Je suis prêt pour une partie de Craps !");
+            "Salut ! Je suis prêt pour une partie de Hnefatafl !");
     }
 }</code></pre>
 </div>
@@ -1819,7 +1823,7 @@ curl http://localhost:8080/demo-3/api/game/start
 
 # Lancer les dés
 curl -X POST -H "Content-Type: text/plain" \
-  -d "Lance les dés !" \
+  -d "Lance les runes !" \
   http://localhost:8080/demo-3/api/game/play
 
 # Ouvrir l'interface web
@@ -1827,14 +1831,14 @@ curl -X POST -H "Content-Type: text/plain" \
 
     <ul class="checklist">
         <li>L'agent IA appelle l'outil <code>roll</code> du serveur MCP via Streamable HTTP</li>
-        <li>Les résultats des dés sont retournés au format DÉS: [X, Y]</li>
-        <li>Lucky Jack Diamond annonce les victoires, défaites et points dans le style Vegas</li>
+        <li>Les résultats des runes sont retournés au format RUNES: [X, Y]</li>
+        <li>Ragnar le Skald annonce les victoires, malédictions et runes marquées dans le style viking</li>
         <li>L'interface web affiche des dés visuels avec des points animés</li>
     </ul>
 
     <div class="callout success">
-        <div class="callout-title">&#127922; Félicitations !</div>
-        <p>Vous avez construit trois applications propulsées par l'IA avec LangChain4j-CDI : un skald viking, un guide d'expéditions résilient, et un jeu de Craps intégré via MCP. Le tout avec des patterns Jakarta EE standards.</p>
+        <div class="callout-title">&#9876;&#65039; Félicitations !</div>
+        <p>Vous avez construit trois applications propulsées par l'IA avec LangChain4j-CDI : un skald viking, un guide d'expéditions résilient, et un jeu de Hnefatafl intégré via MCP. Le tout avec des patterns Jakarta EE standards.</p>
     </div>
 </div>
 </section>

@@ -1302,21 +1302,21 @@ dev.langchain4j.cdi.plugin.mcp-tools.config.url=\
 <section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
     <span class="speaker-tag speaker-yann">Yann</span>
     <p class="demo-banner">🎬 DEMO 3</p>
-    <h2>Jeu de dés 421 avec MCP sur WildFly</h2>
+    <h2>Hnefatafl au Grand Thing avec MCP sur WildFly</h2>
     <div style="font-size: 0.85em; text-align: left; max-width: 700px; margin: 0 auto;">
-        <p>🎲 <strong>Olaf le Chanceux</strong>, le maître des dés qui anime le jeu de 421</p>
+        <p>⚔️ <strong>Ragnar le Skald</strong>, le Jarl qui anime le Hnefatafl au Grand Thing</p>
         <p class="fragment">✅ <span class="accent">Serveur MCP HTTP SSE</span> externe pour les lancers de dés</p>
         <p class="fragment">✅ Agent IA avec <span class="accent-blue">@RegisterAIService</span> + McpToolProvider</p>
         <p class="fragment">✅ Configuration via le <span class="accent-green">subsystem AI WildFly</span></p>
         <p class="fragment">✅ Tout configuré dans <code>standalone.xml</code></p>
     </div>
     <p class="fragment medium accent" style="margin-top: 1em;">
-        Valhalla attend ! 421 sur WildFly ! 🐝⚔️
+        Valhalla attend ! Hnefatafl sur WildFly ! ⚔️🛡️
     </p>
     <aside class="notes">
-        Démo 3 : le jeu de dés 421 avec MCP sur WildFly !
+        Démo 3 : le jeu de Hnefatafl au Grand Thing avec MCP sur WildFly !
 
-        Cette démo montre comment MCP connecte un agent IA à un serveur de lancer de dés externe via HTTP SSE (Server-Sent Events). C'est du vrai -- intégration d'outils au niveau protocole.
+        Cette démo montre comment MCP connecte un agent IA à un serveur de lancer de runes externe via HTTP SSE (Server-Sent Events). C'est du vrai -- intégration d'outils au niveau protocole.
 
         POINT CLÉ : Configuration via le subsystem AI WildFly
 
@@ -1328,15 +1328,15 @@ dev.langchain4j.cdi.plugin.mcp-tools.config.url=\
         CHECKLIST DEMO :
         1. Montrer standalone.xml - subsystem AI avec ollama-chat-model
         2. Montrer standalone.xml - mcp-client-sse avec socket-binding mcp-sse (localhost:8090)
-        3. Montrer VikingDiceAI.java avec @RegisterAIService(chatModelName="ollama", toolProviderName="mcp")
+        3. Montrer HnefataflJarlAI.java avec @RegisterAIService(chatModelName="ollama", toolProviderName="mcp")
         4. Démarrer le serveur MCP HTTP SSE sur le port 8090
         5. Builder l'application : mvn clean install
         6. Démarrer WildFly provisionné : ./target/server/bin/standalone.sh
         7. Ouvrir l'UI Viking à http://localhost:8080/demo-3/
-        8. Jouer une partie de 421 : "Roll the dice" -> Olaf utilise roll_multiple via MCP SSE
+        8. Jouer une partie de Hnefatafl : "Lance les runes" -> Ragnar utilise roll(numberOfDice=2) via MCP SSE
         9. Montrer les logs WildFly avec les appels tools MCP
 
-        421 : chaque joueur lance 3 dés, meilleure combinaison gagne (421 > Brelan > Suite > Paire > Rien)
+        Hnefatafl : 7 ou 11 au premier lancer = Faveur d'Odin (victoire), 2/3/12 = Malédiction des Nornes (défaite), autre = Rune Marquée (on continue)
 
         Si ça plante : "On dirait qu'Odin a d'autres plans !"
     </aside>
@@ -1405,29 +1405,29 @@ dev.langchain4j.cdi.plugin.mcp-tools.config.url=\
 <!-- Slide 25.2: Flux Demo 3 avec MCP SSE -->
 <section>
     <span class="speaker-tag speaker-yann">Yann</span>
-    <h2>Flux : Lancer de dés via MCP SSE</h2>
+    <h2>Flux : Lancer de runes via MCP SSE</h2>
     <div style="font-size: 0.75em; text-align: left; max-width: 900px; margin: 0 auto;">
         <div class="timeline">
             <div class="step">
-                <strong>1. Guerrier</strong> : "Roll the dice"
+                <strong>1. Guerrier</strong> : "Lance les runes"
             </div>
             <div class="step blue">
-                <strong>2. Endpoint JAX-RS</strong> → <code>VikingDiceAI.play()</code>
+                <strong>2. Endpoint JAX-RS</strong> → <code>HnefataflJarlAI.play()</code>
             </div>
             <div class="step green">
-                <strong>3. LLM (Ollama)</strong> via subsystem AI WildFly → décide d'utiliser <code>roll_multiple(count=3, sides=6)</code>
+                <strong>3. LLM (Ollama)</strong> via subsystem AI WildFly → décide d'utiliser <code>roll(numberOfDice=2)</code>
             </div>
             <div class="step purple">
-                <strong>4. McpToolProvider</strong> → JSON-RPC → <strong>Serveur MCP Dice</strong> (HTTP SSE sur localhost:8090)
+                <strong>4. McpToolProvider</strong> → JSON-RPC → <strong>Serveur MCP Runes</strong> (HTTP SSE sur localhost:8090)
             </div>
             <div class="step">
-                <strong>5. Serveur MCP</strong> lance 3d6 → retourne <code>{"rolls": [4, 2, 1], "total": 7}</code> via SSE
+                <strong>5. Serveur MCP</strong> lance 2d6 → retourne <code>{"rolls": [4, 3], "total": 7}</code> via SSE
             </div>
             <div class="step blue">
-                <strong>6. LLM</strong> analyse le résultat → identifie "421" → répond au guerrier
+                <strong>6. LLM</strong> analyse le résultat → identifie "Faveur d'Odin" → répond au guerrier
             </div>
             <div class="step green">
-                <strong>7. Olaf le Chanceux</strong> : "PAR ODIN! Un 421 parfait ! 🎲⚔️"
+                <strong>7. Ragnar le Skald</strong> : "PAR ODIN! Faveur d'Odin ! Le guerrier triomphe ! ⚔️🛡️"
             </div>
         </div>
     </div>
@@ -1435,21 +1435,21 @@ dev.langchain4j.cdi.plugin.mcp-tools.config.url=\
         Le serveur MCP est accessible via socket-binding configuré dans standalone.xml 🔧
     </p>
     <aside class="notes">
-        Voici le flux complet d'un lancer de dés dans la démo 3. Passons étape par étape -- c'est le slide clé pour comprendre MCP.
+        Voici le flux complet d'un lancer de runes dans la démo 3. Passons étape par étape -- c'est le slide clé pour comprendre MCP.
 
-        L'utilisateur clique "Roll the dice" dans l'UI web. L'endpoint JAX-RS injecte VikingDiceAI (l'agent IA) et appelle sa méthode play().
+        L'utilisateur clique "Lance les runes" dans l'UI web. L'endpoint JAX-RS injecte HnefataflJarlAI (l'agent IA) et appelle sa méthode play().
 
-        L'agent utilise le modèle de chat "ollama" configuré dans le subsystem AI WildFly. Le LLM comprend qu'il doit lancer 3 dés à 6 faces, donc il décide d'appeler le tool roll_multiple avec les paramètres count=3 et sides=6.
+        L'agent utilise le modèle de chat "ollama" configuré dans le subsystem AI WildFly. Le LLM comprend qu'il doit lancer 2 pierres runiques à 6 faces, donc il décide d'appeler le tool roll avec le paramètre numberOfDice=2.
 
         Le McpToolProvider (configuré dans le subsystem AI) intercepte cet appel tool et le traduit en appel JSON-RPC 2.0 vers le serveur MCP.
 
         La connexion utilise HTTP SSE (Server-Sent Events) via le socket-binding "mcp-sse" qui pointe vers localhost:8090. Le mcp-client-sse établit la connexion SSE avec le path /sse.
 
-        Le serveur MCP lance réellement 3 dés (aléatoire), calcule le total, et retourne le résultat en format JSON via le flux SSE.
+        Le serveur MCP lance réellement 2 dés (aléatoire), calcule le total, et retourne le résultat en format JSON via le flux SSE.
 
-        Le McpToolProvider retourne le résultat au LLM. Le LLM analyse les dés [4, 2, 1], identifie la combinaison "421" (la meilleure du jeu !), et génère une réponse humoristique dans le style d'Olaf le Chanceux.
+        Le McpToolProvider retourne le résultat au LLM. Le LLM analyse les runes [4, 3], identifie la "Faveur d'Odin" (7 = victoire !), et génère une réponse dans le style de Ragnar le Skald.
 
-        La réponse remonte jusqu'au navigateur, et Olaf annonce : "PAR ODIN! Un 421 parfait !"
+        La réponse remonte jusqu'au navigateur, et Ragnar annonce : "PAR ODIN! Faveur d'Odin ! Le guerrier triomphe !"
 
         Le point clé à retenir : tout est configuré dans standalone.xml via le subsystem AI WildFly. C'est une vraie intégration WildFly native -- pas juste des properties externes.
     </aside>

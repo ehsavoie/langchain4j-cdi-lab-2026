@@ -6,14 +6,14 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 /**
- * REST endpoint for the Craps game at "The Golden Ace Casino".
+ * Point d'entrée REST pour le Hnefatafl au Grand Thing.
  *
- * <p>Delegates all game logic to {@link CasinoDealerAI}. Three endpoints are exposed
- * under {@code /api/game}:
+ * <p>Délègue toute la logique de jeu à {@link HnefataflJarlAI}. Trois endpoints sont exposés
+ * sous {@code /api/game} :
  * <ul>
- *   <li>{@code GET  /start} — greet the player and start a new session.</li>
- *   <li>{@code POST /play}  — send a player action (plain text) and receive the dealer's response.</li>
- *   <li>{@code GET  /health} — liveness check.</li>
+ *   <li>{@code GET  /start} — accueillir le guerrier et démarrer une nouvelle session.</li>
+ *   <li>{@code POST /play}  — envoyer une action du guerrier (texte brut) et recevoir la réponse du Jarl.</li>
+ *   <li>{@code GET  /health} — vérification de disponibilité.</li>
  * </ul>
  */
 @Path("/game")
@@ -21,15 +21,15 @@ import jakarta.ws.rs.core.MediaType;
 public class GameResource {
 
     @Inject
-    CasinoDealerAI gameMaster;
+    HnefataflJarlAI gameMaster;
 
     /**
-     * Send a player action to the dealer and receive the game response.
+     * Envoie une action du guerrier au Jarl et reçoit la réponse de jeu.
      *
-     * <p>Example: {@code POST /api/game/play} with body {@code Roll the dice}
+     * <p>Exemple : {@code POST /api/game/play} avec le corps {@code Lance les runes}
      *
-     * <p>The dealer will invoke the MCP {@code roll} tool to roll 2d6, then
-     * announce the outcome (natural, craps, point set, hit, or seven-out).
+     * <p>Le Jarl invoquera l'outil MCP {@code roll} pour lancer 2 pierres runiques, puis
+     * annoncera le résultat (Faveur d'Odin, Malédiction, rune marquée, atteinte ou Ragnarök).
      */
     @POST
     @Path("/play")
@@ -40,22 +40,22 @@ public class GameResource {
     }
 
     /**
-     * Greet the player and start a new game session.
+     * Accueille le guerrier et démarre une nouvelle session de jeu.
      */
     @GET
     @Path("/start")
     @Produces(MediaType.TEXT_PLAIN)
     public String start() {
-        return gameMaster.play("Hello! I'm here to play Craps.");
+        return gameMaster.play("Salve ! Je suis prêt à jouer au Hnefatafl.");
     }
 
     /**
-     * Health check endpoint.
+     * Endpoint de vérification de disponibilité.
      */
     @GET
     @Path("/health")
     @Produces(MediaType.TEXT_PLAIN)
     public String health() {
-        return "The Golden Ace Casino OK - Lucky Jack is ready for a game of Craps!";
+        return "Le Grand Thing est ouvert - Ragnar le Skald est prêt pour un Hnefatafl !";
     }
 }

@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Démo 3 — The Golden Ace Casino - Craps</title>
+    <title>Démo 3 — Le Grand Thing - Hnefatafl</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', system-ui, sans-serif;
-            background: #0a2010; color: #f0ead8;
+            background: #0a0e1a; color: #f0ead8;
             height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
-        /* ── MAHOGANY RAIL HEADER ── */
+        /* ── EN-TÊTE VIKING ── */
         header {
-            background: linear-gradient(to bottom, #2d1200, #1e0c00);
-            border-bottom: 3px solid #8b5e1a;
+            background: linear-gradient(to bottom, #1a1f2e, #0d1117);
+            border-bottom: 3px solid #4a6fa5;
             padding: 1rem 2rem; display: flex; align-items: center; gap: 1rem;
             flex-shrink: 0; position: relative;
             box-shadow: 0 4px 14px rgba(0,0,0,0.7), inset 0 1px 0 rgba(212,175,55,0.1);
@@ -24,7 +24,7 @@
         header::after {
             content: '';
             position: absolute; bottom: -3px; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, #5a3000, #d4af37, #f5d77a, #d4af37, #5a3000);
+            background: linear-gradient(90deg, #1a2a4a, #d4af37, #f5d77a, #d4af37, #1a2a4a);
         }
         header h1 {
             font-family: 'Playfair Display', serif;
@@ -44,22 +44,22 @@
             color: rgba(212,175,55,0.55); font-size: 0.75rem;
             margin-left: auto; font-weight: 500;
         }
-        /* ── CRAPS HINTS BAR ── */
+        /* ── BARRE D'ASTUCES HNEFATAFL ── */
         .hints {
-            background: #08180e;
+            background: #080d18;
             border-bottom: 1px solid rgba(212,175,55,0.12);
             padding: 0.55rem 2rem;
             font-size: 0.72rem; color: rgba(212,175,55,0.45);
             flex-shrink: 0;
         }
         .hints strong { color: #d4af37; }
-        /* ── FELT TABLE ── */
+        /* ── TABLE EN PIERRE ── */
         #chat {
             flex: 1; overflow-y: auto; padding: 1.5rem 2rem;
             display: flex; flex-direction: column; gap: 1rem;
-            background-color: #0f3d1e;
+            background-color: #0d1520;
             background-image:
-                /* felt weave texture */
+                /* texture de pierre */
                 repeating-linear-gradient(
                     0deg,
                     rgba(0,0,0,0.07) 0px, rgba(0,0,0,0.07) 1px,
@@ -70,11 +70,11 @@
                     rgba(0,0,0,0.07) 0px, rgba(0,0,0,0.07) 1px,
                     transparent 1px, transparent 4px
                 ),
-                /* ambient spotlight */
-                radial-gradient(ellipse at 50% 30%, rgba(212,175,55,0.05) 0%, transparent 65%);
+                /* lueur ambiante */
+                radial-gradient(ellipse at 50% 30%, rgba(74,111,165,0.06) 0%, transparent 65%);
             position: relative;
         }
-        /* Craps layout outer border line */
+        /* Cercle du Thing */
         #chat::before {
             content: '';
             position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
@@ -86,15 +86,15 @@
             max-width: 75%; padding: 0.9rem 1.1rem; border-radius: 6px;
             line-height: 1.6; font-size: 0.92rem;
         }
-        /* User = red "Don't Pass" chip */
+        /* Guerrier = bouclier bleu nordique */
         .msg.user {
             align-self: flex-end;
-            background: linear-gradient(135deg, #7a1010, #a01818);
+            background: linear-gradient(135deg, #1e3a6e, #2a52a3);
             color: #f5ead8;
-            border: 1px solid rgba(192,57,43,0.5);
+            border: 1px solid rgba(42,82,163,0.5);
             box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
         }
-        /* Bot = ivory card / payout slip */
+        /* Jarl = parchemin / tablette runique */
         .msg.bot {
             align-self: flex-start;
             background: linear-gradient(135deg, #f5edd6, #ede4c8);
@@ -116,16 +116,16 @@
             color: #d4af37; font-style: italic;
             max-width: 90%; text-align: center; font-size: 0.88rem;
         }
-        /* ── MAHOGANY RAIL INPUT BAR ── */
+        /* ── BARRE DE SAISIE VIKING ── */
         #input-bar {
-            background: linear-gradient(to top, #1e0c00, #2d1200);
-            border-top: 3px solid #8b5e1a;
+            background: linear-gradient(to top, #0d1117, #1a1f2e);
+            border-top: 3px solid #4a6fa5;
             padding: 1rem 2rem; display: flex; gap: 0.8rem;
             flex-shrink: 0;
             box-shadow: 0 -4px 14px rgba(0,0,0,0.7), inset 0 1px 0 rgba(212,175,55,0.08);
         }
         #message {
-            flex: 1; background: #0a2010;
+            flex: 1; background: #0a0e1a;
             border: 1px solid rgba(212,175,55,0.25);
             color: #f0ead8; padding: 0.7rem 1rem; border-radius: 6px;
             font-family: inherit; font-size: 0.95rem; outline: none;
@@ -134,30 +134,30 @@
         #message:focus {
             border-color: #d4af37;
             box-shadow: 0 0 12px rgba(212,175,55,0.2);
-            background: #0c2a14;
+            background: #0d1a2e;
         }
         #message::placeholder { color: rgba(212,175,55,0.28); }
-        /* ── ROLL BUTTON (red craps "Come" chip style) ── */
+        /* ── BOUTON LANCER (bouclier nordique) ── */
         button#send-btn {
-            background: linear-gradient(145deg, #c0392b, #8b0000);
+            background: linear-gradient(145deg, #1e4a8e, #0d2a5e);
             color: #fff;
-            border: 2px solid rgba(255,120,100,0.3);
+            border: 2px solid rgba(100,160,255,0.3);
             padding: 0.65rem 1.3rem; border-radius: 6px; cursor: pointer;
             font-family: inherit; font-weight: 700; font-size: 0.9rem;
             letter-spacing: 0.05em; text-transform: uppercase;
             box-shadow:
-                0 4px 12px rgba(139,0,0,0.5),
+                0 4px 12px rgba(13,42,94,0.5),
                 inset 0 1px 0 rgba(255,255,255,0.15),
                 inset 0 -2px 0 rgba(0,0,0,0.2);
             transition: all 0.2s;
             display: flex; align-items: center; gap: 7px;
         }
         button#send-btn:hover {
-            background: linear-gradient(145deg, #e04040, #a00000);
-            box-shadow: 0 4px 20px rgba(192,57,43,0.6), inset 0 1px 0 rgba(255,255,255,0.2);
+            background: linear-gradient(145deg, #2a5ab0, #1a3a7e);
+            box-shadow: 0 4px 20px rgba(30,74,142,0.6), inset 0 1px 0 rgba(255,255,255,0.2);
             transform: translateY(-1px);
         }
-        /* Die icon on button */
+        /* Icône de pierre runique sur le bouton */
         .dice-icon {
             width: 19px; height: 19px; flex-shrink: 0;
             filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
@@ -183,11 +183,11 @@
             0%, 80%, 100% { transform: scale(0.4); opacity: 0.4; }
             40% { transform: scale(1); opacity: 1; }
         }
-        /* ── WELCOME PANEL ── */
+        /* ── PANNEAU D'ACCUEIL ── */
         .welcome {
             text-align: center; color: rgba(240,234,216,0.75); margin: auto;
             font-size: 0.9rem; line-height: 2;
-            background: rgba(8, 28, 14, 0.92);
+            background: rgba(8, 14, 26, 0.92);
             border: 2px solid rgba(212,175,55,0.25);
             border-radius: 8px; padding: 2rem 2.5rem;
             box-shadow: 0 0 40px rgba(0,0,0,0.7), inset 0 0 30px rgba(0,0,0,0.3);
@@ -207,7 +207,7 @@
             border-radius: 4px; color: #d4af37; font-size: 0.85rem;
             border: 1px solid rgba(212,175,55,0.22);
         }
-        /* ── DICE RENDERING (used by JS) ── */
+        /* ── RENDU DES PIERRES RUNIQUES (utilisé par le JS) ── */
         .dice-row {
             display: flex; gap: 1rem; align-items: center;
             margin: 0.8rem 0; justify-content: center;
@@ -253,44 +253,44 @@
 </head>
 <body>
     <header>
-        <h1>The Golden Ace Casino</h1>
+        <h1>Le Grand Thing</h1>
         <span class="badge">SOLUTION</span>
-        <span class="subtitle">Craps avec serveur MCP de dés</span>
+        <span class="subtitle">Hnefatafl avec serveur MCP de runes</span>
     </header>
 
     <div class="hints">
-        <strong>Outils MCP de dés :</strong> roll (2d6) &nbsp;|&nbsp;
+        <strong>Outils MCP de runes :</strong> roll (2d6) &nbsp;|&nbsp;
         <strong>Transport :</strong> stdio (JSON-RPC 2.0) &nbsp;|&nbsp;
-        <strong>Croupier :</strong> Lucky Jack Diamond, maître du Craps
+        <strong>Jarl :</strong> Ragnar le Skald, maître du Hnefatafl
     </div>
 
     <div id="chat">
         <div class="welcome">
-            <span class="venue-name">The Golden Ace</span>
-            <p class="subtitle">La table de Craps de Lucky Jack Diamond</p>
-            <p>L'IA lance les dés via MCP et joue au Craps avec vous !</p>
+            <span class="venue-name">Le Grand Thing</span>
+            <p class="subtitle">Le cercle de Hnefatafl de Ragnar le Skald</p>
+            <p>L'IA lance les pierres runiques via MCP et joue au Hnefatafl avec vous !</p>
             <br>
-            <p><strong style="color:#d4af37;">Lancer de sortie :</strong> 7 ou 11 = Victoire ! &nbsp;|&nbsp; 2, 3 ou 12 = Craps !</p>
-            <p><strong style="color:#d4af37;">Phase de point :</strong> Faire votre point = Victoire ! &nbsp;|&nbsp; Lancer un 7 = Sept dehors !</p>
+            <p><strong style="color:#d4af37;">Lancer d'ouverture :</strong> 7 ou 11 = Faveur d'Odin ! &nbsp;|&nbsp; 2, 3 ou 12 = Malédiction !</p>
+            <p><strong style="color:#d4af37;">Phase de la rune :</strong> Atteindre votre rune = Victoire ! &nbsp;|&nbsp; Lancer un 7 = Ragnarök !</p>
             <br>
             <p>Commandes :</p>
-            <p><code>Lance les dés</code> &nbsp;|&nbsp; <code>Tire</code> &nbsp;|&nbsp; <code>Nouvelle partie</code></p>
+            <p><code>Lance les runes</code> &nbsp;|&nbsp; <code>Jette</code> &nbsp;|&nbsp; <code>Nouvelle partie</code></p>
             <p><code>Relance</code> &nbsp;|&nbsp; <code>Continue</code></p>
         </div>
     </div>
 
     <div id="input-bar">
         <input type="text" id="message" autocomplete="off"
-               placeholder="Ex : 'Lance les dés' ou 'Nouvelle partie'">
+               placeholder="Ex : 'Lance les runes' ou 'Nouvelle partie'">
         <button id="send-btn" onclick="sendMessage()">
             <span class="label">
                 <svg class="dice-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                     <rect x="0.5" y="0.5" width="19" height="19" rx="3.5" fill="white" fill-opacity="0.95"/>
-                    <circle cx="5" cy="5"   r="2" fill="#8b0000"/>
-                    <circle cx="15" cy="5"  r="2" fill="#8b0000"/>
-                    <circle cx="10" cy="10" r="2" fill="#8b0000"/>
-                    <circle cx="5" cy="15"  r="2" fill="#8b0000"/>
-                    <circle cx="15" cy="15" r="2" fill="#8b0000"/>
+                    <circle cx="5" cy="5"   r="2" fill="#4a6fa5"/>
+                    <circle cx="15" cy="5"  r="2" fill="#4a6fa5"/>
+                    <circle cx="10" cy="10" r="2" fill="#4a6fa5"/>
+                    <circle cx="5" cy="15"  r="2" fill="#4a6fa5"/>
+                    <circle cx="15" cy="15" r="2" fill="#4a6fa5"/>
                 </svg>
                 Lancer
             </span>
@@ -324,12 +324,12 @@
 
         function renderBotMessage(text) {
             const frag = document.createDocumentFragment();
-            const diceMatch = text.match(/DICE:\s*\[([^\]]+)\]/i);
+            const diceMatch = text.match(/RUNES:\s*\[([^\]]+)\]/i);
 
             if (diceMatch) {
                 const values = diceMatch[1].split(',').map(v => parseInt(v.trim())).filter(v => v >= 1 && v <= 6);
                 if (values.length > 0) {
-                    // Text before DICE line
+                    // Text before RUNES line
                     const beforeDice = text.substring(0, text.indexOf(diceMatch[0])).trim();
                     if (beforeDice) {
                         const pre = document.createElement('pre');
@@ -348,7 +348,7 @@
                     row.appendChild(totalSpan);
                     frag.appendChild(row);
 
-                    // Remaining text (skip DICE and TOTAL lines, keep RESULT and rest)
+                    // Remaining text (skip RUNES and TOTAL lines, keep DESTIN and rest)
                     const afterDice = text.substring(text.indexOf(diceMatch[0]) + diceMatch[0].length);
                     const remaining = afterDice.replace(/^\s*\n?\s*TOTAL:\s*\[?\d+\]?\s*/i, '').trim();
                     if (remaining) {
@@ -429,7 +429,7 @@
                 if (!welcomed) {
                     document.querySelector('.welcome')?.remove();
                     welcomed = true;
-                    appendMsg("Approche de la table de craps...", 'narrator');
+                    appendMsg("Tu approches du cercle sacré du Thing...", 'narrator');
                     sending = true;
                     document.getElementById('send-btn').classList.add('loading');
 

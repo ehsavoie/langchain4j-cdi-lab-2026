@@ -4,10 +4,10 @@ import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
 /**
- * JAX-RS activator that registers the application under the {@code /api} base path.
+ * Activateur JAX-RS qui enregistre l'application sous le chemin de base {@code /api}.
  *
- * <p>All REST resources (e.g. {@link GameResource}) are automatically discovered
- * by the CDI container and exposed under {@code /api}.
+ * <p>Toutes les ressources REST (ex. {@link GameResource}) sont automatiquement découvertes
+ * par le conteneur CDI et exposées sous {@code /api}.
  */
 @ApplicationPath("/api")
 public class JaxRsActivator extends Application {

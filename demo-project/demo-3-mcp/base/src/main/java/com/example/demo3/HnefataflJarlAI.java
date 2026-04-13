@@ -1,28 +1,28 @@
 package com.example.demo3;
 
-// TODO: Import the necessary LangChain4j annotations
+// TODO: Importer les annotations LangChain4j nécessaires
 // import dev.langchain4j.cdi.spi.RegisterAIService;
 // import dev.langchain4j.service.SystemMessage;
 // import dev.langchain4j.service.UserMessage;
 
 /**
- * TODO: Agent IA qui anime un jeu de Craps aux dés dans un casino de Vegas.
+ * TODO: Agent IA qui anime un jeu de Hnefatafl au Grand Thing des guerriers du Nord.
  *
  * À compléter :
  * 1. Annoter avec @RegisterAIService(chatModelName = "mistral", toolProviderName = "mcp")
  * 2. Définir la méthode play() avec @SystemMessage et @UserMessage
- * 3. Le @SystemMessage doit décrire le rôle du croupier et les règles du Craps
+ * 3. Le @SystemMessage doit décrire le rôle du Jarl et les règles du Hnefatafl
  */
 @SuppressWarnings("CdiManagedBeanInconsistencyInspection")
 // TODO: Ajouter l'annotation @RegisterAIService avec chatModelName et toolProviderName
-public interface CasinoDealerAI {
+public interface HnefataflJarlAI {
 
-    // TODO: Ajouter l'annotation @SystemMessage avec le prompt du croupier de casino
-    // Indice : Lucky Jack Diamond, "The Golden Ace Casino", règles du Craps
+    // TODO: Ajouter l'annotation @SystemMessage avec le prompt du Jarl du Thing
+    // Indice : Ragnar le Skald, "Le Grand Thing", règles du Hnefatafl
     // IMPORTANT : Chaque lancer doit être affiché avec le format :
-    // DÉS: [X, Y]
+    // RUNES: [X, Y]
     // TOTAL: [somme]
-    // RÉSULTAT: [ce qui s'est passé]
+    // DESTIN: [ce qui s'est passé]
     // Il lance avec roll(numberOfDice=2)
     String play(/* TODO: Ajouter l'annotation @UserMessage */ String playerAction);
 }
