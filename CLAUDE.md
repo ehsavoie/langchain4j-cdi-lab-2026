@@ -18,10 +18,12 @@ Java 21, Maven 3.8+, Jakarta EE 10, MicroProfile 6.1, WildFly 39 (Galleon), Lang
 ## Commandes Essentielles
 
 ```bash
-# Prérequis : Ollama
+# Prérequis : Ollama (dans un terminal séparé, laisser tourner)
+ollama serve
+
+# Dans un autre terminal, télécharger les modèles
 ollama pull ministral-3:3b    # demo-1, demo-3
 ollama pull qwen2.5:7b        # demo-2 (tool calling + embeddings)
-ollama serve
 
 # Lancer une démo (remplacer N et le nom du module)
 cd demo-project/demo-1-ai-agent/solution && mvn clean wildfly:dev
@@ -36,7 +38,7 @@ curl -X POST -H "Content-Type: text/plain" -d "Raconte-moi une blague viking" ht
 curl -X POST -H "Content-Type: text/plain" -H "X-Session-Id: test-123" -d "Quelles expéditions sont disponibles ?" http://localhost:8080/demo-2/api/chat
 
 # Slides
-cd slides && python3 -m http.server 8000
+# Ouvrir slides/index.html directement dans le navigateur
 ```
 
 Il n'y a pas de tests unitaires dans ce projet. La validation est faite manuellement via curl ou les IUs web.

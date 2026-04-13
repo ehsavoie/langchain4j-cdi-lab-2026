@@ -849,7 +849,7 @@
         <tr><td><strong>Maven</strong></td><td>3.9+</td><td>Outil de build</td></tr>
         <tr><td><strong>IDE</strong></td><td>Apache NetBeans / IntelliJ IDEA / VS Code</td><td>Éditeur de code</td></tr>
         <tr><td><strong>curl</strong></td><td>n'importe quelle</td><td>Test d'API</td></tr>
-        <tr><td><strong>Clé API Mistral AI</strong></td><td>&mdash;</td><td>Fournisseur LLM (niveau gratuit disponible)</td></tr>
+        <tr><td><strong>Clé API Mistral AI</strong> <em>ou</em> <strong>Ollama</strong></td><td>&mdash;</td><td>Fournisseur LLM &mdash; distant (Mistral AI, gratuit) ou local (Ollama)</td></tr>
         <tr><td><strong>Docker / Podman</strong></td><td>n'importe quelle</td><td>Stack Grafana LGTM (Exercice 2 uniquement)</td></tr>
     </tbody>
 </table>
@@ -859,7 +859,44 @@
 <pre><code>git clone https://github.com/yblazart/confs-langchain4j-cdi-javaone2026.git
 cd confs-langchain4j-cdi-javaone2026/demo-project</code></pre>
 
-<h3>2. Configurer Mistral AI</h3>
+<h3>2. Choisir votre fournisseur LLM</h3>
+
+<div class="callout info">
+    <div class="callout-title">&#127922; Deux options au choix</div>
+    <p><strong>Option A &mdash; Mistral AI (distant)</strong> : inscrivez-vous gratuitement sur <a href="https://console.mistral.ai/" target="_blank">console.mistral.ai</a> pour obtenir une clé API. Aucune installation locale requise.</p>
+    <p><strong>Option B &mdash; Ollama (local)</strong> : installez <a href="https://ollama.ai" target="_blank">Ollama</a>, puis téléchargez le modèle :</p>
+    <pre><code># Dans un premier terminal (laisser tourner) :
+ollama serve
+
+# Dans un second terminal :
+ollama pull ministral-3:3b</code></pre>
+    <p>Ollama doit rester actif sur <code>http://localhost:11434</code> pendant tout l'atelier.</p>
+</div>
+
+<div class="callout warning">
+    <div class="callout-title">&#9881; Comment configurer le fournisseur dans chaque exercice</div>
+    <p>Chaque module contient un fichier <code>microprofile-config.properties</code> structuré ainsi :</p>
+    <pre><code># ---- Option A : Mistral AI (distant) ----
+dev.langchain4j.cdi.plugin.my-model.class=...MistralAiChatModel
+dev.langchain4j.cdi.plugin.my-model.config.api-key=${MISTRAL_API_KEY}
+dev.langchain4j.cdi.plugin.my-model.config.model-name=mistral-small-latest
+
+# ---- Option B : Ollama (local) ----
+# dev.langchain4j.cdi.plugin.my-model.class=...OllamaChatModel
+# dev.langchain4j.cdi.plugin.my-model.config.base-url=http://localhost:11434
+# dev.langchain4j.cdi.plugin.my-model.config.model-name=ministral-3:3b
+
+dev.langchain4j.cdi.plugin.my-model.config.temperature=0.9
+dev.langchain4j.cdi.plugin.my-model.config.log-requests=true</code></pre>
+    <p><strong>Par défaut, l'Option A (Mistral AI) est active.</strong> Pour passer à Ollama :</p>
+    <ol>
+        <li><strong>Commentez</strong> les 3 lignes de l'Option A (ajoutez <code>#</code> devant)</li>
+        <li><strong>Décommentez</strong> les 3 lignes de l'Option B (retirez les <code>#</code>)</li>
+    </ol>
+    <p>Les propriétés communes (<code>temperature</code>, <code>log-requests</code>, etc.) sont en dessous et <strong>restent inchangées</strong> &mdash; elles s'appliquent quel que soit le fournisseur choisi.</p>
+</div>
+
+<h4>Option A : Configurer Mistral AI (distant)</h4>
 
 <p>Inscrivez-vous sur <a href="https://console.mistral.ai/" target="_blank">console.mistral.ai</a> et suivez ces étapes pour obtenir une clé API gratuite :</p>
 
@@ -899,38 +936,60 @@ export MISTRAL_API_KEY=your-api-key-here
 $env:MISTRAL_API_KEY="your-api-key-here"</code></pre>
 
 <div class="callout tip">
-    <div class="callout-title">&#128161; Alternative : Ollama local</div>
-    <p>Si vous préférez exécuter les modèles en local, installez <a href="https://ollama.ai" target="_blank">Ollama</a> et téléchargez un modèle : <code>ollama pull qwen2.5:7b</code>. Vous devrez ajuster le fichier <code>microprofile-config.properties</code> pour utiliser OllamaChatModel au lieu de MistralAiChatModel.</p>
+    <div class="callout-title">&#128161; Option B : Ollama local</div>
+    <p>Si vous avez choisi Ollama, <strong>ignorez toute la section Mistral AI ci-dessus</strong>. Pas besoin de clé API &mdash; il suffit de commenter/décommenter les blocs dans <code>microprofile-config.properties</code> comme expliqué plus haut.</p>
 </div>
 
 <h3>3. WildFly (automatique)</h3>
 
 <p>WildFly 39 est automatiquement téléchargé et provisionné par le plugin Maven. Aucune installation manuelle nécessaire :</p>
 
-<pre><code># This downloads WildFly, starts it, and deploys the app
+<pre><code># Ceci télécharge WildFly, le démarre et déploie l'application
 cd demo-1-ai-agent/solution
 mvn clean wildfly:dev</code></pre>
 
 <p>L'objectif <code>wildfly:dev</code> est votre meilleur ami &mdash; il recharge à chaud à chaque <code>mvn package</code>.</p>
 
+<h3>3bis. Configurer le fournisseur LLM dans la solution</h3>
+
+<p>Avant de vérifier votre installation, assurez-vous que le fichier <code>demo-1-ai-agent/solution/src/main/resources/META-INF/microprofile-config.properties</code> est configuré pour votre fournisseur :</p>
+
+<ul>
+    <li><strong>Option A &mdash; Mistral AI (distant)</strong> : c'est la configuration par défaut. Vérifiez simplement que la variable <code>MISTRAL_API_KEY</code> est bien exportée dans votre terminal.</li>
+    <li><strong>Option B &mdash; Ollama (local)</strong> : pour <strong>chaque bloc</strong> (my-model, my-streaming-model, vision-model), commentez les 3 lignes de l'Option A et décommentez les 3 lignes de l'Option B.</li>
+</ul>
+
+<pre><code># Exemple pour my-model — Option B : Ollama
+# (commentez les 3 lignes Mistral AI ci-dessus, puis décommentez celles-ci)
+dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.ollama.OllamaChatModel
+dev.langchain4j.cdi.plugin.my-model.config.base-url=http://localhost:11434
+dev.langchain4j.cdi.plugin.my-model.config.model-name=ministral-3:3b</code></pre>
+
+<div class="callout warning">
+    <div class="callout-title">&#9888; Attention</div>
+    <p>Le fichier contient <strong>3 modèles</strong> (my-model, my-streaming-model, vision-model). Pensez à basculer <strong>les trois</strong> si vous utilisez Ollama.</p>
+</div>
+
 <h3>4. Vérifier votre installation</h3>
 
-<pre><code># Build all modules to download dependencies
+<pre><code># Compiler tous les modules pour télécharger les dépendances
 cd demo-project
 mvn clean install -DskipTests
 
-# Quick smoke test
+# Test rapide de vérification
 cd demo-1-ai-agent/solution
 mvn clean wildfly:dev
 
-# In another terminal:
+# Dans un autre terminal :
 curl -X POST -H "Content-Type: text/plain" \
   -d "Sing me a heroic song" \
   http://localhost:8080/demo-1/api/chat</code></pre>
 
+<p>Vous pouvez aussi tester directement dans votre navigateur en ouvrant <a href="http://localhost:8080/demo-1" target="_blank">http://localhost:8080/demo-1</a> &mdash; l'interface web vous permet de discuter avec le skald viking.</p>
+
 <div class="callout success">
     <div class="callout-title">&#10003; Prêt !</div>
-    <p>Si vous obtenez une réponse du skald viking IA, votre environnement est correctement configuré. Arrêtez le serveur (<kbd>Ctrl+C</kbd>) et passez aux exercices.</p>
+    <p>Si vous obtenez une réponse du skald viking IA (via curl ou via le navigateur), votre environnement est correctement configuré. Arrêtez le serveur (<kbd>Ctrl+C</kbd>) et passez aux exercices.</p>
 </div>
 </section>
 
@@ -1055,7 +1114,7 @@ Assistant assistant;</code></pre>
 
 <div class="callout info">
     <div class="callout-title">&#127916; Lancer les diapositives</div>
-    <p>Depuis la racine du projet : <code>cd slides && python3 -m http.server 8000</code>, puis ouvrez <a href="http://localhost:8000" target="_blank">http://localhost:8000</a>. Appuyez sur <kbd>S</kbd> pour les notes du présentateur, <kbd>F</kbd> pour le plein écran, <kbd>O</kbd> pour la vue d'ensemble.</p>
+    <p>Ouvrir directement <code>slides/index.html</code> dans le navigateur. Appuyez sur <kbd>S</kbd> pour les notes du présentateur, <kbd>F</kbd> pour le plein écran, <kbd>O</kbd> pour la vue d'ensemble.</p>
 </div>
 
 <h3 id="slides-intro-detail">Introduction et contexte</h3>
@@ -1095,7 +1154,7 @@ Assistant assistant;</code></pre>
 </div>
 
 <pre><code>cd demo-project/demo-1-ai-agent/base
-# Open this directory in your IDE</code></pre>
+# Ouvrez ce répertoire dans votre IDE</code></pre>
 
 <h3>Fichiers clés</h3>
 
@@ -1192,6 +1251,11 @@ dev.langchain4j.cdi.plugin.my-model.config.api-key=${MISTRAL_API_KEY}
 dev.langchain4j.cdi.plugin.my-model.config.model-name=mistral-small-latest
 dev.langchain4j.cdi.plugin.my-model.config.temperature=0.9</code></pre>
 
+    <div class="callout tip">
+        <div class="callout-title">🏠 Ollama local</div>
+        <p>Dans <code>microprofile-config.properties</code>, commentez les 3 lignes de l'<strong>Option A</strong> et décommentez les 3 lignes de l'<strong>Option B</strong>. Les propriétés communes (<code>temperature</code>, <code>log-requests</code>...) restent inchangées.</p>
+    </div>
+
     <div class="callout warning">
         <div class="callout-title">&#9888; Critique : le préfixe .config.</div>
         <p>Les propriétés du builder <strong>doivent</strong> utiliser le préfixe <code>.config.</code> : <code>dev.langchain4j.cdi.plugin.&lt;name&gt;.config.&lt;prop&gt;=value</code>. Sans <code>.config.</code>, la propriété est <strong>ignorée silencieusement</strong>.</p>
@@ -1199,7 +1263,7 @@ dev.langchain4j.cdi.plugin.my-model.config.temperature=0.9</code></pre>
 
     <h4>Déployer et tester</h4>
     <pre><code>mvn clean wildfly:dev</code></pre>
-    <pre><code># In another terminal:
+    <pre><code># Dans un autre terminal :
 curl -X POST -H "Content-Type: text/plain" \
   -d "Tell me a saga about Java developers on a Viking voyage" \
   http://localhost:8080/demo-1/api/chat</code></pre>
@@ -1222,7 +1286,7 @@ public interface ChatAssistantStreaming {
     TokenStream chatStream(@UserMessage String userMessage);
 }</code></pre>
 
-    <p>Then in <code>ChatResource.java</code>, add the SSE endpoint:</p>
+    <p>Puis dans <code>ChatResource.java</code>, ajoutez le point d'accès SSE :</p>
 
     <pre><code>@Inject
 ChatAssistantStreaming streamingAssistant;
@@ -1248,12 +1312,17 @@ public void chatStream(@QueryParam("message") String message,
         .start();
 }</code></pre>
 
-    <p>Add the streaming model config in <code>microprofile-config.properties</code>:</p>
+    <p>Ajoutez la configuration du modèle streaming dans <code>microprofile-config.properties</code> :</p>
 
     <pre><code>dev.langchain4j.cdi.plugin.my-streaming-model.class=\
     dev.langchain4j.model.mistralai.MistralAiStreamingChatModel
 dev.langchain4j.cdi.plugin.my-streaming-model.config.api-key=${MISTRAL_API_KEY}
 dev.langchain4j.cdi.plugin.my-streaming-model.config.model-name=mistral-small-latest</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">🏠 Ollama local</div>
+        <p>Même principe : commentez l'<strong>Option A</strong> du streaming model et décommentez l'<strong>Option B</strong> dans <code>microprofile-config.properties</code>.</p>
+    </div>
 </div>
 </section>
 
@@ -1290,12 +1359,17 @@ public class ImageAnalyzerServlet extends HttpServlet {
     }
 }</code></pre>
 
-    <p>And the vision model config:</p>
+    <p>Et la configuration du modèle de vision :</p>
 
     <pre><code>dev.langchain4j.cdi.plugin.vision-model.class=\
     dev.langchain4j.model.mistralai.MistralAiChatModel
 dev.langchain4j.cdi.plugin.vision-model.config.api-key=${MISTRAL_API_KEY}
 dev.langchain4j.cdi.plugin.vision-model.config.model-name=pixtral-large-latest</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">🏠 Ollama local</div>
+        <p>Même principe : commentez l'<strong>Option A</strong> du vision model et décommentez l'<strong>Option B</strong>. Le modèle Ollama déjà téléchargé (<code>ministral-3:3b</code>) sera utilisé.</p>
+    </div>
 </div>
 </section>
 
@@ -1350,6 +1424,8 @@ curl http://localhost:8080/demo-1/api/chat/health</code></pre>
 <pre><code>cd demo-project/demo-2-ft-telemetry/base
 mvn clean wildfly:dev</code></pre>
 
+<p>Ouvrez votre navigateur vers <a href="http://localhost:8080/demo-2" target="_blank">http://localhost:8080/demo-2</a> pour tester l'application.</p>
+
 <h3>Ce qui fonctionne déjà</h3>
 
 <p>Le module base est pré-câblé avec ces fonctionnalités :</p>
@@ -1385,9 +1461,9 @@ mvn clean wildfly:dev</code></pre>
 <div class="step-box">
     <div class="step-header">
         <span class="step-number" style="background: var(--accent-blue);">1</span>
-        <span class="step-title">Add @Retry</span>
+        <span class="step-title">Ajouter @Retry</span>
     </div>
-    <p>Open <code>ChatAssistant.java</code>. The AI service interface already has <code>@RegisterAIService</code> with memory, RAG, and tools. Add the <code>@Retry</code> annotation:</p>
+    <p>Ouvrez <code>ChatAssistant.java</code>. L'interface du service IA possède déjà <code>@RegisterAIService</code> avec la mémoire, le RAG et les outils. Ajoutez l'annotation <code>@Retry</code> :</p>
 
     <pre><code>import org.eclipse.microprofile.faulttolerance.Retry;
 
@@ -1403,8 +1479,8 @@ public interface ChatAssistant {
 }</code></pre>
 
     <div class="callout info">
-        <div class="callout-title">&#128161; Why this works</div>
-        <p>Because <code>@RegisterAIService</code> creates a CDI bean, <strong>all MicroProfile interceptors apply</strong>. The CDI container wraps the proxy with the Fault Tolerance interceptor &mdash; no glue code needed.</p>
+        <div class="callout-title">&#128161; Pourquoi ça fonctionne</div>
+        <p>Comme <code>@RegisterAIService</code> crée un bean CDI, <strong>tous les intercepteurs MicroProfile s'appliquent</strong>. Le conteneur CDI enveloppe le proxy avec l'intercepteur Fault Tolerance &mdash; aucun code de liaison nécessaire.</p>
     </div>
 </div>
 </section>
@@ -1414,9 +1490,9 @@ public interface ChatAssistant {
 <div class="step-box">
     <div class="step-header">
         <span class="step-number" style="background: var(--accent-blue);">2</span>
-        <span class="step-title">Add @Timeout and @Fallback</span>
+        <span class="step-title">Ajouter @Timeout et @Fallback</span>
     </div>
-    <p>Stack the Fault Tolerance annotations:</p>
+    <p>Empilez les annotations Fault Tolerance :</p>
 
     <pre><code>import org.eclipse.microprofile.faulttolerance.*;
 import java.time.temporal.ChronoUnit;
@@ -1447,9 +1523,9 @@ public interface ChatAssistant {
 <div class="step-box">
     <div class="step-header">
         <span class="step-number" style="background: var(--accent-blue);">3</span>
-        <span class="step-title">Add @CircuitBreaker</span>
+        <span class="step-title">Ajouter @CircuitBreaker</span>
     </div>
-    <p>Add the final piece &mdash; the circuit breaker prevents flooding a failing service:</p>
+    <p>Ajoutez la dernière pièce &mdash; le circuit breaker empêche de surcharger un service défaillant :</p>
 
     <pre><code>@Retry(maxRetries = 3, delay = 1000)
 @Timeout(value = 30, unit = ChronoUnit.SECONDS)
@@ -1458,11 +1534,11 @@ public interface ChatAssistant {
 String chat(@MemoryId String sessionId,
             @UserMessage String message);</code></pre>
 
-    <p>Hot-reload: save and run <code>mvn package</code> (or let your IDE auto-build).</p>
+    <p>Rechargement à chaud : sauvegardez et exécutez <code>mvn package</code> (ou laissez votre IDE compiler automatiquement).</p>
 
     <div class="callout success">
-        <div class="callout-title">&#10003; Test the resilience</div>
-        <p>Simulate a failure: temporarily change the API key to an invalid value, then send requests. You should see retries, then the fallback message. Restore the key and the circuit breaker recovers automatically.</p>
+        <div class="callout-title">&#10003; Tester la résilience</div>
+        <p>Simulez une panne : coupez le wifi pour simuler un souci réseau, puis envoyez des requêtes. Si vous utilisez Ollama, coupez simplement le serveur. Vous devriez voir les tentatives de retry, puis le message de fallback. Rétablissez la connexion (ou relancez Ollama) et le circuit breaker se rétablit automatiquement.</p>
     </div>
 </div>
 </section>
@@ -1472,15 +1548,18 @@ String chat(@MemoryId String sessionId,
 <div class="step-box">
     <div class="step-header">
         <span class="step-number" style="background: var(--accent-blue);">4</span>
-        <span class="step-title">Add OpenTelemetry Observability</span>
+        <span class="step-title">Ajouter l'observabilité OpenTelemetry</span>
     </div>
-    <p>Start the Grafana LGTM stack (Loki + Grafana + Tempo + Mimir):</p>
+    <p>Démarrez la stack Grafana LGTM (Loki + Grafana + Tempo + Mimir) :</p>
 
-    <pre><code># Start the observability stack
-podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 \
-           --rm -ti grafana/otel-lgtm</code></pre>
+    <pre><code># Démarrer la stack LGTM complète (Loki + Grafana + Tempo + Mimir)
+# avec le collecteur OpenTelemetry intégré
+podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
 
-    <p>The telemetry configuration is already in <code>microprofile-config.properties</code>:</p>
+# Ou avec Docker
+docker run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm</code></pre>
+
+    <p>La configuration de télémétrie est déjà dans <code>microprofile-config.properties</code> :</p>
 
     <pre><code># OpenTelemetry
 otel.exporter.otlp.endpoint=http://localhost:4318
@@ -1493,14 +1572,14 @@ dev.langchain4j.cdi.plugin.my-model.config.listeners=\
     dev.langchain4j.cdi.telemetry.SpanChatModelListener,\
     dev.langchain4j.cdi.telemetry.MetricsChatModelListener</code></pre>
 
-    <p>Send a few chat requests, then open <a href="http://localhost:3000" target="_blank">http://localhost:3000</a> (Grafana). Navigate to <strong>Explore &rarr; Tempo</strong> and search for service <code>demo-2-langchain4j-cdi</code>.</p>
+    <p>Envoyez quelques requêtes de chat, puis ouvrez <a href="http://localhost:3000" target="_blank">http://localhost:3000</a> (Grafana). Naviguez vers <strong>Explore &rarr; Tempo</strong> et recherchez le service <code>demo-2-langchain4j-cdi</code>.</p>
 
-    <p>You will see distributed traces showing:</p>
+    <p>Vous verrez des traces distribuées montrant :</p>
     <ul>
-        <li>LLM call latency</li>
-        <li>Token counts (in/out)</li>
-        <li>Tool calls and their durations</li>
-        <li>RAG retrieval steps</li>
+        <li>La latence des appels LLM</li>
+        <li>Le nombre de tokens (entrée/sortie)</li>
+        <li>Les appels d'outils et leur durée</li>
+        <li>Les étapes de récupération RAG</li>
     </ul>
 </div>
 </section>
@@ -1510,30 +1589,30 @@ dev.langchain4j.cdi.plugin.my-model.config.listeners=\
 <div class="step-box">
     <div class="step-header">
         <span class="step-number" style="background: var(--accent-green);">&#10003;</span>
-        <span class="step-title">Test & Validate Exercise 2</span>
+        <span class="step-title">Tester et valider l'exercice 2</span>
     </div>
 
-    <pre><code># Chat with session
+    <pre><code># Chat avec session
 curl -X POST -H "Content-Type: text/plain" \
   -H "X-Session-Id: test-456" \
   -d "What expeditions are available?" \
   http://localhost:8080/demo-2/api/chat
 
-# Enroll a warrior
+# Enrôler un guerrier
 curl -X POST -H "Content-Type: text/plain" \
   -H "X-Session-Id: test-456" \
   -d "Enroll Erik Bloodaxe for the first expedition" \
   http://localhost:8080/demo-2/api/chat
 
-# Inspect memory
+# Inspecter la mémoire
 curl "http://localhost:8080/demo-2/api/chat/memory?sessionId=test-456"</code></pre>
 
     <ul class="checklist">
-        <li>Memory retains context across messages in the same session</li>
-        <li>RAG retrieves relevant expedition information</li>
-        <li>Tools execute enrollments, cancellations, and queries</li>
-        <li>Fallback responds gracefully when the AI is unavailable</li>
-        <li>Traces appear in Grafana/Tempo</li>
+        <li>La mémoire conserve le contexte entre les messages d'une même session</li>
+        <li>Le RAG récupère les informations pertinentes sur les expéditions</li>
+        <li>Les outils exécutent les enrôlements, annulations et requêtes</li>
+        <li>Le fallback répond gracieusement quand l'IA est indisponible</li>
+        <li>Les traces apparaissent dans Grafana/Tempo</li>
     </ul>
 </div>
 </section>
@@ -1542,18 +1621,18 @@ curl "http://localhost:8080/demo-2/api/chat/memory?sessionId=test-456"</code></p
 <!-- EXERCISE 3: MCP                                               -->
 <!-- ============================================================ -->
 <section id="ex3-intro" class="section-anchor">
-<h2>Exercise 3: MCP Integration</h2>
+<h2>Exercice 3 : Intégration MCP</h2>
 
-<p><strong>Key message</strong>: "MCP is JDBC for AI &mdash; your agents talk to any tool server"</p>
+<p><strong>Message clé</strong> : « MCP est le JDBC de l'IA &mdash; vos agents communiquent avec n'importe quel serveur d'outils »</p>
 
 <div class="callout info">
-    <div class="callout-title">&#128204; Goal</div>
-    <p>Connect an AI agent to an external MCP (Model Context Protocol) server. The MCP server provides dice-rolling tools, and your AI agent plays a Viking dice game (Orlog) via the protocol.</p>
+    <div class="callout-title">&#128204; Objectif</div>
+    <p>Connectez un agent IA à un serveur MCP (Model Context Protocol) externe. Le serveur MCP fournit des outils de lancer de dés, et votre agent IA joue à un jeu de dés viking (Orlog) via le protocole.</p>
 </div>
 
-<h3>What is MCP?</h3>
+<h3>Qu'est-ce que MCP ?</h3>
 
-<p>The <strong>Model Context Protocol</strong> is an open standard for connecting AI agents to external tools. Think of it as a universal adapter: one protocol, any tool server, any language.</p>
+<p>Le <strong>Model Context Protocol</strong> est un standard ouvert pour connecter les agents IA à des outils externes. Voyez-le comme un adaptateur universel : un seul protocole, n'importe quel serveur d'outils, n'importe quel langage.</p>
 
 <div class="arch-diagram">
 &#128640; Agent CDI &nbsp;&nbsp;&rarr;&nbsp;&nbsp; &#128268; McpToolProvider &nbsp;&nbsp;&rarr;&nbsp;&nbsp; &#127760; MCP Server (any language)<br>
@@ -1565,41 +1644,41 @@ curl "http://localhost:8080/demo-2/api/chat/memory?sessionId=test-456"</code></p
 <div class="step-box">
     <div class="step-header">
         <span class="step-number" style="background: var(--accent-green);">0</span>
-        <span class="step-title">Build & Start the MCP Server</span>
+        <span class="step-title">Compiler et démarrer le serveur MCP</span>
     </div>
-    <p>First, build and start the external MCP dice server:</p>
+    <p>D'abord, compilez et démarrez le serveur MCP de dés externe :</p>
 
-    <pre><code># Build the MCP server
+    <pre><code># Compiler le serveur MCP
 cd demo-project/demo-3-mcp/mcp-server
 mvn clean package
 
-# Start it (runs on port 8090)
+# Le démarrer (écoute sur le port 8090)
 java -jar target/mcp-server-1.0-SNAPSHOT-jar-with-dependencies.jar</code></pre>
 
-    <p>The MCP server exposes a <code>roll</code> tool that generates random dice results for the Viking game. It communicates via HTTP SSE (Server-Sent Events) with JSON-RPC 2.0.</p>
+    <p>Le serveur MCP expose un outil <code>roll</code> qui génère des résultats de dés aléatoires pour le jeu viking. Il communique via HTTP SSE (Server-Sent Events) avec JSON-RPC 2.0.</p>
 
     <div class="callout info">
-        <div class="callout-title">&#128161; Keep this running</div>
-        <p>Leave the MCP server running in a separate terminal. The AI agent will connect to it via HTTP SSE on <code>localhost:8090/sse</code>.</p>
+        <div class="callout-title">&#128161; Laissez-le tourner</div>
+        <p>Laissez le serveur MCP tourner dans un terminal séparé. L'agent IA s'y connectera via HTTP SSE sur <code>localhost:8090/sse</code>.</p>
     </div>
 
-    <h3 style="margin-top: 1.5em;">Test with MCP Inspector</h3>
-    <p>Before wiring the MCP server into the AI agent, you can verify it works using the <strong>MCP Inspector</strong> &mdash; a visual debugging tool for MCP servers. In a new terminal:</p>
+    <h3 style="margin-top: 1.5em;">Tester avec MCP Inspector</h3>
+    <p>Avant de connecter le serveur MCP à l'agent IA, vous pouvez vérifier qu'il fonctionne en utilisant le <strong>MCP Inspector</strong> &mdash; un outil de débogage visuel pour les serveurs MCP. Dans un nouveau terminal :</p>
 
-    <pre><code># From the demo-3-mcp directory
+    <pre><code># Depuis le répertoire demo-3-mcp
 cd demo-project/demo-3-mcp
 ./run-mcp-inspector.sh</code></pre>
 
-    <p>This opens a web UI (usually at <code>http://localhost:6274</code>) connected to your MCP server. Click on the <strong>Tools</strong> tab, then on the <code>roll</code> tool to inspect it and test it interactively:</p>
+    <p>Ceci ouvre une interface web (généralement sur <code>http://localhost:6274</code>) connectée à votre serveur MCP. Cliquez sur l'onglet <strong>Tools</strong>, puis sur l'outil <code>roll</code> pour l'inspecter et le tester interactivement :</p>
 
     <img src="mcp-inspector.png" alt="MCP Inspector showing the roll tool" style="max-width: 100%; border-radius: 12px; margin: 1em 0; border: 1px solid var(--border);">
 
     <div class="callout tip">
-        <div class="callout-title">&#128736; What to check</div>
+        <div class="callout-title">&#128736; Points à vérifier</div>
         <ul style="margin: 0.5em 0 0 1.2em;">
-            <li>The connection status shows <strong>Connected</strong></li>
-            <li>The <code>roll</code> tool appears in the Tools list</li>
-            <li>Set <code>numberOfDice</code> to <code>2</code>, click <strong>Run Tool</strong>, and verify you get dice results back</li>
+            <li>Le statut de connexion affiche <strong>Connected</strong></li>
+            <li>L'outil <code>roll</code> apparaît dans la liste des Tools</li>
+            <li>Mettez <code>numberOfDice</code> à <code>2</code>, cliquez sur <strong>Run Tool</strong>, et vérifiez que vous obtenez des résultats de dés</li>
         </ul>
     </div>
 </div>
@@ -1610,9 +1689,9 @@ cd demo-project/demo-3-mcp
 <div class="step-box">
     <div class="step-header">
         <span class="step-number" style="background: var(--accent-green);">1</span>
-        <span class="step-title">Create the Viking Game Master AI Service</span>
+        <span class="step-title">Créer le service IA du Maître de Jeu Viking</span>
     </div>
-    <p>Open <code>VikingGameMasterAI.java</code> in <code>demo-3-mcp/base/</code>:</p>
+    <p>Ouvrez <code>VikingGameMasterAI.java</code> dans <code>demo-3-mcp/base/</code> :</p>
 
     <pre><code>@RegisterAIService(chatModelName = "mistral",
                    toolProviderName = "mcp")
@@ -1637,7 +1716,7 @@ public interface VikingGameMasterAI {
 
     <div class="callout tip">
         <div class="callout-title">&#128161; toolProviderName</div>
-        <p><code>toolProviderName = "mcp"</code> connects this agent to the <code>McpToolProvider</code> bean, which automatically discovers dice-rolling tools from the external MCP server for the Viking Orlog game.</p>
+        <p><code>toolProviderName = "mcp"</code> connecte cet agent au bean <code>McpToolProvider</code>, qui découvre automatiquement les outils de lancer de dés depuis le serveur MCP externe pour le jeu viking Orlog.</p>
     </div>
 </div>
 </section>
@@ -1647,17 +1726,17 @@ public interface VikingGameMasterAI {
 <div class="step-box">
     <div class="step-header">
         <span class="step-number" style="background: var(--accent-green);">2</span>
-        <span class="step-title">Configure MCP via Properties</span>
+        <span class="step-title">Configurer MCP via les propriétés</span>
     </div>
-    <p>Open <code>microprofile-config.properties</code> and uncomment the MCP configuration:</p>
+    <p>Ouvrez <code>microprofile-config.properties</code> et décommentez la configuration MCP :</p>
 
-    <pre><code># Chat Model (Mistral AI)
+    <pre><code># Chat Model (Mistral AI distant)
 dev.langchain4j.cdi.plugin.mistral.class=\
     dev.langchain4j.model.mistralai.MistralAiChatModel
 dev.langchain4j.cdi.plugin.mistral.config.api-key=${MISTRAL_API_KEY}
 dev.langchain4j.cdi.plugin.mistral.config.model-name=mistral-small-latest
 
-# MCP Transport (SSE to Viking dice server)
+# Transport MCP (SSE vers le serveur de dés viking)
 dev.langchain4j.cdi.plugin.ssetransport.class=\
     dev.langchain4j.mcp.client.transport.http.HttpMcpTransport
 dev.langchain4j.cdi.plugin.ssetransport.config.sseUrl=\
@@ -1673,9 +1752,14 @@ dev.langchain4j.cdi.plugin.mcp.class=\
     dev.langchain4j.mcp.McpToolProvider
 dev.langchain4j.cdi.plugin.mcp.config.mcpClients=lookup:@mcpclient</code></pre>
 
+    <div class="callout tip">
+        <div class="callout-title">🏠 Ollama local</div>
+        <p>Même principe : commentez l'<strong>Option A</strong> du Chat Model et décommentez l'<strong>Option B</strong>. La config MCP (transport, client, tool provider) reste identique.</p>
+    </div>
+
     <div class="callout info">
-        <div class="callout-title">&#128161; The lookup: pattern</div>
-        <p><code>lookup:@ssetransport</code> references another CDI bean by its config name. This is how you wire beans together purely through configuration &mdash; no Java code needed for the plumbing.</p>
+        <div class="callout-title">&#128161; Le pattern lookup:</div>
+        <p><code>lookup:@ssetransport</code> référence un autre bean CDI par son nom de configuration. C'est ainsi que vous câblez les beans entre eux uniquement via la configuration &mdash; aucun code Java nécessaire pour la plomberie.</p>
     </div>
 </div>
 </section>
@@ -1685,9 +1769,9 @@ dev.langchain4j.cdi.plugin.mcp.config.mcpClients=lookup:@mcpclient</code></pre>
 <div class="step-box">
     <div class="step-header">
         <span class="step-number" style="background: var(--accent-green);">3</span>
-        <span class="step-title">Wire the REST Endpoint</span>
+        <span class="step-title">Câbler le point d'accès REST</span>
     </div>
-    <p>Open <code>GameResource.java</code>:</p>
+    <p>Ouvrez <code>GameResource.java</code> :</p>
 
     <pre><code>@Path("/game")
 @ApplicationScoped
@@ -1720,36 +1804,36 @@ public class GameResource {
 <div class="step-box">
     <div class="step-header">
         <span class="step-number" style="background: var(--accent-green);">&#10003;</span>
-        <span class="step-title">Test & Validate Exercise 3</span>
+        <span class="step-title">Tester et valider l'exercice 3</span>
     </div>
 
-    <pre><code># Make sure the MCP server is running on port 8090!
+    <pre><code># Assurez-vous que le serveur MCP tourne sur le port 8090 !
 
-# Deploy
+# Déployer
 cd demo-project/demo-3-mcp/base
 mvn clean wildfly:dev
 
-# Start a game
+# Démarrer une partie
 curl http://localhost:8080/demo-3/api/game/start
 
-# Roll the dice
+# Lancer les dés
 curl -X POST -H "Content-Type: text/plain" \
   -d "Cast the bones of fate!" \
   http://localhost:8080/demo-3/api/game/play
 
-# Open the web UI
+# Ouvrir l'interface web
 # http://localhost:8080/demo-3/</code></pre>
 
     <ul class="checklist">
-        <li>The AI agent calls the MCP server's <code>roll</code> tool via HTTP SSE</li>
-        <li>Dice results are returned in the DICE: [X, Y] format</li>
-        <li>Ragnar the Wise announces victories, defeats, and fate numbers with Viking spirit</li>
-        <li>The web UI renders visual dice with animated pips</li>
+        <li>L'agent IA appelle l'outil <code>roll</code> du serveur MCP via HTTP SSE</li>
+        <li>Les résultats des dés sont retournés au format DICE: [X, Y]</li>
+        <li>Ragnar le Sage annonce les victoires, défaites et nombres du destin avec l'esprit viking</li>
+        <li>L'interface web affiche des dés visuels avec des points animés</li>
     </ul>
 
     <div class="callout success">
-        <div class="callout-title">&#127922; Congratulations!</div>
-        <p>You have built three AI-powered applications using LangChain4j-CDI: a Viking skald, a resilient expedition guide, and an MCP-integrated Viking dice game. All using standard Jakarta EE patterns.</p>
+        <div class="callout-title">&#127922; Félicitations !</div>
+        <p>Vous avez construit trois applications propulsées par l'IA avec LangChain4j-CDI : un skald viking, un guide d'expéditions résilient, et un jeu de dés viking intégré via MCP. Le tout avec des patterns Jakarta EE standards.</p>
     </div>
 </div>
 </section>

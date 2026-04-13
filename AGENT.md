@@ -28,7 +28,7 @@ Licence : Apache 2.0.
 ├── LICENSE                  <- Apache 2.0
 ├── slides/
 │   ├── index.html           <- Présentation Reveal.js (tout-en-un)
-│   └── start.sh             <- python3 -m http.server 8000
+│   └── (ouvrir index.html directement dans le navigateur)
 └── demo-project/
     ├── pom.xml              <- POM parent (versions centralisées)
     ├── README.md            <- Stratégie globale des démos
@@ -58,9 +58,10 @@ Seules les annotations/config faisant l'objet du live coding diffèrent (TODOs d
 ## Lancer les Démos
 
 ```bash
-# Prérequis : Ollama en cours d'exécution avec ministral-3:3b
-ollama pull ministral-3:3b
+# Prérequis : Ollama (dans un terminal séparé, laisser tourner)
 ollama serve
+# Dans un autre terminal :
+ollama pull ministral-3:3b
 
 # Demo 1
 cd demo-project/demo-1-ai-agent/solution
@@ -84,11 +85,8 @@ Le context-root est défini par `<name>` dans le `wildfly-maven-plugin` de chaqu
 
 ## Slides
 
-```bash
-cd slides && python3 -m http.server 8000
-# -> http://localhost:8000
-# Touche S = Vue présentateur (notes), F = plein écran, O = vue d'ensemble
-```
+Ouvrir `slides/index.html` directement dans le navigateur.
+Touche S = Vue présentateur (notes), F = plein écran, O = vue d'ensemble.
 
 Les slides constituent un fichier unique `slides/index.html`. Les notes pour le présentateur sont dans les balises `<aside class="notes">`.
 
@@ -271,8 +269,7 @@ Chaque démo possède un `index.html` dans `src/main/webapp/` avec :
 # Vérifier qu'Ollama est en cours d'exécution
 curl http://localhost:11434/api/tags
 
-# Lancer les slides
-cd slides && python3 -m http.server 8000
+# Lancer les slides : ouvrir slides/index.html dans le navigateur
 
 # Lancer une démo (remplacer N et le module)
 cd demo-project/demo-N-xxx/solution && mvn clean wildfly:dev

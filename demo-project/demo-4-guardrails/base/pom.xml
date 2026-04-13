@@ -55,6 +55,10 @@
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-mistral-ai</artifactId>
         </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-ollama</artifactId>
+        </dependency>
         <!-- Apache Tika language detection -->
         <dependency>
             <groupId>org.apache.tika</groupId>
