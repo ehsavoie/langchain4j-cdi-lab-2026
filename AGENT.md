@@ -39,7 +39,7 @@ Licence : Apache 2.0.
     │   ├── base/            <- Squelette (FT en TODOs, Tools/Memory fonctionnels)
     │   └── solution/        <- Référence complète avec FT
     └── demo-3-mcp/          <- Intégration MCP (Model Context Protocol)
-        ├── mcp-server/      <- Serveur MCP standalone (JAR, JSON-RPC stdio)
+        ├── mcp-server/      <- Serveur MCP standalone (Helidon 4, endpoint /mcp)
         ├── base/            <- Squelette
         └── solution/        <- Référence complète
 ```
@@ -73,9 +73,10 @@ cd demo-project/demo-2-ft-telemetry/solution
 mvn clean wildfly:dev
 # -> http://localhost:8080/demo-2/
 
-# Demo 3 (compiler d'abord le serveur MCP)
+# Demo 3 (démarrer d'abord le serveur MCP sur le port 8090)
 cd demo-project/demo-3-mcp/mcp-server
 mvn clean package
+java -jar target/casino-dice-roller.jar
 cd ../solution
 mvn clean wildfly:dev
 # -> http://localhost:8080/demo-3/

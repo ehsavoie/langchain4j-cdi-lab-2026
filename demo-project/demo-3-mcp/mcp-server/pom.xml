@@ -10,41 +10,81 @@
     </parent>
 
     <artifactId>casino-dice-roller</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>LangChain4j-CDI Demo 3 MCP Server</name>
-    <description>Complete MCP Server Casino Dice game demo</description>
-    
+    <description>MCP Server Casino Dice game — powered by LangChain4j-CDI MCP + Helidon 4</description>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jakartaee>10.0.0</jakartaee>
-        <version.wildfly.server>39.0.1.Final</version.wildfly.server>
+        <maven.compiler.release>21</maven.compiler.release>
+        <langchain4j-cdi-mcp.version>1.2.0-Beta1</langchain4j-cdi-mcp.version>
+        <helidon.version>4.3.4</helidon.version>
+        <mainClass>io.helidon.Main</mainClass>
     </properties>
-    
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.helidon</groupId>
+                <artifactId>helidon-bom</artifactId>
+                <version>${helidon.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
-        <!-- Jakarta EE -->
+        <!-- LangChain4j-CDI MCP Server -->
         <dependency>
-            <groupId>jakarta.platform</groupId>
-            <artifactId>jakarta.jakartaee-api</artifactId>
-            <scope>provided</scope>
+            <groupId>dev.langchain4j.cdi.mcp</groupId>
+            <artifactId>langchain4j-cdi-mcp-server</artifactId>
+            <version>${langchain4j-cdi-mcp.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.wildfly.generative-ai</groupId>
-            <artifactId>wildfly-mcp-api</artifactId>
-            <version>0.9.0</version>
-            <scope>provided</scope>
+            <groupId>dev.langchain4j.cdi.mcp</groupId>
+            <artifactId>langchain4j-cdi-mcp-build-compatible-ext</artifactId>
+            <version>${langchain4j-cdi-mcp.version}</version>
+        </dependency>
+
+        <!-- Helidon MicroProfile -->
+        <dependency>
+            <groupId>io.helidon.microprofile.bundles</groupId>
+            <artifactId>helidon-microprofile</artifactId>
+        </dependency>
+
+        <!-- Jersey JSON-B -->
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-binding</artifactId>
+            <version>3.1.10</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Jandex -->
+        <dependency>
+            <groupId>io.smallrye</groupId>
+            <artifactId>jandex</artifactId>
+            <version>3.3.0</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>io.helidon.logging</groupId>
+            <artifactId>helidon-logging-jul</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.wildfly.generative-ai</groupId>
-            <artifactId>wildfly-wasm-api</artifactId>
-            <version>0.9.0</version>
-            <scope>provided</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>2.0.17</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -55,40 +95,51 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.4.0</version>
-                <configuration>
-                    <!-- Jakarta EE doesn't require web.xml, Maven needs to catch up! -->
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
-            </plugin>
-
-            <!-- The WildFly plugin deploys your war to a local JBoss AS container -->
-            <plugin>
-                <groupId>org.wildfly.plugins</groupId>
-                <artifactId>wildfly-maven-plugin</artifactId>
-                <configuration>
-                    <discoverProvisioningInfo>
-                        <spaces>
-                            <space>incubating</space>
-                        </spaces>
-                        <version>${version.wildfly.server}</version>
-                    </discoverProvisioningInfo>
-                    <name>ROOT.war</name>
-                    <packagingScripts>
-                        <packaging-script>
-                            <scripts>
-                                <script>./src/scripts/configure_mcp.cli</script>
-                            </scripts>
-                        </packaging-script>
-                    </packagingScripts>
-                </configuration>
+                <groupId>io.smallrye</groupId>
+                <artifactId>jandex-maven-plugin</artifactId>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
+                        <id>make-index</id>
                         <goals>
-                            <goal>package</goal>
+                            <goal>jandex</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>libs</classpathPrefix>
+                            <mainClass>${mainClass}</mainClass>
+                            <useUniqueVersions>false</useUniqueVersions>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.8.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-libs</id>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/libs</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

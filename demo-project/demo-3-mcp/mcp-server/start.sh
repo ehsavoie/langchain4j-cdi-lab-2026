@@ -1,2 +1,2 @@
-./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=10
+mvn clean package && java -jar target/casino-dice-roller.jar
 

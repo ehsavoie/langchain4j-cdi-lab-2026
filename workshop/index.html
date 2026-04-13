@@ -1095,7 +1095,7 @@ Assistant assistant;</code></pre>
 &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="highlight">base/</span><br>
 &#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">solution/</span><br>
 &#9500;&#9472;&#9472; <span class="dir">demo-3-mcp/</span> <span class="comment">&larr; MCP Integration</span><br>
-&#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="dir">mcp-server/</span> <span class="comment">&larr; Standalone MCP server (fat JAR)</span><br>
+&#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="dir">mcp-server/</span> <span class="comment">&larr; Serveur MCP standalone (Helidon 4)</span><br>
 &#9474;&nbsp;&nbsp; &#9500;&#9472;&#9472; <span class="highlight">base/</span><br>
 &#9474;&nbsp;&nbsp; &#9492;&#9472;&#9472; <span class="file">solution/</span><br>
 &#9492;&#9472;&#9472; <span class="dir">demo-4-guardrails/</span> <span class="comment">&larr; Input &amp; Output Guardrails</span><br>
@@ -1627,7 +1627,7 @@ curl "http://localhost:8080/demo-2/api/chat/memory?sessionId=test-456"</code></p
 
 <div class="callout info">
     <div class="callout-title">&#128204; Objectif</div>
-    <p>Connectez un agent IA à un serveur MCP (Model Context Protocol) externe. Le serveur MCP fournit des outils de lancer de dés, et votre agent IA joue à un jeu de dés viking (Orlog) via le protocole.</p>
+    <p>Connectez un agent IA à un serveur MCP (Model Context Protocol) externe. Le serveur MCP fournit des outils de lancer de dés, et votre agent IA anime un jeu de Craps au casino via le protocole.</p>
 </div>
 
 <h3>Qu'est-ce que MCP ?</h3>
@@ -1636,7 +1636,7 @@ curl "http://localhost:8080/demo-2/api/chat/memory?sessionId=test-456"</code></p
 
 <div class="arch-diagram">
 &#128640; Agent CDI &nbsp;&nbsp;&rarr;&nbsp;&nbsp; &#128268; McpToolProvider &nbsp;&nbsp;&rarr;&nbsp;&nbsp; &#127760; MCP Server (any language)<br>
-<span style="color: var(--text-muted);">@RegisterAIService &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; toolProviderName &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; JSON-RPC via HTTP SSE</span>
+<span style="color: var(--text-muted);">@RegisterAIService &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; toolProviderName &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; JSON-RPC via Streamable HTTP</span>
 </div>
 </section>
 
@@ -1648,28 +1648,30 @@ curl "http://localhost:8080/demo-2/api/chat/memory?sessionId=test-456"</code></p
     </div>
     <p>D'abord, compilez et démarrez le serveur MCP de dés externe :</p>
 
-    <pre><code># Compiler le serveur MCP
+    <pre><code># Compiler et démarrer le serveur MCP avec Helidon 4 (écoute sur le port 8090)
 cd demo-project/demo-3-mcp/mcp-server
 mvn clean package
+java -jar target/casino-dice-roller.jar</code></pre>
 
-# Le démarrer (écoute sur le port 8090)
-java -jar target/mcp-server-1.0-SNAPSHOT-jar-with-dependencies.jar</code></pre>
-
-    <p>Le serveur MCP expose un outil <code>roll</code> qui génère des résultats de dés aléatoires pour le jeu viking. Il communique via HTTP SSE (Server-Sent Events) avec JSON-RPC 2.0.</p>
+    <p>Le serveur MCP est une application MicroProfile propulsée par <strong>LangChain4j-CDI MCP Server</strong> et <strong>Helidon 4</strong>. Il expose automatiquement un endpoint <code>/mcp</code> qui parle le protocole MCP (JSON-RPC 2.0 sur HTTP Streamable). L'outil <code>roll</code> génère des résultats de dés aléatoires pour le jeu viking.</p>
 
     <div class="callout info">
         <div class="callout-title">&#128161; Laissez-le tourner</div>
-        <p>Laissez le serveur MCP tourner dans un terminal séparé. L'agent IA s'y connectera via HTTP SSE sur <code>localhost:8090/sse</code>.</p>
+        <p>Laissez le serveur MCP tourner dans un terminal séparé. L'agent IA s'y connectera via l'endpoint MCP sur <code>localhost:8090/mcp</code>.</p>
     </div>
 
     <h3 style="margin-top: 1.5em;">Tester avec MCP Inspector</h3>
     <p>Avant de connecter le serveur MCP à l'agent IA, vous pouvez vérifier qu'il fonctionne en utilisant le <strong>MCP Inspector</strong> &mdash; un outil de débogage visuel pour les serveurs MCP. Dans un nouveau terminal :</p>
 
-    <pre><code># Depuis le répertoire demo-3-mcp
-cd demo-project/demo-3-mcp
-./run-mcp-inspector.sh</code></pre>
+    <pre><code># Lancer le MCP Inspector
+npx @modelcontextprotocol/inspector</code></pre>
 
-    <p>Ceci ouvre une interface web (généralement sur <code>http://localhost:6274</code>) connectée à votre serveur MCP. Cliquez sur l'onglet <strong>Tools</strong>, puis sur l'outil <code>roll</code> pour l'inspecter et le tester interactivement :</p>
+    <p>Ceci ouvre une interface web (généralement sur <code>http://localhost:6274</code>). Configurez la connexion :</p>
+    <ul>
+        <li><strong>Transport Type</strong> : <code>Streamable HTTP</code></li>
+        <li><strong>URL</strong> : <code>http://localhost:8090/mcp</code></li>
+    </ul>
+    <p>Cliquez sur <strong>Connect</strong>, puis sur l'onglet <strong>Tools</strong> et sur l'outil <code>roll</code> pour l'inspecter et le tester interactivement :</p>
 
     <img src="mcp-inspector.png" alt="MCP Inspector showing the roll tool" style="max-width: 100%; border-radius: 12px; margin: 1em 0; border: 1px solid var(--border);">
 
@@ -1691,32 +1693,32 @@ cd demo-project/demo-3-mcp
         <span class="step-number" style="background: var(--accent-green);">1</span>
         <span class="step-title">Créer le service IA du Maître de Jeu Viking</span>
     </div>
-    <p>Ouvrez <code>VikingGameMasterAI.java</code> dans <code>demo-3-mcp/base/</code> :</p>
+    <p>Ouvrez <code>CasinoDealerAI.java</code> dans <code>demo-3-mcp/base/</code> :</p>
 
     <pre><code>@RegisterAIService(chatModelName = "mistral",
                    toolProviderName = "mcp")
-public interface VikingGameMasterAI {
+public interface CasinoDealerAI {
 
     @SystemMessage("""
-        You are Ragnar the Wise, master of Orlog in the great Viking hall.
-        You run the sacred Viking dice game Orlog.
+        Tu es Lucky Jack Diamond, le croupier au "Golden Ace Casino".
+        Tu animes des parties de Craps !
 
-        RULES: Roll 2 dice. Use the roll tool with numberOfDice=2.
-        - 7 or 11 on first roll = VICTORY in Odin's favor
-        - 2, 3, or 12 on first roll = DEFEAT by the Norns
-        - Any other = that is your fate number
+        RÈGLES : Lance 2 dés avec roll(numberOfDice=2).
+        - 7 ou 11 au premier lancer = VICTOIRE (Natural)
+        - 2, 3 ou 12 au premier lancer = DÉFAITE (Craps)
+        - Autre nombre = c'est LE POINT, on continue
 
-        REQUIRED FORMAT:
-        DICE: [X, Y]
-        TOTAL: [sum]
-        RESULT: [what happened in Viking terms]
+        FORMAT OBLIGATOIRE :
+        DÉS: [X, Y]
+        TOTAL: [somme]
+        RÉSULTAT: [ce qui s'est passé]
         """)
     String play(@UserMessage String playerAction);
 }</code></pre>
 
     <div class="callout tip">
         <div class="callout-title">&#128161; toolProviderName</div>
-        <p><code>toolProviderName = "mcp"</code> connecte cet agent au bean <code>McpToolProvider</code>, qui découvre automatiquement les outils de lancer de dés depuis le serveur MCP externe pour le jeu viking Orlog.</p>
+        <p><code>toolProviderName = "mcp"</code> connecte cet agent au bean <code>McpToolProvider</code>, qui découvre automatiquement les outils de lancer de dés depuis le serveur MCP externe.</p>
     </div>
 </div>
 </section>
@@ -1730,26 +1732,25 @@ public interface VikingGameMasterAI {
     </div>
     <p>Ouvrez <code>microprofile-config.properties</code> et décommentez la configuration MCP :</p>
 
-    <pre><code># Chat Model (Mistral AI distant)
-dev.langchain4j.cdi.plugin.mistral.class=\
-    dev.langchain4j.model.mistralai.MistralAiChatModel
+    <pre><code># Chat Model
+# ---- Option A : Mistral AI (distant) ----
+dev.langchain4j.cdi.plugin.mistral.class=dev.langchain4j.model.mistralai.MistralAiChatModel
 dev.langchain4j.cdi.plugin.mistral.config.api-key=${MISTRAL_API_KEY}
 dev.langchain4j.cdi.plugin.mistral.config.model-name=mistral-small-latest
 
-# Transport MCP (SSE vers le serveur de dés viking)
+# MCP Transport (Streamable HTTP vers le serveur MCP de dés)
 dev.langchain4j.cdi.plugin.ssetransport.class=\
-    dev.langchain4j.mcp.client.transport.http.HttpMcpTransport
-dev.langchain4j.cdi.plugin.ssetransport.config.sseUrl=\
-    http://localhost:8090/sse
+    dev.langchain4j.mcp.client.transport.http.StreamableHttpMcpTransport
+dev.langchain4j.cdi.plugin.ssetransport.config.url=http://localhost:8090/mcp
+dev.langchain4j.cdi.plugin.ssetransport.config.logRequests=true
+dev.langchain4j.cdi.plugin.ssetransport.config.logResponses=true
 
 # MCP Client
-dev.langchain4j.cdi.plugin.mcpclient.class=\
-    dev.langchain4j.mcp.client.DefaultMcpClient
+dev.langchain4j.cdi.plugin.mcpclient.class=dev.langchain4j.mcp.client.DefaultMcpClient
 dev.langchain4j.cdi.plugin.mcpclient.config.transport=lookup:@ssetransport
 
-# MCP Tool Provider
-dev.langchain4j.cdi.plugin.mcp.class=\
-    dev.langchain4j.mcp.McpToolProvider
+# MCP Tool Provider (nommé "mcp" pour @RegisterAIService)
+dev.langchain4j.cdi.plugin.mcp.class=dev.langchain4j.mcp.McpToolProvider
 dev.langchain4j.cdi.plugin.mcp.config.mcpClients=lookup:@mcpclient</code></pre>
 
     <div class="callout tip">
@@ -1778,7 +1779,7 @@ dev.langchain4j.cdi.plugin.mcp.config.mcpClients=lookup:@mcpclient</code></pre>
 public class GameResource {
 
     @Inject
-    VikingGameMasterAI gameMaster;
+    CasinoDealerAI gameMaster;
 
     @POST
     @Path("/play")
@@ -1793,7 +1794,7 @@ public class GameResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String start() {
         return gameMaster.play(
-            "Hail! I wish to play Orlog with you.");
+            "Salut ! Je suis prêt pour une partie de Craps !");
     }
 }</code></pre>
 </div>
@@ -1818,22 +1819,22 @@ curl http://localhost:8080/demo-3/api/game/start
 
 # Lancer les dés
 curl -X POST -H "Content-Type: text/plain" \
-  -d "Cast the bones of fate!" \
+  -d "Lance les dés !" \
   http://localhost:8080/demo-3/api/game/play
 
 # Ouvrir l'interface web
 # http://localhost:8080/demo-3/</code></pre>
 
     <ul class="checklist">
-        <li>L'agent IA appelle l'outil <code>roll</code> du serveur MCP via HTTP SSE</li>
-        <li>Les résultats des dés sont retournés au format DICE: [X, Y]</li>
-        <li>Ragnar le Sage annonce les victoires, défaites et nombres du destin avec l'esprit viking</li>
+        <li>L'agent IA appelle l'outil <code>roll</code> du serveur MCP via Streamable HTTP</li>
+        <li>Les résultats des dés sont retournés au format DÉS: [X, Y]</li>
+        <li>Lucky Jack Diamond annonce les victoires, défaites et points dans le style Vegas</li>
         <li>L'interface web affiche des dés visuels avec des points animés</li>
     </ul>
 
     <div class="callout success">
         <div class="callout-title">&#127922; Félicitations !</div>
-        <p>Vous avez construit trois applications propulsées par l'IA avec LangChain4j-CDI : un skald viking, un guide d'expéditions résilient, et un jeu de dés viking intégré via MCP. Le tout avec des patterns Jakarta EE standards.</p>
+        <p>Vous avez construit trois applications propulsées par l'IA avec LangChain4j-CDI : un skald viking, un guide d'expéditions résilient, et un jeu de Craps intégré via MCP. Le tout avec des patterns Jakarta EE standards.</p>
     </div>
 </div>
 </section>

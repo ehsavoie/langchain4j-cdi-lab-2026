@@ -46,17 +46,33 @@
         <dependency>
             <groupId>dev.langchain4j.cdi</groupId>
             <artifactId>langchain4j-cdi-core</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>dev.langchain4j.cdi</groupId>
             <artifactId>langchain4j-cdi-portable-ext</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j</artifactId>
-            <scope>provided</scope>
+        </dependency>
+        <!-- LangChain4j-CDI MicroProfile Config (pour configurer MCP via properties) -->
+        <dependency>
+            <groupId>dev.langchain4j.cdi.mp</groupId>
+            <artifactId>langchain4j-cdi-config</artifactId>
+        </dependency>
+        <!-- LangChain4j MCP client -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-mcp</artifactId>
+        </dependency>
+        <!-- LLM providers -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-mistral-ai</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-ollama</artifactId>
         </dependency>
     </dependencies>
 
@@ -86,16 +102,8 @@
             <plugin>
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
-                <version>${version.wildfly.maven.plugin}</version>
                 <configuration>
-                    <discoverProvisioningInfo>
-                        <spaces>
-                            <space>incubating</space>
-                        </spaces>
-                        <version>${version.wildfly.server}</version>
-                         <suggest>true</suggest>
-                    </discoverProvisioningInfo>
-                    <name>ROOT.war</name>
+                    <name>demo-3.war</name>
                     <packagingScripts>
                         <packaging-script>
                             <scripts>
@@ -104,13 +112,6 @@
                         </packaging-script>
                     </packagingScripts>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>package</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
