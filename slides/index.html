@@ -22,6 +22,7 @@
             --accent-green: #81c784;
             --accent-purple: #b39ddb;
             --accent-yellow: #ffd54f;
+            --accent-red: #ef5350;
         }
 
         .reveal { font-size: 32px; }
@@ -103,6 +104,7 @@
         .timeline .step.blue::before { background: var(--accent-blue); }
         .timeline .step.green::before { background: var(--accent-green); }
         .timeline .step.purple::before { background: var(--accent-purple); }
+        .timeline .step.red::before { background: var(--accent-red); }
 
         .box {
             background: rgba(255,255,255,0.05);
@@ -113,6 +115,7 @@
         .box-accent { border: 1px solid var(--accent-orange); }
         .box-blue { border: 1px solid var(--accent-blue); }
 
+        .accent-red { color: var(--accent-red); }
         .fragment.highlight-orange.visible { color: var(--accent-orange); }
 
         /* Server logos grid */
@@ -380,9 +383,9 @@
             <span class="small"> — Valider l'entrée et la sortie de vos agents</span>
             <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
         </div>
-        <div class="step blue">
-            <strong>🔮 Et la suite ?</strong>
-            <span class="small"> — A2A et feuille de route</span>
+        <div class="step red">
+            <strong>🤝 A2A : Agent-to-Agent</strong>
+            <span class="small"> — Orchestration multi-agents via le protocole A2A</span>
             <span class="speaker-tag speaker-both">Les deux</span>
         </div>
     </div>
@@ -1654,36 +1657,207 @@ public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
 </section>
 
 <!-- ============================================= -->
-<!-- SECTION 9: FUTURE AND CLOSING                  -->
+<!-- SECTION 9: DEMO 5 - A2A (Les deux)             -->
 <!-- ============================================= -->
 
-<!-- Slide 26: A2A -->
+<!-- A2A concept -->
 <section>
     <span class="speaker-tag speaker-both">Les deux</span>
-    <h2>Et la suite ? A2A 🤝</h2>
-    <p class="big">Agent-to-Agent Protocol</p>
-    <div class="box" style="margin-top: 1em; font-size: 0.85em; text-align: left;">
-        <p>🤖 Agent 1 <span style="color: var(--accent-orange)">⟷</span> 🤖 Agent 2 <span style="color: var(--accent-orange)">⟷</span> 🤖 Agent 3</p>
-        <p class="fragment" style="margin-top: 0.5em;">
-            Imaginez : votre agent Jakarta EE <strong>délègue</strong> des tâches<br>
-            à d'autres agents, chacun spécialisé, chacun sur son propre serveur.
-        </p>
-        <p class="fragment" style="margin-top: 0.5em;">
-            <span class="accent">MCP</span> connecte les agents aux <em>outils</em>.<br>
-            <span class="accent-blue">A2A</span> connecte les agents <em>entre eux</em>.
-        </p>
+    <h2>A2A : Agent-to-Agent Protocol 🤝</h2>
+    <div class="two-col">
+        <div class="box box-accent">
+            <h3>MCP</h3>
+            <p class="medium">Agent <span style="color: var(--accent-orange)">⟷</span> Outils</p>
+            <p class="small">
+                Un agent appelle des <em>outils</em> externes<br>
+                (bases de données, APIs, fichiers...)
+            </p>
+        </div>
+        <div class="box box-blue">
+            <h3 style="color: var(--accent-blue);">A2A</h3>
+            <p class="medium">Agent <span style="color: var(--accent-blue)">⟷</span> Agent</p>
+            <p class="small">
+                Un agent <strong>délègue</strong> à d'autres agents<br>
+                spécialisés, chacun sur son propre serveur
+            </p>
+        </div>
     </div>
-    <p class="fragment small" style="margin-top: 0.5em;">
-        <em>"Si on a du temps, on peut parler d'A2A"</em> -- c'est maintenant 😄
+    <p class="fragment medium" style="margin-top: 1em;">
+        🤖 Les <span class="accent-red">microservices</span>, version agents IA
     </p>
     <aside class="notes">
-        Si on a le temps, jetons un œil vers le futur.
+        A2A -- Agent-to-Agent -- c'est le complément naturel de MCP. MCP connecte les agents aux outils. A2A connecte les agents entre eux.
 
-        A2A -- Agent-to-Agent -- c'est le prochain standard après MCP. MCP connecte les agents aux outils. A2A connecte les agents entre eux.
+        Imaginez un agent Jakarta EE qui gère les réservations, un autre qui gère l'inventaire, un troisième sur le support client. Ils se parlent, délèguent des tâches, chacun tournant sur son propre serveur.
 
-        Imaginez ça : un agent Jakarta EE qui gère les réservations, un autre qui gère l'inventaire, un troisième sur le support client. Ils se parlent, délèguent des tâches, chacun tournant sur son propre serveur. C'est les microservices, mais pour les agents IA.
+        C'est les microservices, mais pour les agents IA. Et CDI a littéralement été construit pour ça : communication managée entre composants.
+    </aside>
+</section>
 
-        C'est encore en développement, mais langchain4j-cdi sera prêt. CDI a littéralement été construit pour ça : communication managée entre composants.
+<!-- A2A architecture -->
+<section>
+    <span class="speaker-tag speaker-both">Les deux</span>
+    <h2>Architecture A2A : Story Forge</h2>
+    <div style="font-size: 0.8em; text-align: left; max-width: 750px; margin: 0 auto;">
+        <div class="box" style="text-align: center; margin-bottom: 0.5em;">
+            <strong style="color: var(--accent-orange);">Orchestrateur</strong> (port 8082)<br>
+            <span class="small">LangChain4j Agentic : séquence + boucle</span>
+        </div>
+        <div style="display: flex; gap: 1em;">
+            <div class="box box-accent" style="flex: 1; text-align: center;">
+                <strong>Creative Writer</strong><br>
+                <span class="small">Agent A2A (port 8080)</span><br>
+                <span class="small">@RegisterAIService + AgentCard</span>
+            </div>
+            <div class="box box-blue" style="flex: 1; text-align: center;">
+                <strong style="color: var(--accent-blue);">Style Scorer</strong><br>
+                <span class="small">Agent A2A (port 8081)</span><br>
+                <span class="small">@RegisterAIService + AgentCard</span>
+            </div>
+        </div>
+        <p class="fragment small" style="margin-top: 0.8em; text-align: center;">
+            📝 Creative Writer génère → 🎯 Style Scorer évalue (score &lt; 0.8 ?) → ✏️ Style Editor réécrit → 🔄 Boucle
+        </p>
+    </div>
+    <aside class="notes">
+        L'architecture de la démo Story Forge. Trois services WildFly indépendants qui communiquent via A2A.
+
+        Le Creative Writer génère une histoire. Le Style Scorer évalue si elle correspond au style demandé. Si le score est inférieur à 0.8, un Style Editor local réécrit l'histoire, et on boucle. Maximum 5 itérations.
+
+        L'orchestrateur utilise LangChain4j Agentic pour câbler tout ça : séquence (writer puis review) et boucle (scorer + editor).
+    </aside>
+</section>
+
+<!-- A2A code : AgentCard + Executor -->
+<section>
+    <span class="speaker-tag speaker-both">Les deux</span>
+    <h2>Serveur A2A = AgentCard + Executor</h2>
+    <pre><code class="language-java" data-trim>
+@RegisterAIService(chatModelName = "ollama", scope = ApplicationScoped.class)
+public interface CreativeWriter {
+    @UserMessage("Generate a story around the topic {{topic}}...")
+    String generateStory(@V("topic") String topic);
+}
+    </code></pre>
+    <pre class="fragment"><code class="language-java" data-trim>
+@Produces @PublicAgentCard
+public AgentCard agentCard() {
+    return new AgentCard.Builder()
+        .name("Creative Writer")
+        .skills(List.of(new AgentSkill.Builder()
+            .id("creative_writer").build()))
+        .preferredTransport(TransportProtocol.JSONRPC.asString())
+        .build();
+}
+    </code></pre>
+    <p class="fragment small">
+        <span class="accent">@RegisterAIService</span> + <span class="accent-blue">AgentCard CDI producer</span> + <span class="accent-green">AgentExecutor</span> = serveur A2A complet
+    </p>
+    <aside class="notes">
+        Côté serveur A2A, on a trois composants : le service IA LangChain4j-CDI classique, un producteur CDI pour l'AgentCard qui décrit l'agent au réseau A2A, et un AgentExecutor qui reçoit les requêtes A2A et délègue au service IA.
+
+        Le service IA est identique à ce qu'on fait depuis la démo 1. L'AgentCard est un bean CDI produit avec @Produces et @PublicAgentCard. L'executor est un autre producteur CDI.
+    </aside>
+</section>
+
+<!-- A2A code : Orchestrateur -->
+<section>
+    <span class="speaker-tag speaker-both">Les deux</span>
+    <h2>Orchestrateur : séquence + boucle</h2>
+    <pre><code class="language-java" data-trim data-line-numbers="1-3|5-7|9-12|14-16">
+A2ACreativeWriter writer = AgenticServices
+    .a2aBuilder(writerUrl, A2ACreativeWriter.class)
+    .outputKey("story").build();
+
+UntypedAgent reviewLoop = AgenticServices.loopBuilder()
+    .subAgents(styleScorer, styleEditor)
+    .maxIterations(5)
+    .exitCondition(scope -> scope.readState("score", 0.0) >= 0.8)
+    .build();
+
+StyledWriter pipeline = AgenticServices
+    .sequenceBuilder(StyledWriter.class)
+    .subAgents(writer, reviewLoop)
+    .outputKey("story").build();
+    </code></pre>
+    <p class="fragment small">
+        <span class="accent-red">a2aBuilder</span> → agent distant via A2A |
+        <span class="accent-blue">loopBuilder</span> → boucle avec condition de sortie |
+        <span class="accent-green">sequenceBuilder</span> → pipeline séquentiel
+    </p>
+    <aside class="notes">
+        L'orchestrateur câble le pipeline avec LangChain4j Agentic. Trois builders : a2aBuilder pour les agents distants, loopBuilder pour la boucle de révision, et sequenceBuilder pour le pipeline complet.
+
+        La boucle vérifie le score de style à chaque itération. Si le score dépasse 0.8, on sort. Sinon, le StyleEditor réécrit l'histoire et on recommence. Maximum 5 itérations pour éviter les boucles infinies.
+    </aside>
+</section>
+
+<!-- Demo 5 -->
+<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
+    <span class="speaker-tag speaker-both">Les deux</span>
+    <p class="demo-banner">🎬 DEMO 5</p>
+    <h2>Story Forge — Orchestration A2A</h2>
+    <div style="font-size: 0.85em; text-align: left; max-width: 700px; margin: 0 auto;">
+        <p>🤝 <strong>3 services WildFly</strong> communiquant via le protocole A2A</p>
+        <p class="fragment">✅ <span class="accent">Creative Writer</span> : génère une histoire sur un sujet</p>
+        <p class="fragment">✅ <span class="accent-blue">Style Scorer</span> : évalue l'alignement avec un style</p>
+        <p class="fragment">✅ <span class="accent-red">Orchestrateur</span> : séquence + boucle de révision (score &ge; 0.8)</p>
+        <p class="fragment">✅ <span class="accent-green">Style Editor</span> : réécriture locale si le score est insuffisant</p>
+    </div>
+    <p class="fragment medium accent" style="margin-top: 1em;">
+        Les microservices IA, câblés avec CDI et LangChain4j Agentic 🚀
+    </p>
+    <aside class="notes">
+        Démo 5 ! Story Forge — l'orchestration multi-agents via A2A.
+
+        On a trois services WildFly indépendants. Le Creative Writer génère une histoire. Le Style Scorer l'évalue. L'orchestrateur câble tout avec LangChain4j Agentic : une séquence (writer puis review) et une boucle (scorer + editor local).
+
+        CHECKLIST DEMO :
+        1. Démarrer le Creative Writer : cd demo-5-a2a/solution/a2a-creative-writer && mvn clean wildfly:dev
+        2. Démarrer le Style Scorer (port 8081) : cd a2a-style-scorer && mvn clean wildfly:dev -Djboss.socket.binding.port-offset=1
+        3. Démarrer l'Orchestrateur (port 8082) : cd a2a-orchestrator && mvn clean wildfly:dev -Djboss.socket.binding.port-offset=2
+        4. Ouvrir http://localhost:8082 — l'interface Story Forge
+        5. Saisir topic="dragons and wizards", style="comedy"
+        6. Observer la boucle de révision dans les logs
+
+        SECOURS : Montrer les slides de backup avec le code
+    </aside>
+</section>
+
+<!-- Demo 5 - Backup slide : AgentExecutor -->
+<section data-visibility="uncounted">
+    <h2>AgentExecutor : recevoir les requêtes A2A</h2>
+    <pre><code class="language-java" data-trim>
+@Produces
+public AgentExecutor agentExecutor() {
+    return new AgentExecutor() {
+        @Override
+        public void execute(RequestContext context, EventQueue eventQueue)
+                throws JSONRPCError {
+            TaskUpdater updater = new TaskUpdater(context, eventQueue);
+            if (context.getTask() == null) { updater.submit(); }
+            updater.startWork();
+
+            String userMessage = extractTextFromMessage(context.getMessage());
+            String response = creativeWriter.generateStory(userMessage);
+
+            updater.addArtifact(List.of(new TextPart(response, null)),
+                null, null, null);
+            updater.complete();
+        }
+    };
+}
+    </code></pre>
+    <p class="fragment small">
+        L'<code>AgentExecutor</code> est un producteur CDI —
+        pattern identique à l'<code>AgentCard</code>
+    </p>
+    <aside class="notes">
+        SECOURS si la démo live ne marche pas.
+
+        L'AgentExecutor reçoit les requêtes A2A. Il crée un TaskUpdater pour gérer le cycle de vie de la tâche A2A : submit, startWork, addArtifact, complete.
+
+        Le message A2A contient des TextParts. On extrait le texte, on appelle le service IA, on renvoie la réponse comme artifact.
     </aside>
 </section>
 
@@ -1697,6 +1871,7 @@ public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
         <p class="fragment">🧠 Memory, RAG, Tools, <span class="accent-purple">MCP</span> -- tout injectable</p>
         <p class="fragment">🛡️ <span class="accent">Fault Tolerance</span> + <span class="accent-blue">Telemetry</span> out of the box</p>
         <p class="fragment">🔒 <span class="accent-purple">Guardrails</span> -- valider entrée et sortie avec des beans CDI</p>
+        <p class="fragment">🤝 <span class="accent-red">A2A</span> -- orchestration multi-agents avec LangChain4j Agentic</p>
         <p class="fragment">🐝 Compatible avec <strong>tous</strong> les serveurs CDI</p>
     </div>
     <aside class="notes">

@@ -172,6 +172,7 @@
         .step-num.blue { background: var(--accent-blue); color: #000; }
         .step-num.green { background: var(--accent-green); color: #000; }
         .step-num.purple { background: var(--accent-purple); color: #000; }
+        .step-num.red { background: var(--accent-red); color: #fff; }
 
         .sidebar-link .icon { font-size: 1rem; flex-shrink: 0; }
 
@@ -757,6 +758,28 @@
     </div>
 
     <div class="sidebar-section">
+        <div class="sidebar-section-title">Exercice 5 &mdash; A2A</div>
+        <a href="#ex5-intro" class="sidebar-link">
+            <span class="step-num red">1</span> Introduction A2A
+        </a>
+        <a href="#ex5-step1" class="sidebar-link">
+            <span class="step-num red">2</span> Agent Creative Writer
+        </a>
+        <a href="#ex5-step2" class="sidebar-link">
+            <span class="step-num red">3</span> Agent Style Scorer
+        </a>
+        <a href="#ex5-step3" class="sidebar-link">
+            <span class="step-num red">4</span> AgentCard &amp; Executor
+        </a>
+        <a href="#ex5-step4" class="sidebar-link">
+            <span class="step-num red">5</span> Orchestrateur agentic
+        </a>
+        <a href="#ex5-test" class="sidebar-link">
+            <span class="step-num red">&#10003;</span> Test et validation
+        </a>
+    </div>
+
+    <div class="sidebar-section">
         <div class="sidebar-section-title">Conclusion</div>
         <a href="#whats-next" class="sidebar-link">
             <span class="icon">&#128302;</span> Et après ?
@@ -801,7 +824,7 @@
 
 <h2>Ce que vous allez construire</h2>
 
-<p>Dans cet atelier pratique, vous allez progressivement construire trois applications alimentées par l'IA en utilisant <strong>LangChain4j-CDI</strong>, transformant des interfaces Jakarta EE en agents IA injectables avec une seule annotation.</p>
+<p>Dans cet atelier pratique, vous allez progressivement construire cinq applications alimentées par l'IA en utilisant <strong>LangChain4j-CDI</strong>, transformant des interfaces Jakarta EE en agents IA injectables avec une seule annotation.</p>
 
 <div class="card-grid">
     <div class="card">
@@ -823,6 +846,11 @@
         <div class="card-icon">&#128274;</div>
         <h4>Exercice 4 : Guardrails</h4>
         <p>Ajoutez des garde-fous sur l'entrée et la sortie de votre skald viking : langue française obligatoire et sans races fantastiques.</p>
+    </div>
+    <div class="card">
+        <div class="card-icon">&#129309;</div>
+        <h4>Exercice 5 : A2A Protocol</h4>
+        <p>Orchestrez plusieurs agents IA via le protocole Agent-to-Agent : un writer, un scorer, et un orchestrateur avec boucle de révision.</p>
     </div>
 </div>
 
@@ -2141,7 +2169,399 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
 
     <div class="callout success">
         <div class="callout-title">&#127881; Félicitations !</div>
-        <p>Vous avez construit quatre applications alimentées par l'IA avec LangChain4j-CDI : un skald viking, un guide d'expéditions résilient, un jeu de dés avec MCP, et maintenant un skald avec guardrails. Tous avec les patterns Jakarta EE que vous connaissez déjà.</p>
+        <p>Vous avez construit quatre applications aliment&eacute;es par l'IA avec LangChain4j-CDI. Passez &agrave; l'exercice 5 pour d&eacute;couvrir l'orchestration multi-agents avec le protocole A2A !</p>
+    </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- EXERCISE 5: A2A PROTOCOL                                      -->
+<!-- ============================================================ -->
+<section id="ex5-intro" class="section-anchor">
+<h2>Exercice 5 : A2A — Orchestration multi-agents</h2>
+
+<p><strong>Message cl&eacute;</strong> : &laquo; MCP connecte les agents aux outils. A2A connecte les agents <em>entre eux</em> &mdash; les microservices version IA &raquo;</p>
+
+<div class="callout info">
+    <div class="callout-title">&#128204; Objectif</div>
+    <p>Construisez trois services WildFly ind&eacute;pendants communicant via le protocole A2A (Agent-to-Agent) : un <strong>Creative Writer</strong> qui g&eacute;n&egrave;re des histoires, un <strong>Style Scorer</strong> qui &eacute;value le style, et un <strong>Orchestrateur</strong> qui coordonne le tout avec une boucle de r&eacute;vision automatique.</p>
+</div>
+
+<pre><code>cd demo-project/demo-5-a2a/base
+# Ouvrir ce r&eacute;pertoire dans votre IDE</code></pre>
+
+<h3>Concept : MCP vs A2A</h3>
+
+<div class="compare-grid">
+    <div class="compare-box">
+        <h4 style="color: var(--accent-orange);">MCP (Model Context Protocol)</h4>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">Un agent appelle des <strong>outils</strong> externes (bases de donn&eacute;es, APIs, fichiers). Communication agent &rarr; outil.</p>
+        <pre><code>Agent &rarr; MCP Server &rarr; Tool</code></pre>
+    </div>
+    <div class="compare-box">
+        <h4 style="color: var(--accent-red);">A2A (Agent-to-Agent)</h4>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">Un agent <strong>d&eacute;l&egrave;gue</strong> &agrave; d'autres agents sp&eacute;cialis&eacute;s, chacun sur son propre serveur. Communication agent &harr; agent.</p>
+        <pre><code>Orchestrateur &harr; Agent A2A &harr; Agent A2A</code></pre>
+    </div>
+</div>
+
+<h3>Architecture de Story Forge</h3>
+
+<p>L'application <strong>Story Forge</strong> orchestre trois services :</p>
+
+<ol>
+    <li><strong>Creative Writer</strong> (port 8080) &mdash; G&eacute;n&egrave;re une histoire courte sur un sujet donn&eacute;</li>
+    <li><strong>Style Scorer</strong> (port 8081) &mdash; &Eacute;value l'ad&eacute;quation de l'histoire avec un style (score 0.0&ndash;1.0)</li>
+    <li><strong>Orchestrateur</strong> (port 8082) &mdash; Coordonne le pipeline : &eacute;criture &rarr; boucle (scorer + &eacute;diteur local) jusqu'&agrave; score &ge; 0.8</li>
+</ol>
+
+<h3>Fichiers cl&eacute;s</h3>
+
+<h4>a2a-creative-writer</h4>
+<table>
+    <thead><tr><th>Fichier</th><th>R&ocirc;le</th><th>TODO</th></tr></thead>
+    <tbody>
+        <tr><td><code>CreativeWriter.java</code></td><td>Service IA LangChain4j</td><td>Ajouter <code>@RegisterAIService</code> et <code>@UserMessage</code></td></tr>
+        <tr><td><code>CreativeWriterAgentCardProducer.java</code></td><td>D&eacute;crit l'agent au r&eacute;seau A2A</td><td>Construire l'<code>AgentCard</code></td></tr>
+        <tr><td><code>CreativeWriterExecutorProducer.java</code></td><td>Re&ccedil;oit et traite les requ&ecirc;tes A2A</td><td>Impl&eacute;menter <code>execute()</code></td></tr>
+    </tbody>
+</table>
+
+<h4>a2a-style-scorer</h4>
+<table>
+    <thead><tr><th>Fichier</th><th>R&ocirc;le</th><th>TODO</th></tr></thead>
+    <tbody>
+        <tr><td><code>StyleScorer.java</code></td><td>Service IA LangChain4j</td><td>Ajouter <code>@RegisterAIService</code> et <code>@UserMessage</code></td></tr>
+        <tr><td><code>StyleScorerAgentCardProducer.java</code></td><td>D&eacute;crit l'agent au r&eacute;seau A2A</td><td>Construire l'<code>AgentCard</code></td></tr>
+        <tr><td><code>StyleScorerExecutorProducer.java</code></td><td>Re&ccedil;oit et traite les requ&ecirc;tes A2A</td><td>Impl&eacute;menter <code>execute()</code></td></tr>
+    </tbody>
+</table>
+
+<h4>a2a-orchestrator</h4>
+<table>
+    <thead><tr><th>Fichier</th><th>R&ocirc;le</th><th>TODO</th></tr></thead>
+    <tbody>
+        <tr><td><code>Agents.java</code></td><td>Interfaces des agents du pipeline</td><td>Ajouter <code>@Agent</code>, <code>@UserMessage</code>, <code>AgenticScopeAccess</code></td></tr>
+        <tr><td><code>OrchestratorService.java</code></td><td>C&acirc;ble le pipeline agentic</td><td>Cr&eacute;er les builders <code>a2a</code>, <code>loop</code>, <code>sequence</code></td></tr>
+        <tr><td><code>StyledWriterEndpoint.java</code></td><td>Point d'acc&egrave;s REST (d&eacute;j&agrave; c&acirc;bl&eacute;)</td><td>Rien &mdash; d&eacute;j&agrave; impl&eacute;ment&eacute;</td></tr>
+    </tbody>
+</table>
+
+<div class="callout warning">
+    <div class="callout-title">&#9888; Pr&eacute;requis</div>
+    <p>Cet exercice utilise <strong>Ollama</strong> avec le mod&egrave;le <code>qwen2.5:7b</code>. Assurez-vous qu'Ollama tourne (<code>ollama serve</code>) et que le mod&egrave;le est t&eacute;l&eacute;charg&eacute; (<code>ollama pull qwen2.5:7b</code>).</p>
+</div>
+</section>
+
+<!-- Step 1: Agent Creative Writer -->
+<section id="ex5-step1" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-red);">1</span>
+        <span class="step-title">Impl&eacute;menter le service IA <code>CreativeWriter</code></span>
+    </div>
+
+    <p>Ouvrez <code>a2a-creative-writer/src/main/java/com/example/demo5/writer/CreativeWriter.java</code> et compl&eacute;tez l'interface :</p>
+
+    <pre><code>package com.example.demo5.writer;
+
+import dev.langchain4j.cdi.spi.RegisterAIService;
+import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.V;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@RegisterAIService(chatModelName = "ollama", scope = ApplicationScoped.class)
+public interface CreativeWriter {
+
+    @UserMessage("""
+                You are a creative writer.
+                Generate a draft of a story long no more than 3 sentence around the given topic.
+                Return only the story and nothing else.
+                The topic is {{topic}}.
+                """)
+    String generateStory(@V("topic") String topic);
+}</code></pre>
+
+    <div class="callout info">
+        <div class="callout-title">&#128161; @RegisterAIService</div>
+        <p>Comme dans les exercices pr&eacute;c&eacute;dents, <code>@RegisterAIService</code> transforme l'interface en bean CDI injectable. Le <code>chatModelName = "ollama"</code> r&eacute;f&eacute;rence la configuration dans <code>microprofile-config.properties</code>.</p>
+    </div>
+</div>
+</section>
+
+<!-- Step 2: Agent Style Scorer -->
+<section id="ex5-step2" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-red);">2</span>
+        <span class="step-title">Impl&eacute;menter le service IA <code>StyleScorer</code></span>
+    </div>
+
+    <p>Ouvrez <code>a2a-style-scorer/src/main/java/com/example/demo5/scorer/StyleScorer.java</code> et compl&eacute;tez l'interface :</p>
+
+    <pre><code>package com.example.demo5.scorer;
+
+import dev.langchain4j.cdi.spi.RegisterAIService;
+import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.V;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@RegisterAIService(chatModelName = "ollama", scope = ApplicationScoped.class)
+public interface StyleScorer {
+
+    @UserMessage("""
+            You are a critical reviewer.
+            Give a review score between 0.0 and 1.0 for the following story
+            based on how well it aligns with the style '{{style}}'.
+            Return only the score and nothing else.
+
+            The story is: "{{story}}"
+            """)
+    double scoreStyle(@V("story") String story, @V("style") String style);
+}</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">&#128161; Type de retour <code>double</code></div>
+        <p>LangChain4j parse automatiquement la r&eacute;ponse du LLM en <code>double</code>. Le prompt demande explicitement un score num&eacute;rique pour faciliter le parsing.</p>
+    </div>
+</div>
+</section>
+
+<!-- Step 3: AgentCard & Executor -->
+<section id="ex5-step3" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-red);">3</span>
+        <span class="step-title">Cr&eacute;er l'AgentCard et l'AgentExecutor</span>
+    </div>
+
+    <p>Chaque agent A2A a besoin de deux composants CDI : une <strong>AgentCard</strong> (qui d&eacute;crit l'agent au r&eacute;seau) et un <strong>AgentExecutor</strong> (qui traite les requ&ecirc;tes).</p>
+
+    <h4>AgentCard &mdash; Creative Writer</h4>
+    <p>Ouvrez <code>CreativeWriterAgentCardProducer.java</code> et impl&eacute;mentez <code>agentCard()</code> :</p>
+
+    <pre><code>@Produces
+@PublicAgentCard
+public AgentCard agentCard() {
+    return new AgentCard.Builder()
+            .name("Creative Writer")
+            .description("Generate a story based on the given topic")
+            .url(serverUrl)
+            .version("1.0.0")
+            .protocolVersion("1.0.0")
+            .capabilities(new AgentCapabilities.Builder()
+                    .streaming(true)
+                    .pushNotifications(false)
+                    .stateTransitionHistory(false)
+                    .build())
+            .defaultInputModes(Collections.singletonList("text"))
+            .defaultOutputModes(Collections.singletonList("text"))
+            .skills(Collections.singletonList(new AgentSkill.Builder()
+                    .id("creative_writer")
+                    .name("Creative Writer")
+                    .description("Generate a story based on the given topic")
+                    .tags(Collections.singletonList("writing"))
+                    .build()))
+            .protocolVersion("0.3.0")
+            .preferredTransport(TransportProtocol.JSONRPC.asString())
+            .additionalInterfaces(List.of(
+                    new AgentInterface(TransportProtocol.JSONRPC.asString(), serverUrl)))
+            .build();
+}</code></pre>
+
+    <h4>AgentExecutor &mdash; Creative Writer</h4>
+    <p>Ouvrez <code>CreativeWriterExecutorProducer.java</code> et d&eacute;commentez les &eacute;tapes 1&ndash;4 dans <code>execute()</code> :</p>
+
+    <pre><code>@Override
+public void execute(RequestContext context, EventQueue eventQueue) throws JSONRPCError {
+    TaskUpdater updater = new TaskUpdater(context, eventQueue);
+
+    // &Eacute;TAPE 1 : Soumettre et d&eacute;marrer
+    if (context.getTask() == null) { updater.submit(); }
+    updater.startWork();
+
+    // &Eacute;TAPE 2 : Extraire le texte du message A2A
+    String userMessage = extractTextFromMessage(context.getMessage());
+
+    // &Eacute;TAPE 3 : Appeler le service IA
+    String response = creativeWriter.generateStory(userMessage);
+
+    // &Eacute;TAPE 4 : R&eacute;pondre et compl&eacute;ter
+    TextPart responsePart = new TextPart(response, null);
+    updater.addArtifact(List.of(responsePart), null, null, null);
+    updater.complete();
+}</code></pre>
+
+    <h4>R&eacute;p&eacute;ter pour le Style Scorer</h4>
+    <p>Appliquez le m&ecirc;me pattern dans <code>StyleScorerAgentCardProducer.java</code> (skill id : <code>"style_scorer"</code>) et <code>StyleScorerExecutorProducer.java</code> (extraire deux arguments : story et style).</p>
+
+    <div class="callout info">
+        <div class="callout-title">&#128161; Pattern serveur A2A</div>
+        <p>Un serveur A2A Jakarta EE se r&eacute;sume &agrave; trois composants CDI : le <code>@RegisterAIService</code> (logique IA), un <code>@Produces @PublicAgentCard</code> (description), et un <code>@Produces AgentExecutor</code> (pont entre A2A et le service IA).</p>
+    </div>
+</div>
+</section>
+
+<!-- Step 4: Orchestrateur -->
+<section id="ex5-step4" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-red);">4</span>
+        <span class="step-title">C&acirc;bler l'orchestrateur agentic</span>
+    </div>
+
+    <h4>D&eacute;finir les interfaces d'agents</h4>
+    <p>Ouvrez <code>a2a-orchestrator/src/.../orchestrator/Agents.java</code> et ajoutez les annotations :</p>
+
+    <pre><code>import dev.langchain4j.agentic.Agent;
+import dev.langchain4j.agentic.scope.AgenticScopeAccess;
+import dev.langchain4j.agentic.scope.ResultWithAgenticScope;
+import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.V;
+
+public class Agents {
+
+    public interface A2ACreativeWriter {
+        @Agent(description = "Generate a story based on the given topic",
+               outputKey = "story")
+        String generateStory(@V("topic") String topic);
+    }
+
+    public interface A2AStyleScorer {
+        @Agent(description = "Score a story based on how well it aligns with a given style",
+               outputKey = "score")
+        double scoreStyle(@V("story") String story, @V("style") String style);
+    }
+
+    public interface StyleEditor {
+        @UserMessage("""
+                You are a professional editor.
+                Analyze and rewrite the following story to better fit the {{style}} style.
+                Return only the story and nothing else.
+                The story is "{{story}}".
+                """)
+        @Agent(description = "Edit a story to better fit a given style",
+               outputKey = "story")
+        String editStory(@V("story") String story, @V("style") String style);
+    }
+
+    public interface StyleReviewLoop {
+        @Agent("Review the given story to ensure it aligns with the specified style")
+        String scoreAndReview(@V("story") String story, @V("style") String style);
+    }
+
+    public interface StyledWriter extends AgenticScopeAccess {
+        @Agent
+        ResultWithAgenticScope&lt;String&gt; writeStoryWithStyle(
+                @V("topic") String topic, @V("style") String style);
+    }
+}</code></pre>
+
+    <h4>C&acirc;bler le pipeline dans <code>OrchestratorService.java</code></h4>
+    <p>D&eacute;commentez les 6 &eacute;tapes dans <code>init()</code> :</p>
+
+    <pre><code>@PostConstruct
+void init() {
+    // &Eacute;TAPE 1 : ChatModel local pour le StyleEditor
+    ChatModel chatModel = OllamaChatModel.builder()
+            .baseUrl(ollamaBaseUrl).modelName(ollamaModelName)
+            .timeout(Duration.ofMinutes(10)).temperature(0.0)
+            .logRequests(true).logResponses(true).build();
+
+    // &Eacute;TAPE 2 : Agent A2A distant &mdash; Creative Writer
+    A2ACreativeWriter creativeWriter = AgenticServices
+            .a2aBuilder(creativeWriterUrl, A2ACreativeWriter.class)
+            .outputKey("story").build();
+
+    // &Eacute;TAPE 3 : Agent A2A distant &mdash; Style Scorer
+    A2AStyleScorer styleScorer = AgenticServices
+            .a2aBuilder(styleScorerUrl, A2AStyleScorer.class)
+            .outputKey("score").build();
+
+    // &Eacute;TAPE 4 : Agent local &mdash; Style Editor
+    StyleEditor styleEditor = AgenticServices.agentBuilder(StyleEditor.class)
+            .chatModel(chatModel).outputKey("story").build();
+
+    // &Eacute;TAPE 5 : Boucle de r&eacute;vision (max 5 it&eacute;rations, sort si score &ge; 0.8)
+    UntypedAgent styleReviewLoop = AgenticServices.loopBuilder()
+            .subAgents(styleScorer, styleEditor)
+            .maxIterations(5)
+            .exitCondition(scope -&gt; scope.readState("score", 0.0) &gt;= 0.8)
+            .build();
+
+    // &Eacute;TAPE 6 : S&eacute;quence compl&egrave;te
+    styledWriter = AgenticServices.sequenceBuilder(StyledWriter.class)
+            .subAgents(creativeWriter, styleReviewLoop)
+            .outputKey("story").build();
+}</code></pre>
+
+    <div class="callout info">
+        <div class="callout-title">&#128161; LangChain4j Agentic</div>
+        <p>Trois builders pour orchestrer des agents :</p>
+        <ul>
+            <li><code>a2aBuilder()</code> &mdash; proxy vers un agent A2A distant</li>
+            <li><code>loopBuilder()</code> &mdash; boucle avec condition de sortie</li>
+            <li><code>sequenceBuilder()</code> &mdash; pipeline s&eacute;quentiel</li>
+        </ul>
+        <p>L'<code>outputKey</code> permet de partager des donn&eacute;es entre agents via le scope agentic.</p>
+    </div>
+
+    <h4>D&eacute;marrer les trois services</h4>
+    <p>Chaque service tourne sur un port diff&eacute;rent. Ouvrez <strong>trois terminaux</strong> :</p>
+
+    <pre><code># Terminal 1 : Creative Writer (port 8080)
+cd demo-project/demo-5-a2a/base/a2a-creative-writer
+mvn clean wildfly:dev
+
+# Terminal 2 : Style Scorer (port 8081)
+cd demo-project/demo-5-a2a/base/a2a-style-scorer
+mvn clean wildfly:dev -Djboss.socket.binding.port-offset=1
+
+# Terminal 3 : Orchestrateur (port 8082)
+cd demo-project/demo-5-a2a/base/a2a-orchestrator
+mvn clean wildfly:dev -Djboss.socket.binding.port-offset=2</code></pre>
+
+    <div class="callout warning">
+        <div class="callout-title">&#9888; Ordre de d&eacute;marrage</div>
+        <p>D&eacute;marrez le Creative Writer et le Style Scorer <strong>avant</strong> l'Orchestrateur. L'orchestrateur se connecte aux agents A2A au d&eacute;marrage.</p>
+    </div>
+</div>
+</section>
+
+<!-- Test Ex5 -->
+<section id="ex5-test" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-green);">&#10003;</span>
+        <span class="step-title">Tester et valider l'exercice 5</span>
+    </div>
+
+    <h4>Via curl</h4>
+    <pre><code># G&eacute;n&eacute;rer une histoire avec un style
+curl "http://localhost:8082/api/styled-story?topic=dragons+and+wizards&amp;style=comedy"
+
+# Autre exemple
+curl "http://localhost:8082/api/styled-story?topic=a+brave+knight&amp;style=horror"</code></pre>
+
+    <h4>Via l'interface web</h4>
+    <p>Ouvrez <a href="http://localhost:8082" target="_blank">http://localhost:8082</a> pour acc&eacute;der &agrave; l'interface Story Forge. Saisissez un sujet et un style, puis observez la g&eacute;n&eacute;ration.</p>
+
+    <ul class="checklist">
+        <li>Les trois services WildFly d&eacute;marrent sans erreur (ports 8080, 8081, 8082)</li>
+        <li>L'interface web Story Forge s'affiche sur le port 8082</li>
+        <li>Une requ&ecirc;te produit une histoire avec un score de style</li>
+        <li>Les logs montrent la boucle de r&eacute;vision (scorer &rarr; editor &rarr; scorer...)</li>
+        <li>Le score final est &ge; 0.8 (ou max 5 it&eacute;rations atteintes)</li>
+    </ul>
+
+    <div class="callout tip">
+        <div class="callout-title">&#128161; Bloqu&eacute; ?</div>
+        <p>Passez &agrave; la solution : utilisez les modules sous <code>demo-5-a2a/solution/</code> au lieu de <code>base/</code>.</p>
+    </div>
+
+    <div class="callout success">
+        <div class="callout-title">&#127881; F&eacute;licitations !</div>
+        <p>Vous avez construit cinq applications aliment&eacute;es par l'IA avec LangChain4j-CDI : un skald viking, un guide d'exp&eacute;ditions r&eacute;silient, un jeu de d&eacute;s avec MCP, un skald avec guardrails, et maintenant un pipeline multi-agents via A2A. Tous avec les patterns Jakarta EE que vous connaissez d&eacute;j&agrave;.</p>
     </div>
 </div>
 </section>
@@ -2150,11 +2570,7 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
 <!-- WHAT'S NEXT                                                   -->
 <!-- ============================================================ -->
 <section id="whats-next" class="section-anchor">
-<h2>Et après ?</h2>
-
-<h3>A2A : Protocole Agent-to-Agent</h3>
-
-<p>MCP connecte les agents aux <em>outils</em>. <strong>A2A</strong> connecte les agents <em>entre eux</em>. Imaginez votre agent Jakarta EE déléguant des tâches à d'autres agents spécialisés, chacun tournant sur son propre serveur.</p>
+<h2>Et apr&egrave;s ?</h2>
 
 <h3>Modules LangChain4j-CDI</h3>
 
@@ -2244,6 +2660,26 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
             <td>Exception guardrail non parsée</td>
             <td>Le <code>ChatResource</code> extrait le message avec <code>extractGuardrailMessage()</code> — vérifier l'implémentation</td>
         </tr>
+        <tr>
+            <td>L'orchestrateur ne d&eacute;marre pas</td>
+            <td>Agents A2A non accessibles</td>
+            <td>D&eacute;marrer Creative Writer (8080) et Style Scorer (8081) <strong>avant</strong> l'Orchestrateur (8082)</td>
+        </tr>
+        <tr>
+            <td><code>Connection refused</code> vers l'agent A2A</td>
+            <td>Port-offset manquant</td>
+            <td>Utiliser <code>-Djboss.socket.binding.port-offset=1</code> pour le scorer, <code>=2</code> pour l'orchestrateur</td>
+        </tr>
+        <tr>
+            <td>Score toujours &lt; 0.8 apr&egrave;s 5 it&eacute;rations</td>
+            <td>Mod&egrave;le trop petit ou style vague</td>
+            <td>Normal &mdash; la boucle s'arr&ecirc;te apr&egrave;s <code>maxIterations(5)</code>. Essayez un style plus simple.</td>
+        </tr>
+        <tr>
+            <td><code>AgentCard</code> non trouv&eacute;e</td>
+            <td><code>@PublicAgentCard</code> manquant</td>
+            <td>V&eacute;rifier que le producteur CDI est annot&eacute; <code>@Produces @PublicAgentCard</code></td>
+        </tr>
     </tbody>
 </table>
 
@@ -2252,7 +2688,11 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
     <p>Si quelque chose ne va pas, passez au module solution :</p>
     <pre><code>cd demo-N-xxx/solution && mvn clean wildfly:dev
 # Exemple pour l'exercice 4 :
-cd demo-4-guardrails/solution && mvn clean wildfly:dev</code></pre>
+cd demo-4-guardrails/solution && mvn clean wildfly:dev
+# Exemple pour l'exercice 5 (3 terminaux) :
+cd demo-5-a2a/solution/a2a-creative-writer && mvn clean wildfly:dev
+cd demo-5-a2a/solution/a2a-style-scorer && mvn clean wildfly:dev -Djboss.socket.binding.port-offset=1
+cd demo-5-a2a/solution/a2a-orchestrator && mvn clean wildfly:dev -Djboss.socket.binding.port-offset=2</code></pre>
 </div>
 </section>
 
