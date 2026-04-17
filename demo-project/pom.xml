@@ -17,6 +17,7 @@
         <module>demo-2-ft-telemetry</module>
         <module>demo-3-mcp</module>
         <module>demo-4-guardrails</module>
+        <module>demo-5-a2a</module>
     </modules>
 
     <properties>
@@ -33,8 +34,13 @@
         <!-- Mistral AI -->
         <mistral.model>mistral-small-latest</mistral.model>
 
-        <!-- LangChain4j MCP (beta versioning) -->
+        <!-- LangChain4j MCP / Agentic (beta versioning) -->
         <langchain4j-mcp.version>1.13.0-beta23</langchain4j-mcp.version>
+        <langchain4j-agentic.version>1.13.0-beta23</langchain4j-agentic.version>
+
+        <!-- A2A SDK -->
+        <a2a-sdk.version>0.3.2.Final</a2a-sdk.version>
+        <a2a-jakarta.version>0.3.0.Final</a2a-jakarta.version>
 
         <!-- Apache Tika language detection -->
         <tika.version>2.9.2</tika.version>
@@ -94,6 +100,11 @@
             </dependency>
             <dependency>
                 <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-core</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-mistral-ai</artifactId>
                 <version>${langchain4j.version}</version>
             </dependency>
@@ -111,6 +122,40 @@
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-mcp</artifactId>
                 <version>${langchain4j-mcp.version}</version>
+            </dependency>
+
+            <!-- LangChain4j Agentic -->
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-agentic</artifactId>
+                <version>${langchain4j-agentic.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-agentic-a2a</artifactId>
+                <version>${langchain4j-agentic.version}</version>
+            </dependency>
+
+            <!-- A2A SDK -->
+            <dependency>
+                <groupId>io.github.a2asdk</groupId>
+                <artifactId>a2a-java-sdk-server-common</artifactId>
+                <version>${a2a-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.a2a</groupId>
+                <artifactId>a2a-java-sdk-jakarta-jsonrpc</artifactId>
+                <version>${a2a-jakarta.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.a2asdk</groupId>
+                <artifactId>a2a-java-sdk-client</artifactId>
+                <version>${a2a-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.a2asdk</groupId>
+                <artifactId>a2a-java-sdk-client-transport-jsonrpc</artifactId>
+                <version>${a2a-sdk.version}</version>
             </dependency>
 
             <!-- Apache Tika language detection -->
@@ -172,4 +217,11 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <repositories>
+        <repository>
+            <id>jboss-public</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
 </project>
