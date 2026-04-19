@@ -71,6 +71,7 @@
             border-left: 4px solid var(--accent-orange);
         }
         .speaker-card.emmanuel { border-left-color: var(--accent-blue); }
+        .speaker-card.antoine { border-left-color: var(--accent-green); }
         .speaker-card .avatar {
             font-size: 3em;
             min-width: 80px;
@@ -139,16 +140,16 @@
 <!-- SLIDE 1: Title                                -->
 <!-- ============================================= -->
 <section>
-    <img src="../slides/cbgmd-javaone26-hero.webp"
+    <img src="../slides/logodevoxxfr26.png"
          alt="Devoxx France 2026"
-         style="position: absolute; top: 0; right: 0; max-width: 180px; z-index: 10;">
+         style="position: absolute; top: 20px; right: 20px; max-width: 90px; z-index: 10;">
     <img src="../slides/langchain4j-cdi-logo.png"
          onerror="this.src='https://raw.githubusercontent.com/langchain4j/langchain4j-cdi/main/langchain4j-cdi-logo.png'"
          alt="LangChain4j-CDI" style="max-width: 280px; margin-bottom: 0.3em;">
     <h1>LangChain4j-CDI</h1>
     <h3 style="color: var(--accent-blue);">IA générative<br>Nativement injectable dans Jakarta EE</h3>
     <p class="small" style="margin-top: 1em;">
-        <span class="accent">Yann Blazart</span> &amp; <span class="accent">Emmanuel Hugonnet</span>
+        <span class="accent">Yann Blazart</span>, <span class="accent">Emmanuel Hugonnet</span> &amp; <span class="accent">Antoine Sabot-Durand</span>
     </p>
     <p class="small">Devoxx France 2026 — Atelier pratique</p>
     <aside class="notes">
@@ -240,15 +241,44 @@
             <a href="https://twitter.com/ehsavoie" style="color: var(--accent-blue);">@ehsavoie</a>
         </p>
     </div>
-    <p class="fragment small" style="margin-top: 0.8em; color: #777;">
-        À nous deux, nous avons 50 ans d'expérience Java. Ça ne nous rajeunit pas. &#x1F474;&#x1F474;
-    </p>
     <aside class="notes">
         Emmanuel se présente (ou Yann le présente).
 
         Il intègre l'IA dans WildFly : WildFly AI Feature Pack (LC4J-CDI, MCP Server, WASM WASI) et A2A Java/JakartaEE SDK.
+    </aside>
+</section>
 
-        À nous deux, 50 ans de Java. Nous sommes des dinosaures, mais des dinosaures avec de l'IA maintenant.
+<!-- ============================================= -->
+<!-- SLIDE 5: Antoine                              -->
+<!-- ============================================= -->
+<section>
+    <h2>Et le spec lead historique de CDI</h2>
+    <div class="speaker-card antoine" style="border-left-width: 6px;">
+        <div class="avatar"><img src="../slides/asd.png" alt="Antoine Sabot-Durand" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;"></div>
+        <div class="info">
+            <h3 style="color: var(--accent-green);">Antoine Sabot-Durand</h3>
+            <p>Java Champion &bull; Ex spec lead <strong>CDI</strong> (Jakarta EE) &bull; Ex-Red Hat</p>
+            <p>Équipe de lancement Quarkus &bull; MicroProfile Fault Tolerance &amp; Health Check</p>
+            <p><span class="badge badge-green">CDI</span> <span class="badge badge-green">Jakarta EE</span> <span class="badge badge-green">Quarkus</span> <span class="badge badge-green">MicroProfile</span></p>
+        </div>
+    </div>
+    <div class="fragment" style="margin-top: 1.2em; text-align: center;">
+        <p class="medium" style="color: #ccc; margin-top: 0.3em;">
+            Directeur Technique @ <strong style="color: var(--accent-orange);">SCIAM</strong> — collègue de Yann
+        </p>
+        <p class="small" style="color: #999;">
+            <a href="https://github.com/antoinesd" style="color: var(--accent-blue);">github.com/antoinesd</a>
+        </p>
+    </div>
+    <p class="fragment small" style="margin-top: 0.8em; color: #777;">
+        À nous trois, bien plus de 75 ans d'expérience Java cumulés. Nous sommes vraiment des Technosaures maintenant. &#x1F995;&#x1F995;&#x1F995;
+    </p>
+    <aside class="notes">
+        Antoine se présente (ou Yann le présente, vu qu'ils sont chez SCIAM tous les deux).
+
+        Spec lead historique de CDI côté Jakarta EE / Red Hat, membre de l'équipe fondatrice de Quarkus, contributeur majeur à MicroProfile Fault Tolerance et Health Check.
+
+        Aujourd'hui Directeur Technique chez SCIAM, il apporte toute la profondeur CDI nécessaire à l'extension langchain4j-cdi.
     </aside>
 </section>
 
@@ -307,7 +337,7 @@
 <!-- ============================================= -->
 <section>
     <h2>Programme de l'atelier</h2>
-    <div class="timeline" style="font-size: 0.9em;">
+    <div class="timeline" style="font-size: 0.65em;">
         <div class="step fragment">
             <strong>&#x2699;&#xFE0F; Configuration et architecture</strong>
             <span class="small"> — Prérequis, vue d'ensemble de la stack, internes de l'extension CDI</span>
@@ -324,9 +354,17 @@
             <strong>&#x1F50C; Exercice 3 — Intégration MCP</strong>
             <span class="small"> — Model Context Protocol, fournisseurs d'outils externes</span>
         </div>
+        <div class="step fragment">
+            <strong>&#x1F6A7; Exercice 4 — Guardrails</strong>
+            <span class="small"> — validation d'entrée/sortie, filtrage, sécurité des prompts</span>
+        </div>
+        <div class="step blue fragment">
+            <strong>&#x1F91D; Exercice 5 — Agent to Agent (A2A)</strong>
+            <span class="small"> — orchestration multi-agents, protocole A2A, Java/Jakarta SDK</span>
+        </div>
         <div class="step yellow fragment">
             <strong>&#x1F680; Conclusion et suite</strong>
-            <span class="small"> — A2A, roadmap, Q&amp;R</span>
+            <span class="small"> — roadmap, Q&amp;R</span>
         </div>
     </div>
     <p class="fragment small" style="margin-top: 1em; color: #777;">
@@ -337,7 +375,7 @@
 
         Nous commençons par une vérification rapide de la configuration et un aperçu théorique du fonctionnement de l'extension CDI sous le capot — le territoire d'Emmanuel.
 
-        Ensuite trois exercices pratiques, chacun construisant sur le précédent. L'exercice 1 est votre premier agent IA avec une seule annotation. L'exercice 2 ajoute la résilience et l'observabilité. L'exercice 3 connecte votre agent au monde extérieur via MCP.
+        Ensuite cinq exercices pratiques, chacun construisant sur le précédent. L'exercice 1 est votre premier agent IA avec une seule annotation. L'exercice 2 ajoute la résilience et l'observabilité. L'exercice 3 connecte votre agent au monde extérieur via MCP. L'exercice 4 met en place des guardrails pour sécuriser les échanges. L'exercice 5 fait dialoguer plusieurs agents entre eux via le protocole A2A.
 
         Chaque exercice a un squelette base/ avec des TODOs et une solution/ pour quand vous êtes bloqué. Pas de jugement — la solution est là pour une raison.
 
@@ -350,17 +388,27 @@
 <!-- ============================================= -->
 <section data-background-gradient="linear-gradient(135deg, #1a1a2e, #16213e)">
     <h2>Récupérer le code</h2>
-    <p style="margin-top: 1em;">
-        <img src="https://genqrcode.com/embedded?style=0&inner_eye_style=0&outer_eye_style=0&logo=null&color=%23000000FF&background_color=%23FFFFFFFF&inner_eye_color=%23000000&outer_eye_color=%23000000&imageformat=svg&language=en&frame_style=0&frame_text=SCAN%20ME&frame_text_icon_color=%23000000&frame_text_icon=null&frame_color=%23000000&frame_background_color=%23FFFFFF&frame_text_color=%23FFFFFF&invert_colors=false&gradient_style=0&gradient_color_start=%23FF0000&gradient_color_end=%237F007F&gradient_start_offset=5&gradient_end_offset=95&stl_type=1&logo_remove_background=null&stl_size=100&stl_qr_height=1.5&stl_base_height=2&stl_include_stands=false&stl_qr_magnet_type=3&stl_qr_magnet_count=0&type=0&text=https%3A%2F%2Fgithub.com%2Fyblazart%2Fconfs-langchain4j-cdi-javaone2026&width=500&height=500&bordersize=2"
-             alt="QR Code — GitHub repository"
-             style="max-width: 350px; border-radius: 12px;">
-    </p>
-    <p style="margin-top: 0.8em;">
-        <a href="https://github.com/yblazart/confs-langchain4j-cdi-javaone2026"
-           style="color: var(--accent-blue); font-size: 0.75em; word-break: break-all;">
-            https://github.com/yblazart/confs-langchain4j-cdi-javaone2026
-        </a>
-    </p>
+    <div style="display: flex; gap: 2em; align-items: center; justify-content: center; margin-top: 1em;">
+        <div style="text-align: center;">
+            <img src="https://genqrcode.com/embedded?style=0&inner_eye_style=0&outer_eye_style=0&logo=null&color=%23000000FF&background_color=%23FFFFFFFF&inner_eye_color=%23000000&outer_eye_color=%23000000&imageformat=svg&language=en&frame_style=0&frame_text=SCAN%20ME&frame_text_icon_color=%23000000&frame_text_icon=null&frame_color=%23000000&frame_background_color=%23FFFFFF&frame_text_color=%23FFFFFF&invert_colors=false&gradient_style=0&gradient_color_start=%23FF0000&gradient_color_end=%237F007F&gradient_start_offset=5&gradient_end_offset=95&stl_type=1&logo_remove_background=null&stl_size=100&stl_qr_height=1.5&stl_base_height=2&stl_include_stands=false&stl_qr_magnet_type=3&stl_qr_magnet_count=0&type=0&text=https%3A%2F%2Fgithub.com%2Fehsavoie%2Flangchain4j-cdi-lab-2026&width=500&height=500&bordersize=2"
+                 alt="QR Code — GitHub repository"
+                 style="max-width: 300px; border-radius: 12px;">
+            <p style="margin-top: 0.6em;">
+                <a href="https://github.com/ehsavoie/langchain4j-cdi-lab-2026"
+                   style="color: var(--accent-blue); font-size: 0.55em; word-break: break-all;">
+                    https://github.com/ehsavoie/langchain4j-cdi-lab-2026
+                </a>
+            </p>
+        </div>
+        <div style="text-align: center;">
+            <img src="../slides/ouvre-workshop.png"
+                 alt="Ouvrir le workshop"
+                 style="max-width: 300px; border-radius: 12px;">
+            <p class="small" style="margin-top: 0.6em; color: #ccc;">
+                Ouvrez l'<code>index.html</code> du <strong>workshop</strong> avec votre navigateur préféré.
+            </p>
+        </div>
+    </div>
     <aside class="notes">
         Scannez le code QR ou suivez le lien pour cloner le dépôt. Tout ce dont vous avez besoin est là : diapositives, atelier, et les trois projets de démo avec modules base et solution.
     </aside>
