@@ -43,8 +43,8 @@ ollama pull qwen2.5:7b       # démo 2 (tool calling + embeddings), démo 5 (A2A
 ### Code source
 
 ```bash
-git clone https://github.com/yblazart/confs-langchain4j-cdi-javaone2026.git
-cd confs-langchain4j-cdi-javaone2026/demo-project
+git clone https://github.com/ehsavoie/langchain4j-cdi-lab-2026.git
+cd langchain4j-cdi-lab-2026/demo-project
 
 # Télécharger toutes les dépendances Maven
 mvn clean install -DskipTests
