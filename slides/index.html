@@ -73,6 +73,7 @@
             border-left: 4px solid var(--accent-orange);
         }
         .speaker-card.emmanuel { border-left-color: var(--accent-blue); }
+        .speaker-card.antoine { border-left-color: var(--accent-green); }
         .speaker-card .avatar {
             font-size: 3em;
             min-width: 80px;
@@ -194,16 +195,16 @@
 
 <!-- Slide 1: Title with logo -->
 <section>
-    <img src="cbgmd-javaone26-hero.webp"
+    <img src="logodevoxxfr26.png"
          alt="Devoxx France 2026"
-         style="position: absolute; top: 0; right: 0; max-width: 180px; z-index: 10;">
+         style="position: absolute; top: 20px; right: 20px; max-width: 90px; z-index: 10;">
     <img src="langchain4j-cdi-logo.png"
          onerror="this.src='https://raw.githubusercontent.com/langchain4j/langchain4j-cdi/main/langchain4j-cdi-logo.png'"
          alt="LangChain4j-CDI" style="max-width: 280px; margin-bottom: 0.3em;">
     <h1>LangChain4j-CDI</h1>
     <h3 style="color: var(--accent-blue);">IA Générative<br>Nativement Injectable dans Jakarta EE</h3>
     <p class="small" style="margin-top: 1em;">
-        <span class="accent">Yann Blazart</span> &amp; <span class="accent">Emmanuel Hugonnet</span>
+        <span class="accent">Yann Blazart</span>, <span class="accent">Emmanuel Hugonnet</span> &amp; <span class="accent">Antoine Sabot-Durand</span>
     </p>
     <p class="small">Devoxx France 2026</p>
     <aside class="notes">
@@ -289,17 +290,44 @@
             <a href="https://twitter.com/ehsavoie" style="color: var(--accent-blue);">@ehsavoie</a>
         </p>
     </div>
-    <p class="fragment small" style="margin-top: 0.8em; color: #777;">
-        À nous deux, on cumule 50 ans d'expérience Java. Ça ne nous rajeunit pas. 👴👴
-    </p>
     <aside class="notes">
         Emmanuel se présente (ou Yann le présente).
 
         Emmanuel sort de la salle des serveurs après de longues années passées à collectionner bugs et patches.
 
         Il intègre l'IA dans WildFly : WildFly AI Feature Pack (LC4J-CDI, MCP Server, WASM WASI) et A2A Java/JakartaEE SDK.
+    </aside>
+</section>
 
-        À nous deux, 50 ans de Java. On est des dinosaures 🦕🦕, mais des dinosaures avec de l'IA maintenant : 🦖🦖🦖🦖
+<!-- Slide 4bis: Antoine Sabot-Durand -->
+<section>
+    <h2>Et le spec lead historique de CDI</h2>
+    <div class="speaker-card antoine" style="border-left-width: 6px;">
+        <div class="avatar"><img src="asd.png" alt="Antoine Sabot-Durand" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;"></div>
+        <div class="info">
+            <h3 style="color: var(--accent-green);">Antoine Sabot-Durand</h3>
+            <p>Java Champion • Ex spec lead <strong>CDI</strong> (Jakarta EE) • Ex-Red Hat</p>
+            <p>Équipe de lancement Quarkus • MicroProfile Fault Tolerance &amp; Health Check</p>
+            <p><span class="badge badge-green">CDI</span> <span class="badge badge-green">Jakarta EE</span> <span class="badge badge-green">Quarkus</span> <span class="badge badge-green">MicroProfile</span></p>
+        </div>
+    </div>
+    <div class="fragment" style="margin-top: 1.2em; text-align: center;">
+        <p class="medium" style="color: #ccc; margin-top: 0.3em;">
+            Directeur Technique @ <strong style="color: var(--accent-orange);">SCIAM</strong> — collègue de Yann
+        </p>
+        <p class="small" style="color: #999;">
+            <a href="https://github.com/antoinesd" style="color: var(--accent-blue);">github.com/antoinesd</a>
+        </p>
+    </div>
+    <p class="fragment small" style="margin-top: 0.8em; color: #777;">
+        À nous trois, bien plus de 75 ans d'expérience Java cumulés. On est vraiment des Technosaures maintenant. 🦕🦕🦕
+    </p>
+    <aside class="notes">
+        Antoine se présente (ou Yann le présente, vu qu'ils sont chez SCIAM tous les deux).
+
+        Spec lead historique de CDI côté Jakarta EE / Red Hat, membre de l'équipe fondatrice de Quarkus, contributeur majeur à MicroProfile Fault Tolerance et Health Check.
+
+        Aujourd'hui Directeur Technique chez SCIAM, il apporte toute la profondeur CDI nécessaire à l'extension langchain4j-cdi.
     </aside>
 </section>
 
@@ -1961,14 +1989,14 @@ public AgentExecutor agentExecutor() {
 <section data-background-gradient="linear-gradient(135deg, #1a1a2e, #16213e)">
     <h2>Slides & Code</h2>
     <p style="margin-top: 1em;">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=e0e0e0&bgcolor=0a0a1a&data=https%3A%2F%2Fgithub.com%2Fyblazart%2Fconfs-langchain4j-cdi-javaone2026"
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=e0e0e0&bgcolor=0a0a1a&data=https%3A%2F%2Fgithub.com%2Fehsavoie%2Flangchain4j-cdi-lab-2026"
              alt="QR Code vers le dépôt GitHub"
              style="border-radius: 12px;">
     </p>
     <p style="margin-top: 0.8em;">
-        <a href="https://github.com/yblazart/confs-langchain4j-cdi-javaone2026"
+        <a href="https://github.com/ehsavoie/langchain4j-cdi-lab-2026"
            style="color: var(--accent-green); font-size: 0.6em;">
-            github.com/yblazart/confs-langchain4j-cdi-javaone2026
+            github.com/ehsavoie/langchain4j-cdi-lab-2026
         </a>
     </p>
 </section>
