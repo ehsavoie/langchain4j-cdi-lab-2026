@@ -21,14 +21,14 @@ package com.example.demo5.orchestrator;
 public class Agents {
 
     // TODO: Interface pour l'agent A2A Creative Writer
-    // @Agent(description = "Generate a story based on the given topic", outputKey = "story")
+    // @Agent(description = "Generate a Norse saga based on the given topic", outputKey = "story")
     // String generateStory(@V("topic") String topic);
     public interface A2ACreativeWriter {
         String generateStory(String topic);
     }
 
     // TODO: Interface pour l'agent A2A Style Scorer
-    // @Agent(description = "Score a story based on how well it aligns with a given style", outputKey = "score")
+    // @Agent(description = "Score a saga based on how well it captures a given style", outputKey = "score")
     // double scoreStyle(@V("story") String story, @V("style") String style);
     public interface A2AStyleScorer {
         double scoreStyle(String story, String style);
@@ -37,18 +37,18 @@ public class Agents {
     // TODO: Interface pour l'agent local StyleEditor
     // Ajouter @UserMessage avec le prompt d'édition de style :
     // """
-    // You are a professional editor.
-    // Analyze and rewrite the following story to better fit and be more coherent with the {{style}} style.
-    // Return only the story and nothing else.
-    // The story is "{{story}}".
+    // You are a master Norse skald who shapes and tempers sagas like a smith forges steel.
+    // Rewrite the following saga to better honor and embody the {{style}} style.
+    // Return only the saga and nothing else.
+    // The saga is "{{story}}".
     // """
-    // Ajouter @Agent(description = "Edit a story to better fit a given style", outputKey = "story")
+    // Ajouter @Agent(description = "Reforge a saga to better capture a given style", outputKey = "story")
     public interface StyleEditor {
         String editStory(String story, String style);
     }
 
     // TODO: Interface pour la boucle de révision de style
-    // @Agent("Review the given story to ensure it aligns with the specified style")
+    // @Agent("Judge the saga by the standards of the specified style, as a Viking elder would at the Thing")
     public interface StyleReviewLoop {
         String scoreAndReview(String story, String style);
     }

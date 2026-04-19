@@ -1716,13 +1716,13 @@ public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
             </div>
         </div>
         <p class="fragment small" style="margin-top: 0.8em; text-align: center;">
-            📝 Creative Writer génère → 🎯 Style Scorer évalue (score &lt; 0.8 ?) → ✏️ Style Editor réécrit → 🔄 Boucle
+            📝 Skald forge la saga → 🎯 Juge évalue (score &lt; 0.8 ?) → ✏️ Maître skald réécrit → 🔄 Boucle
         </p>
     </div>
     <aside class="notes">
         L'architecture de la démo Story Forge. Trois services WildFly indépendants qui communiquent via A2A.
 
-        Le Creative Writer génère une histoire. Le Style Scorer évalue si elle correspond au style demandé. Si le score est inférieur à 0.8, un Style Editor local réécrit l'histoire, et on boucle. Maximum 5 itérations.
+        Le Creative Writer (skald) forge une saga. Le Style Scorer (juge skald) évalue si elle correspond au style demandé. Si le score est inférieur à 0.8, le Style Editor (maître skald) réécrit la saga, et on boucle. Maximum 5 itérations.
 
         L'orchestrateur utilise LangChain4j Agentic pour câbler tout ça : séquence (writer puis review) et boucle (scorer + editor).
     </aside>
@@ -1735,7 +1735,7 @@ public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
     <pre><code class="language-java" data-trim>
 @RegisterAIService(chatModelName = "ollama", scope = ApplicationScoped.class)
 public interface CreativeWriter {
-    @UserMessage("Generate a story around the topic {{topic}}...")
+    @UserMessage("Forge a Norse saga around the topic {{topic}}...")
     String generateStory(@V("topic") String topic);
 }
     </code></pre>
@@ -1788,7 +1788,7 @@ StyledWriter pipeline = AgenticServices
     <aside class="notes">
         L'orchestrateur câble le pipeline avec LangChain4j Agentic. Trois builders : a2aBuilder pour les agents distants, loopBuilder pour la boucle de révision, et sequenceBuilder pour le pipeline complet.
 
-        La boucle vérifie le score de style à chaque itération. Si le score dépasse 0.8, on sort. Sinon, le StyleEditor réécrit l'histoire et on recommence. Maximum 5 itérations pour éviter les boucles infinies.
+        La boucle vérifie le score de style à chaque itération. Si le score dépasse 0.8, on sort. Sinon, le StyleEditor (maître skald) retravaille la saga et on recommence. Maximum 5 itérations pour éviter les boucles infinies.
     </aside>
 </section>
 
@@ -1799,8 +1799,8 @@ StyledWriter pipeline = AgenticServices
     <h2>Story Forge — Orchestration A2A</h2>
     <div style="font-size: 0.85em; text-align: left; max-width: 700px; margin: 0 auto;">
         <p>🤝 <strong>3 services WildFly</strong> communiquant via le protocole A2A</p>
-        <p class="fragment">✅ <span class="accent">Creative Writer</span> : génère une histoire sur un sujet</p>
-        <p class="fragment">✅ <span class="accent-blue">Style Scorer</span> : évalue l'alignement avec un style</p>
+        <p class="fragment">✅ <span class="accent">Creative Writer</span> : forge une saga nordique sur un sujet</p>
+        <p class="fragment">✅ <span class="accent-blue">Style Scorer</span> : juge l'alignement de la saga avec un style</p>
         <p class="fragment">✅ <span class="accent-red">Orchestrateur</span> : séquence + boucle de révision (score &ge; 0.8)</p>
         <p class="fragment">✅ <span class="accent-green">Style Editor</span> : réécriture locale si le score est insuffisant</p>
     </div>
@@ -1810,7 +1810,7 @@ StyledWriter pipeline = AgenticServices
     <aside class="notes">
         Démo 5 ! Story Forge — l'orchestration multi-agents via A2A.
 
-        On a trois services WildFly indépendants. Le Creative Writer génère une histoire. Le Style Scorer l'évalue. L'orchestrateur câble tout avec LangChain4j Agentic : une séquence (writer puis review) et une boucle (scorer + editor local).
+        On a trois services WildFly indépendants. Le Creative Writer (skald) forge une saga. Le Style Scorer (juge skald) l'évalue. L'orchestrateur câble tout avec LangChain4j Agentic : une séquence (writer puis review) et une boucle (scorer + editor local).
 
         CHECKLIST DEMO :
         1. Démarrer le Creative Writer : cd demo-5-a2a/solution/a2a-creative-writer && mvn clean wildfly:dev

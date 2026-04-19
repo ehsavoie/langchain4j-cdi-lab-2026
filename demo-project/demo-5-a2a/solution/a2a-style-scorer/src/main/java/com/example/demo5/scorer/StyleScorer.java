@@ -10,11 +10,11 @@ public interface StyleScorer {
 
     @UserMessage(
             """
-            You are a critical reviewer.
-            Give a review score between 0.0 and 1.0 for the following story based on how well it aligns with the style '{{style}}'.
+            You are a seasoned Norse skald elder who judges sagas by the fire of a longhouse.
+            Give a score between 0.0 and 1.0 for the following saga based on how well it captures the '{{style}}' style.
             Return only the score and nothing else.
 
-            The story is: "{{story}}"
+            The saga is: "{{story}}"
             """)
     double scoreStyle(@V("story") String story, @V("style") String style);
 }

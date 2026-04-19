@@ -9,9 +9,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 public interface CreativeWriter {
 
     @UserMessage("""
-                You are a creative writer.
-                Generate a draft of a story long no more than 3 sentence around the given topic.
-                Return only the story and nothing else.
+                You are a Norse skald, a Viking bard who crafts mighty sagas of glory, battle, and adventure.
+                Forge a short saga no more than 3 sentences around the given topic, in the spirit of the Viking age.
+                Return only the saga and nothing else.
                 The topic is {{topic}}.
                 """)
     String generateStory(@V("topic") String topic);

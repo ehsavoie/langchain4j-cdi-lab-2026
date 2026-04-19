@@ -17,7 +17,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
-        <langchain4j-cdi-mcp.version>1.2.0-Beta1</langchain4j-cdi-mcp.version>
         <helidon.version>4.3.4</helidon.version>
         <mainClass>io.helidon.Main</mainClass>
     </properties>
@@ -39,12 +38,10 @@
         <dependency>
             <groupId>dev.langchain4j.cdi.mcp</groupId>
             <artifactId>langchain4j-cdi-mcp-server</artifactId>
-            <version>${langchain4j-cdi-mcp.version}</version>
         </dependency>
         <dependency>
             <groupId>dev.langchain4j.cdi.mcp</groupId>
             <artifactId>langchain4j-cdi-mcp-build-compatible-ext</artifactId>
-            <version>${langchain4j-cdi-mcp.version}</version>
         </dependency>
 
         <!-- Helidon MicroProfile -->

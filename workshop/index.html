@@ -2210,8 +2210,8 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
 <p>L'application <strong>Story Forge</strong> orchestre trois services :</p>
 
 <ol>
-    <li><strong>Creative Writer</strong> (port 8080) &mdash; G&eacute;n&egrave;re une histoire courte sur un sujet donn&eacute;</li>
-    <li><strong>Style Scorer</strong> (port 8081) &mdash; &Eacute;value l'ad&eacute;quation de l'histoire avec un style (score 0.0&ndash;1.0)</li>
+    <li><strong>Creative Writer</strong> (port 8080) &mdash; Forge une saga nordique courte sur un sujet donn&eacute;</li>
+    <li><strong>Style Scorer</strong> (port 8081) &mdash; &Eacute;value l'ad&eacute;quation de la saga avec un style (score 0.0&ndash;1.0)</li>
     <li><strong>Orchestrateur</strong> (port 8082) &mdash; Coordonne le pipeline : &eacute;criture &rarr; boucle (scorer + &eacute;diteur local) jusqu'&agrave; score &ge; 0.8</li>
 </ol>
 
@@ -2274,9 +2274,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 public interface CreativeWriter {
 
     @UserMessage("""
-                You are a creative writer.
-                Generate a draft of a story long no more than 3 sentence around the given topic.
-                Return only the story and nothing else.
+                You are a Norse skald, a Viking bard who crafts mighty sagas of glory, battle, and adventure.
+                Forge a short saga no more than 3 sentences around the given topic, in the spirit of the Viking age.
+                Return only the saga and nothing else.
                 The topic is {{topic}}.
                 """)
     String generateStory(@V("topic") String topic);
@@ -2310,12 +2310,12 @@ import jakarta.enterprise.context.ApplicationScoped;
 public interface StyleScorer {
 
     @UserMessage("""
-            You are a critical reviewer.
-            Give a review score between 0.0 and 1.0 for the following story
-            based on how well it aligns with the style '{{style}}'.
+            You are a seasoned Norse skald elder who judges sagas by the fire of a longhouse.
+            Give a score between 0.0 and 1.0 for the following saga
+            based on how well it captures the '{{style}}' style.
             Return only the score and nothing else.
 
-            The story is: "{{story}}"
+            The saga is: "{{story}}"
             """)
     double scoreStyle(@V("story") String story, @V("style") String style);
 }</code></pre>
@@ -2345,7 +2345,7 @@ public interface StyleScorer {
 public AgentCard agentCard() {
     return new AgentCard.Builder()
             .name("Creative Writer")
-            .description("Generate a story based on the given topic")
+            .description("Generate a Norse saga based on the given topic")
             .url(serverUrl)
             .version("1.0.0")
             .protocolVersion("1.0.0")
@@ -2359,7 +2359,7 @@ public AgentCard agentCard() {
             .skills(Collections.singletonList(new AgentSkill.Builder()
                     .id("creative_writer")
                     .name("Creative Writer")
-                    .description("Generate a story based on the given topic")
+                    .description("Generate a Norse saga based on the given topic")
                     .tags(Collections.singletonList("writing"))
                     .build()))
             .protocolVersion("0.3.0")
@@ -2422,31 +2422,31 @@ import dev.langchain4j.service.V;
 public class Agents {
 
     public interface A2ACreativeWriter {
-        @Agent(description = "Generate a story based on the given topic",
+        @Agent(description = "Generate a Norse saga based on the given topic",
                outputKey = "story")
         String generateStory(@V("topic") String topic);
     }
 
     public interface A2AStyleScorer {
-        @Agent(description = "Score a story based on how well it aligns with a given style",
+        @Agent(description = "Score a saga based on how well it captures a given style",
                outputKey = "score")
         double scoreStyle(@V("story") String story, @V("style") String style);
     }
 
     public interface StyleEditor {
         @UserMessage("""
-                You are a professional editor.
-                Analyze and rewrite the following story to better fit the {{style}} style.
-                Return only the story and nothing else.
-                The story is "{{story}}".
+                You are a master Norse skald who shapes and tempers sagas like a smith forges steel.
+                Rewrite the following saga to better honor and embody the {{style}} style.
+                Return only the saga and nothing else.
+                The saga is "{{story}}".
                 """)
-        @Agent(description = "Edit a story to better fit a given style",
+        @Agent(description = "Reforge a saga to better capture a given style",
                outputKey = "story")
         String editStory(@V("story") String story, @V("style") String style);
     }
 
     public interface StyleReviewLoop {
-        @Agent("Review the given story to ensure it aligns with the specified style")
+        @Agent("Judge the saga by the standards of the specified style, as a Viking elder would at the Thing")
         String scoreAndReview(@V("story") String story, @V("style") String style);
     }
 
@@ -2537,11 +2537,11 @@ mvn clean wildfly:dev -Djboss.socket.binding.port-offset=2</code></pre>
     </div>
 
     <h4>Via curl</h4>
-    <pre><code># G&eacute;n&eacute;rer une histoire avec un style
-curl "http://localhost:8082/api/styled-story?topic=dragons+and+wizards&amp;style=comedy"
+    <pre><code># Forger une saga avec un style
+curl "http://localhost:8082/api/styled-story?topic=Erik+le+Rouge+traverse+les+mers&amp;style=epique"
 
 # Autre exemple
-curl "http://localhost:8082/api/styled-story?topic=a+brave+knight&amp;style=horror"</code></pre>
+curl "http://localhost:8082/api/styled-story?topic=la+bataille+de+Ragnarok&amp;style=tragique"</code></pre>
 
     <h4>Via l'interface web</h4>
     <p>Ouvrez <a href="http://localhost:8082" target="_blank">http://localhost:8082</a> pour acc&eacute;der &agrave; l'interface Story Forge. Saisissez un sujet et un style, puis observez la g&eacute;n&eacute;ration.</p>
@@ -2549,7 +2549,7 @@ curl "http://localhost:8082/api/styled-story?topic=a+brave+knight&amp;style=horr
     <ul class="checklist">
         <li>Les trois services WildFly d&eacute;marrent sans erreur (ports 8080, 8081, 8082)</li>
         <li>L'interface web Story Forge s'affiche sur le port 8082</li>
-        <li>Une requ&ecirc;te produit une histoire avec un score de style</li>
+        <li>Une requ&ecirc;te produit une saga avec un score de style</li>
         <li>Les logs montrent la boucle de r&eacute;vision (scorer &rarr; editor &rarr; scorer...)</li>
         <li>Le score final est &ge; 0.8 (ou max 5 it&eacute;rations atteintes)</li>
     </ul>
