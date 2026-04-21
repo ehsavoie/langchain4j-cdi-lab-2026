@@ -55,7 +55,7 @@ public class OrchestratorService {
                 .maxIterations(5)
                 .exitCondition(scope -> {
                     Object raw = scope.readState("score");
-                    LOGGER.error("The score of the story " + scope.readState("story") + " is " + raw);
+                    LOGGER.info("The score of the story " + scope.readState("story") + " is " + raw);
                     if (raw == null) {
                         return false;
                     }
