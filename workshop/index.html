@@ -613,6 +613,68 @@
         .file-tree .file { color: var(--text-secondary); }
         .file-tree .highlight { color: var(--accent-orange); font-weight: 600; }
         .file-tree .comment { color: var(--text-muted); font-style: italic; }
+        /* Slides modal */
+        .slides-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .slides-modal-overlay.open { display: flex; }
+
+        .slides-modal {
+            position: relative;
+            width: 95vw;
+            height: 92vh;
+            background: #0a0a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.8);
+        }
+
+        .slides-modal iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .slides-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            z-index: 10;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 0.4em 0.8em;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+        .slides-modal-close:hover { background: rgba(255,80,50,0.7); }
+
+        .open-slides-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--accent-blue);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75em 1.4em;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: opacity 0.2s;
+        }
+        .open-slides-btn:hover { opacity: 0.85; }
     </style>
 </head>
 <body>
@@ -654,18 +716,9 @@
     </div>
 
     <div class="sidebar-section">
-        <div class="sidebar-section-title">Diapositives de présentation</div>
-        <a href="#slides-intro" class="sidebar-link">
-            <span class="icon">&#127916;</span> Introduction et contexte
-        </a>
-        <a href="#slides-architecture" class="sidebar-link">
-            <span class="icon">&#128295;</span> Internes de l'extension CDI
-        </a>
-        <a href="#slides-features" class="sidebar-link">
-            <span class="icon">&#128736;</span> Fonctionnalités progressives
-        </a>
-        <a href="#slides-production" class="sidebar-link">
-            <span class="icon">&#128737;</span> Prêt pour la production
+        <div class="sidebar-section-title">Introduction</div>
+        <a href="#introduction-slides" class="sidebar-link">
+            <span class="icon">&#127916;</span> Diapositives d'introduction
         </a>
     </div>
 
@@ -892,12 +945,13 @@ cd langchain4j-cdi-lab-2026/demo-project</code></pre>
 <div class="callout info">
     <div class="callout-title">&#127922; Deux options au choix</div>
     <p><strong>Option A &mdash; Mistral AI (distant)</strong> : inscrivez-vous gratuitement sur <a href="https://console.mistral.ai/" target="_blank">console.mistral.ai</a> pour obtenir une clé API. Aucune installation locale requise.</p>
-    <p><strong>Option B &mdash; Ollama (local)</strong> : installez <a href="https://ollama.ai" target="_blank">Ollama</a>, puis téléchargez le modèle :</p>
+    <p><strong>Option B &mdash; Ollama (local)</strong> : installez <a href="https://ollama.ai" target="_blank">Ollama</a>, puis téléchargez les modèles :</p>
     <pre><code># Dans un premier terminal (laisser tourner) :
 ollama serve
 
 # Dans un second terminal :
-ollama pull ministral-3:3b</code></pre>
+ollama pull ministral-3:3b   # exercices 1, 2, 3, 4
+ollama pull qwen2.5:7b       # exercice 5 (A2A — toujours requis)</code></pre>
     <p>Ollama doit rester actif sur <code>http://localhost:11434</code> pendant tout l'atelier.</p>
 </div>
 
@@ -1133,40 +1187,29 @@ Assistant assistant;</code></pre>
 </section>
 
 <!-- ============================================================ -->
-<!-- SLIDES OVERVIEW                                               -->
+<!-- INTRODUCTION SLIDES                                           -->
 <!-- ============================================================ -->
-<section id="slides-intro" class="section-anchor">
-<h2>Diapositives de présentation</h2>
+<section id="introduction-slides" class="section-anchor">
+<h2>Diapositives d'introduction</h2>
 
-<p>L'atelier comprend un jeu de diapositives Reveal.js couvrant la théorie derrière chaque exercice. Voici ce que couvre chaque section.</p>
+<p>Présentation du contexte, des intervenants et du programme de l'atelier.</p>
 
-<div class="callout info">
-    <div class="callout-title">&#127916; Lancer les diapositives</div>
-    <p>Ouvrir directement <code>slides/index.html</code> dans le navigateur. Appuyez sur <kbd>S</kbd> pour les notes du présentateur, <kbd>F</kbd> pour le plein écran, <kbd>O</kbd> pour la vue d'ensemble.</p>
-</div>
+<button class="open-slides-btn" onclick="document.getElementById('slides-modal-overlay').classList.add('open')">
+    &#127916; Ouvrir les diapositives
+</button>
 
-<h3 id="slides-intro-detail">Introduction et contexte</h3>
-<p>La présentation commence par l'énoncé du problème : LangChain4j fonctionne très bien avec Quarkus, mais les entreprises utilisent <strong>WildFly, Payara, Liberty, GlassFish, Helidon</strong>. La réponse : <code>@RegisterAIService</code> &mdash; « Injectez un agent IA aussi naturellement qu'un EntityManager ».</p>
-
-<h3 id="slides-architecture" class="section-anchor">Internes de l'extension CDI</h3>
-<p>Plongée approfondie dans la façon dont l'extension CDI scanne <code>@RegisterAIService</code>, crée des beans synthétiques, résout les composants via le SPI <code>LLMConfig</code> et fait le pont vers MicroProfile Config. Couvre à la fois les extensions Portable et Build Compatible.</p>
-
-<h3 id="slides-features" class="section-anchor">Fonctionnalités progressives</h3>
-<ul>
-    <li><strong>Mémoire de conversation</strong> : <code>@MemoryId</code> + <code>ChatMemoryProvider</code> pour l'état par session</li>
-    <li><strong>RAG</strong> : <code>contentRetrieverName</code> avec embeddings et vector stores</li>
-    <li><strong>Outils / Function Calling</strong> : beans CDI avec méthodes <code>@Tool</code> &mdash; la fonctionnalité majeure</li>
-    <li><strong>MCP</strong> : Model Context Protocol via <code>toolProviderName</code> &mdash; « JDBC pour l'IA »</li>
-</ul>
-
-<h3 id="slides-production" class="section-anchor">Prêt pour la production</h3>
-<ul>
-    <li><strong>MicroProfile Fault Tolerance</strong> : <code>@Retry</code>, <code>@Timeout</code>, <code>@Fallback</code>, <code>@CircuitBreaker</code></li>
-    <li><strong>MicroProfile Telemetry</strong> : traces et métriques OpenTelemetry avec Grafana LGTM</li>
-    <li><strong>Modules LangChain4j-CDI</strong> : core, portable-ext, build-compatible-ext, fault-tolerance, telemetry</li>
-    <li><strong>A2A (Agent-to-Agent)</strong> : aperçu du prochain protocole pour la communication inter-agents</li>
-</ul>
+<p class="small" style="margin-top: 0.75rem; color: var(--text-muted);">
+    Dans la présentation : <kbd>→</kbd> slide suivant · <kbd>S</kbd> notes · <kbd>O</kbd> vue d'ensemble · <kbd>Échap</kbd> fermer le plein écran
+</p>
 </section>
+
+<!-- Slides full-screen modal -->
+<div id="slides-modal-overlay" class="slides-modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="slides-modal">
+        <button class="slides-modal-close" onclick="document.getElementById('slides-modal-overlay').classList.remove('open')">✕ Fermer</button>
+        <iframe src="../introduction/index.html" allowfullscreen></iframe>
+    </div>
+</div>
 
 <!-- ============================================================ -->
 <!-- EXERCISE 1: AI AGENT                                         -->
