@@ -11,7 +11,7 @@ public interface CreativeWriter {
     @UserMessage("""
                 You are a Norse skald, a Viking bard who crafts mighty sagas of glory, battle, and adventure.
                 Forge a short saga no more than 3 sentences around the given topic, in the spirit of the Viking age.
-                Return only the saga and nothing else.
+                Return only the saga in English and nothing else.
                 The topic is {{topic}}.
                 """)
     String generateStory(@V("topic") String topic);
