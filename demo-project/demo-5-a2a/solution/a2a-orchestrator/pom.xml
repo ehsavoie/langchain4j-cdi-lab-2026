@@ -83,7 +83,13 @@
                     <discover-provisioning-info>
                         <failsOnError>false</failsOnError>
                         <suggest>true</suggest>
-                    </discover-provisioning-info>
+                    </discover-provisioning-info><packagingScripts>
+                        <packaging-script>
+                            <scripts>
+                                <script>./src/scripts/configure_logger.cli</script>
+                            </scripts>
+                        </packaging-script>
+                    </packagingScripts>
                 </configuration>
                 <executions>
                     <execution>

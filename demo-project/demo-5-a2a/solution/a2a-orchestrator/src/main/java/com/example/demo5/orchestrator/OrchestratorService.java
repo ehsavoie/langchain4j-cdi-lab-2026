@@ -32,7 +32,7 @@ public class OrchestratorService {
     String ollamaBaseUrl;
 
     @Inject
-    @ConfigProperty(name = "ollama.model-name", defaultValue = "qwen2.5:7b")
+    @ConfigProperty(name = "ollama.model-name", defaultValue = "ministral-3:3b")
     String ollamaModelName;
 
     private StyledWriter styledWriter;
