@@ -5,30 +5,28 @@ package com.example.demo5.orchestrator;
 // import dev.langchain4j.agentic.UntypedAgent;
 // import dev.langchain4j.agentic.scope.ResultWithAgenticScope;
 import dev.langchain4j.model.chat.ChatModel;
-import dev.langchain4j.model.ollama.OllamaChatModel;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.time.Duration;
+import jakarta.inject.Named;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 // TODO: Importer les interfaces d'agents
 // import com.example.demo5.orchestrator.Agents.A2ACreativeWriter;
 // import com.example.demo5.orchestrator.Agents.A2AStyleScorer;
 // import com.example.demo5.orchestrator.Agents.StyleEditor;
-// import com.example.demo5.orchestrator.Agents.StyleReviewLoop;
 // import com.example.demo5.orchestrator.Agents.StyledWriter;
 
 /**
  * Service d'orchestration qui coordonne les agents A2A.
  *
  * TODO: À compléter dans init() :
- * ÉTAPE 1 : Créer le ChatModel Ollama local (pour le StyleEditor)
- * ÉTAPE 2 : Créer l'agent A2A CreativeWriter via AgenticServices.a2aBuilder()
- * ÉTAPE 3 : Créer l'agent A2A StyleScorer via AgenticServices.a2aBuilder()
- * ÉTAPE 4 : Créer l'agent local StyleEditor via AgenticServices.agentBuilder()
- * ÉTAPE 5 : Créer la boucle de révision via AgenticServices.loopBuilder()
+ * ÉTAPE 1 : Créer l'agent A2A CreativeWriter via AgenticServices.a2aBuilder()
+ * ÉTAPE 2 : Créer l'agent A2A StyleScorer via AgenticServices.a2aBuilder()
+ * ÉTAPE 3 : Créer l'agent local StyleEditor via AgenticServices.agentBuilder()
+ *           en utilisant le chatModel injecté
+ * ÉTAPE 4 : Créer la boucle de révision via AgenticServices.loopBuilder()
  *           avec exitCondition: score >= 0.8, maxIterations: 5
- * ÉTAPE 6 : Créer la séquence complète via AgenticServices.sequenceBuilder()
+ * ÉTAPE 5 : Créer la séquence complète via AgenticServices.sequenceBuilder()
  */
 @ApplicationScoped
 public class OrchestratorService {
@@ -42,52 +40,44 @@ public class OrchestratorService {
     String styleScorerUrl;
 
     @Inject
-    @ConfigProperty(name = "ollama.base-url", defaultValue = "http://127.0.0.1:11434")
-    String ollamaBaseUrl;
-
-    @Inject
-    @ConfigProperty(name = "ollama.model-name", defaultValue = "qwen2.5:7b")
-    String ollamaModelName;
+    @Named("ollama")
+    ChatModel chatModel;
 
     // TODO: Déclarer le champ StyledWriter
     // private StyledWriter styledWriter;
 
     @PostConstruct
     void init() {
-        // TODO ÉTAPE 1 : Créer le ChatModel Ollama local
-        // ChatModel chatModel = OllamaChatModel.builder()
-        //         .baseUrl(ollamaBaseUrl)
-        //         .modelName(ollamaModelName)
-        //         .timeout(Duration.ofMinutes(10))
-        //         .temperature(0.0)
-        //         .logRequests(true)
-        //         .logResponses(true)
-        //         .build();
-
-        // TODO ÉTAPE 2 : Créer l'agent A2A CreativeWriter
+        // TODO ÉTAPE 1 : Créer l'agent A2A CreativeWriter
         // A2ACreativeWriter creativeWriter = AgenticServices.a2aBuilder(creativeWriterUrl, A2ACreativeWriter.class)
         //         .outputKey("story")
         //         .build();
 
-        // TODO ÉTAPE 3 : Créer l'agent A2A StyleScorer
+        // TODO ÉTAPE 2 : Créer l'agent A2A StyleScorer
         // A2AStyleScorer styleScorer = AgenticServices.a2aBuilder(styleScorerUrl, A2AStyleScorer.class)
         //         .outputKey("score")
         //         .build();
 
-        // TODO ÉTAPE 4 : Créer l'agent local StyleEditor
+        // TODO ÉTAPE 3 : Créer l'agent local StyleEditor
         // StyleEditor styleEditor = AgenticServices.agentBuilder(StyleEditor.class)
         //         .chatModel(chatModel)
         //         .outputKey("story")
         //         .build();
 
-        // TODO ÉTAPE 5 : Créer la boucle de révision (loop)
+        // TODO ÉTAPE 4 : Créer la boucle de révision (loop)
         // UntypedAgent styleReviewLoop = AgenticServices.loopBuilder()
         //         .subAgents(styleScorer, styleEditor)
         //         .maxIterations(5)
-        //         .exitCondition(scope -> scope.readState("score", 0.0) >= 0.8)
+        //         .exitCondition(scope -> {
+        //             Object raw = scope.readState("score");
+        //             if (raw == null) return false;
+        //             if (raw instanceof Number n) return n.doubleValue() >= 0.8;
+        //             try { return Double.parseDouble(raw.toString()) >= 0.8; }
+        //             catch (NumberFormatException e) { return false; }
+        //         })
         //         .build();
 
-        // TODO ÉTAPE 6 : Créer la séquence complète
+        // TODO ÉTAPE 5 : Créer la séquence complète
         // styledWriter = AgenticServices.sequenceBuilder(StyledWriter.class)
         //         .subAgents(creativeWriter, styleReviewLoop)
         //         .outputKey("story")
