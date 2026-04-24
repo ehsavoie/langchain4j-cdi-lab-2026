@@ -31,14 +31,14 @@ export MISTRAL_API_KEY=your-key-here
 demo-1-ai-agent/
 ├── base/                          # Live coding skeleton (TODOs)
 │   ├── src/main/java/com/example/demo1/
-│   │   ├── JaxRsActivator.java           # @ApplicationPath("/api")
+│   │   ├── JaxRsActivator.java           # @ApplicationPath("/api") — ready
 │   │   ├── ChatAssistant.java            # TODO: Add @RegisterAIService
 │   │   ├── ChatAssistantStreaming.java   # TODO: Add @RegisterAIService (streaming)
-│   │   ├── ChatResource.java             # TODO: @Inject + call the assistant
-│   │   └── ImageAnalyzerServlet.java     # Bonus: vision model (TODOs)
+│   │   ├── ChatResource.java             # TODO: Replace @PostConstruct with @Inject
+│   │   └── ImageAnalyzerServlet.java     # Bonus: vision model (TODOs inside)
 │   └── src/main/
 │       ├── resources/META-INF/
-│       │   └── microprofile-config.properties  # TODO: uncomment model config
+│       │   └── microprofile-config.properties  # Pre-configured — switch Mistral/Ollama as needed
 │       └── webapp/
 │           ├── WEB-INF/beans.xml
 │           ├── index.html         # Chat UI (ready!)
@@ -50,10 +50,11 @@ demo-1-ai-agent/
     │   ├── JaxRsActivator.java
     │   ├── ChatAssistant.java            # With @RegisterAIService
     │   ├── ChatAssistantStreaming.java   # With @RegisterAIService
-    │   └── ChatResource.java             # With @Inject
+    │   ├── ChatResource.java             # With @Inject
+    │   └── ImageAnalyzerServlet.java     # Vision analysis implemented
     └── src/main/
         ├── resources/META-INF/
-        │   └── microprofile-config.properties  # All models configured
+        │   └── microprofile-config.properties
         └── webapp/
             ├── WEB-INF/beans.xml
             ├── index.html
@@ -72,73 +73,114 @@ target\server\bin\standalone.bat    # Windows
 
 WildFly is provisioned via Galleon during `mvn clean install`. The app is at **http://localhost:8080/demo-1/**
 
-The chat UI is directly accessible — no curl needed to demo!
-
 ## Live Coding Walkthrough
+
+The `base/` module starts with a working but non-CDI version: `ChatResource` manually builds
+the LLM models using `AiServices.builder()` in a `@PostConstruct` method. The goal is to
+replace all that boilerplate with CDI injection.
 
 ### Step 1: Add @RegisterAIService to ChatAssistant
 
-Open `ChatAssistant.java` — it is an empty interface with a system message already set.
-
-Add `@RegisterAIService` and the necessary imports:
+Open `ChatAssistant.java`. Follow the TODO comments: uncomment the import, then add the annotation:
 
 ```java
 import dev.langchain4j.cdi.spi.RegisterAIService;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 
+@SuppressWarnings("CdiManagedBeanInconsistencyInspection")
 @RegisterAIService(chatModelName = "my-model")
 public interface ChatAssistant {
 
-    @SystemMessage("""
-        Tu es un skald viking qui raconte des blagues et des histoires drôles dans la grande salle.
-        Tes blagues portent sur les guerriers maladroits, les raids qui tournent mal,
-        les festins trop arrosés, les dieux nordiques et leurs facéties.
-        Tes blagues sont courtes, percutantes et font rire tout le monde.
-        """)
+    @SystemMessage("...")
     String chat(@UserMessage String userMessage);
 }
 ```
 
-### Step 2: Inject into ChatResource
+`chatModelName = "my-model"` references the plugin name in `microprofile-config.properties`.
+CDI will now produce a managed bean for this interface automatically.
 
-Open `ChatResource.java` and inject the assistant:
+### Step 2: Add @RegisterAIService to ChatAssistantStreaming
+
+Open `ChatAssistantStreaming.java`. Same pattern, but using `streamingChatModelName`:
 
 ```java
-@Inject
-ChatAssistant assistant;
+import dev.langchain4j.cdi.spi.RegisterAIService;
 
-@POST
-@Consumes(MediaType.TEXT_PLAIN)
-@Produces(MediaType.TEXT_PLAIN)
-public String chat(String message) {
-    return assistant.chat(message);
+@SuppressWarnings("CdiManagedBeanInconsistencyInspection")
+@RegisterAIService(streamingChatModelName = "my-streaming-model")
+public interface ChatAssistantStreaming {
+
+    @SystemMessage("...")
+    TokenStream chatStream(@UserMessage String userMessage);
 }
 ```
 
-### Step 3: Configure the model
+The method returns `TokenStream` — tokens arrive one by one from the LLM.
 
-Uncomment the chosen backend in `microprofile-config.properties`:
+### Step 3: Refactor ChatResource to use @Inject
 
-```properties
-# Option A: Ollama (local)
-dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.ollama.OllamaChatModel
-dev.langchain4j.cdi.plugin.my-model.config.base-url=http://localhost:11434
-dev.langchain4j.cdi.plugin.my-model.config.model-name=ministral-3:3b
+Open `ChatResource.java`. Follow the TODO comments: this is the main refactoring step.
 
-# Option B: Mistral AI (remote)
-# dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.mistralai.MistralAiChatModel
-# dev.langchain4j.cdi.plugin.my-model.config.api-key=${MISTRAL_API_KEY}
-# dev.langchain4j.cdi.plugin.my-model.config.model-name=mistral-small-latest
+**3a. Replace the imports** — remove the four LangChain4j/PostConstruct imports and add `@Inject`:
+
+```java
+// Remove these:
+// import dev.langchain4j.model.mistralai.MistralAiChatModel;
+// import dev.langchain4j.model.mistralai.MistralAiStreamingChatModel;
+// import dev.langchain4j.service.AiServices;
+// import jakarta.annotation.PostConstruct;
+
+// Add this:
+import jakarta.inject.Inject;
 ```
 
-The pattern: `dev.langchain4j.cdi.plugin.<name>.class` for the implementation type, then `.config.<property>` for each builder parameter.
+**3b. Replace the private fields with @Inject fields**:
 
-**Critical**: the `.config.` prefix is mandatory — without it, properties are silently ignored.
+```java
+// Before:
+private ChatAssistant assistant;
+private ChatAssistantStreaming streamingAssistant;
 
-### Step 4: Test
+// After:
+@Inject
+ChatAssistant assistant;
 
-WildFly hot-reloads automatically. Open **http://localhost:8080/demo-1/** and test the chat in the UI.
+@Inject
+ChatAssistantStreaming streamingAssistant;
+```
+
+**3c. Delete the entire @PostConstruct init() method** — all 22 lines of manual model construction. CDI injects the beans before the first request; no initialization code is needed.
+
+The `chat()` and `chatStream()` methods stay untouched.
+
+### Step 4: Choose the LLM provider
+
+`microprofile-config.properties` is already configured. By default it uses **Mistral AI** (requires `MISTRAL_API_KEY`). To switch to **Ollama**, comment out the three Mistral lines and uncomment the three Ollama lines for each model block (`my-model`, `my-streaming-model`, `vision-model`).
+
+```properties
+# Active by default — Mistral AI:
+dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.mistralai.MistralAiChatModel
+dev.langchain4j.cdi.plugin.my-model.config.api-key=${MISTRAL_API_KEY}
+dev.langchain4j.cdi.plugin.my-model.config.model-name=mistral-small-latest
+
+# Switch to Ollama by commenting above and uncommenting below:
+#dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.ollama.OllamaChatModel
+#dev.langchain4j.cdi.plugin.my-model.config.base-url=http://localhost:11434
+#dev.langchain4j.cdi.plugin.my-model.config.model-name=ministral-3:3b
+```
+
+**Critical**: the `.config.` prefix in property keys is mandatory — without it, properties are silently ignored.
+
+### Step 5: Build and test
+
+```bash
+mvn clean install
+./target/server/bin/standalone.sh   # Linux / macOS
+target\server\bin\standalone.bat    # Windows
+```
+
+Open **http://localhost:8080/demo-1/** and test the chat UI.
 
 Or via curl:
 ```bash
@@ -149,58 +191,17 @@ curl -X POST -H "Content-Type: text/plain" \
 
 ## Bonus: Streaming with SSE (Server-Sent Events)
 
-Demo 1 also includes a streaming variant that shows AI responses token by token in real time.
-
-### Key interface
-
-`ChatAssistantStreaming.java` returns a `TokenStream` instead of a `String`:
-
-```java
-@RegisterAIService(chatModelName = "my-streaming-model")
-public interface ChatAssistantStreaming {
-
-    @SystemMessage("""
-        Tu es un skald viking, un conteur et poète de la grande salle.
-        Tu chantes des récits épiques sur les batailles glorieuses...
-        """)
-    TokenStream chatStream(@UserMessage String userMessage);
-}
-```
-
-### Configuration
-
-```properties
-# Streaming model (OllamaStreamingChatModel or MistralAiStreamingChatModel)
-dev.langchain4j.cdi.plugin.my-streaming-model.class=dev.langchain4j.model.ollama.OllamaStreamingChatModel
-dev.langchain4j.cdi.plugin.my-streaming-model.config.base-url=http://localhost:11434
-dev.langchain4j.cdi.plugin.my-streaming-model.config.model-name=ministral-3:3b
-```
-
-### Access
+`ChatAssistantStreaming` returns a `TokenStream` instead of a `String`. The `chatStream()`
+endpoint in `ChatResource` wires it to JAX-RS Server-Sent Events — tokens appear in the
+browser as they arrive from the LLM.
 
 - **Simple chat**: http://localhost:8080/demo-1/
 - **Streaming chat**: http://localhost:8080/demo-1/stream.html
-- **Vision (bonus)**: http://localhost:8080/demo-1/image.html
-
-### How SSE works
-
-The `/api/chat/stream` endpoint uses JAX-RS SSE (GET, because `EventSource` only supports GET):
-
-```java
-@GET @Path("/stream")
-@Produces(MediaType.SERVER_SENT_EVENTS)
-public void chatStream(@QueryParam("message") String message,
-                       @Context SseEventSink sink, @Context Sse sse)
-```
-
-Three event types are emitted:
-- `token` — each token as it's generated
-- `done` — end-of-stream signal
-- `error` — if an error occurs
 
 ## Bonus: Vision / Image Analysis
 
-`ImageAnalyzerServlet.java` demonstrates injecting a vision-capable `ChatModel` via `@Named`:
+`ImageAnalyzerServlet.java` contains its own TODO steps (ÉTAPE 1–6) for injecting a
+vision-capable `ChatModel` via `@Named` and sending an image to the LLM:
 
 ```java
 @Inject
@@ -208,20 +209,17 @@ Three event types are emitted:
 ChatModel visionModel;
 ```
 
-The vision model is configured separately in `microprofile-config.properties`:
+The vision model is pre-configured in `microprofile-config.properties` (`pixtral-large-latest`
+for Mistral AI, or `ministral-3:3b` for Ollama).
 
-```properties
-dev.langchain4j.cdi.plugin.vision-model.class=dev.langchain4j.model.mistralai.MistralAiChatModel
-dev.langchain4j.cdi.plugin.vision-model.config.api-key=${MISTRAL_API_KEY}
-dev.langchain4j.cdi.plugin.vision-model.config.model-name=pixtral-large-latest
-```
+- **Vision UI**: http://localhost:8080/demo-1/image.html
 
 ## Key Takeaways
 
 1. **CDI magic**: `@RegisterAIService` automatically produces a CDI bean — no factory, no builder
-2. **Zero LLM code**: Everything is in MicroProfile Config; switching models = changing a property
-3. **External configuration**: Same interface, swap Ollama for Mistral in one line
-4. **Injectability = testability**: It is a CDI bean, can be mocked in tests like any other bean
+2. **Zero LLM code**: everything is in MicroProfile Config; switching models = changing a property
+3. **External configuration**: same interface, swap Ollama for Mistral in one line
+4. **Injectability = testability**: it is a CDI bean, can be mocked in tests like any other bean
 
 ## Troubleshooting
 

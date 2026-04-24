@@ -1,10 +1,15 @@
 package com.example.demo1;
 
+// TODO ÉTAPE 3 : Supprimer les quatre imports ci-dessous — ils ne sont plus nécessaires avec CDI.
+// CDI instancie et injecte ChatAssistant et ChatAssistantStreaming automatiquement.
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.mistralai.MistralAiStreamingChatModel;
 import dev.langchain4j.service.AiServices;
-import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.PostConstruct;
+
+// TODO ÉTAPE 3 : Décommenter cet import pour l'injection CDI
+// import jakarta.inject.Inject;
+import dev.langchain4j.service.TokenStream;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -16,9 +21,21 @@ import jakarta.ws.rs.sse.SseEventSink;
 @ApplicationScoped
 public class ChatResource {
 
+    // TODO ÉTAPE 3 : Remplacer ces deux champs par des injections CDI.
+    // Une fois ChatAssistant et ChatAssistantStreaming annotés avec @RegisterAIService,
+    // CDI peut les injecter directement — aucune instanciation manuelle nécessaire.
+    //
+    // @Inject
+    // ChatAssistant assistant;
+    //
+    // @Inject
+    // ChatAssistantStreaming streamingAssistant;
     private ChatAssistant assistant;
     private ChatAssistantStreaming streamingAssistant;
 
+    // TODO ÉTAPE 3 : Supprimer toute cette méthode @PostConstruct.
+    // Avec @Inject, CDI gère le cycle de vie des beans — ils sont disponibles
+    // avant le premier appel sans aucune initialisation manuelle.
     @PostConstruct
     void init() {
         MistralAiChatModel model = MistralAiChatModel.builder()
