@@ -434,7 +434,7 @@
     <h2>Le problème</h2>
     <pre><code class="language-java" data-trim>
 // Avec LangChain4j "vanille"... c'est verbeux
-ChatLanguageModel model = OpenAiChatModel.builder()
+ChatModel model = OpenAiChatModel.builder()
     .apiKey(System.getenv("OPENAI_API_KEY"))
     .modelName("gpt-4o")
     .build();

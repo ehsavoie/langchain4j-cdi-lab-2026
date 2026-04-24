@@ -5,7 +5,7 @@ package com.example.demo1;
 // import dev.langchain4j.data.message.ImageContent;
 // import dev.langchain4j.data.message.TextContent;
 // import dev.langchain4j.data.message.UserMessage;
-// import dev.langchain4j.model.chat.ChatLanguageModel;
+// import dev.langchain4j.model.chat.ChatModel;
 // import dev.langchain4j.model.chat.response.ChatResponse;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -31,13 +31,13 @@ import java.util.Base64;
 @WebServlet("/uploadServlet")
 public class ImageAnalyzerServlet extends HttpServlet {
 
-    // TODO ÉTAPE 2 : Injecter le ChatLanguageModel dédié à l'analyse d'image
+    // TODO ÉTAPE 2 : Injecter le ChatModel dédié à l'analyse d'image
     // IMPORTANT : Utiliser @Named("vision-model") pour injecter le modèle de vision configuré
     // Ce modèle DOIT supporter l'analyse d'image (vision)
     // Voir microprofile-config.properties pour la configuration du vision-model
     // @Inject
     // @Named("vision-model")
-    // ChatLanguageModel visionModel;
+    // ChatModel visionModel;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
