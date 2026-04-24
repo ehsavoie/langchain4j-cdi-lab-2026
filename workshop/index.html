@@ -1564,6 +1564,17 @@ curl http://localhost:8080/demo-1/api/chat/health</code></pre>
     <p>Commencez avec un guide d'expéditions viking fonctionnel qui possède déjà la mémoire, RAG et des outils. Votre tâche : ajouter des annotations MicroProfile Fault Tolerance pour le rendre prêt pour la production, puis l'observer avec OpenTelemetry.</p>
 </div>
 
+<p>Commencez par démarrer la stack Grafana LGTM (Loki + Grafana + Tempo + Mimir) dans un terminal dédié &mdash; elle sera prête quand vous en aurez besoin pour la télémétrie :</p>
+
+<pre><code># Démarrer la stack LGTM complète (Loki + Grafana + Tempo + Mimir)
+# avec le collecteur OpenTelemetry intégré — laisser tourner en arrière-plan
+podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
+
+# Ou avec Docker
+docker run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm</code></pre>
+
+<p>Puis lancez l'application dans un autre terminal :</p>
+
 <pre><code>cd demo-project/demo-2-ft-telemetry/base
 mvn clean wildfly:dev</code></pre>
 
@@ -1679,6 +1690,15 @@ String chat(@MemoryId String sessionId,
 
     <p>Rechargement à chaud : sauvegardez et exécutez <code>mvn package</code> (ou laissez votre IDE compiler automatiquement).</p>
 
+    <div class="callout warning">
+        <div class="callout-title">&#128226; Décommenter la dépendance Fault Tolerance</div>
+        <p>Maintenant que les annotations sont en place, ouvrez <code>pom.xml</code> et décommentez la dépendance <code>langchain4j-cdi-fault-tolerance</code> (bloc marqué <code>TODO</code>). Sans elle, les annotations sont ignorées silencieusement.</p>
+        <pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;dev.langchain4j.cdi.mp&lt;/groupId&gt;
+    &lt;artifactId&gt;langchain4j-cdi-fault-tolerance&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+    </div>
+
     <div class="callout success">
         <div class="callout-title">&#10003; Tester la résilience</div>
         <p>Simulez une panne : coupez le wifi pour simuler un souci réseau, puis envoyez des requêtes. Si vous utilisez Ollama, coupez simplement le serveur. Vous devriez voir les tentatives de retry, puis le message de fallback. Rétablissez la connexion (ou relancez Ollama) et le circuit breaker se rétablit automatiquement.</p>
@@ -1693,16 +1713,7 @@ String chat(@MemoryId String sessionId,
         <span class="step-number" style="background: var(--accent-blue);">4</span>
         <span class="step-title">Ajouter l'observabilité OpenTelemetry</span>
     </div>
-    <p>Démarrez la stack Grafana LGTM (Loki + Grafana + Tempo + Mimir) :</p>
-
-    <pre><code># Démarrer la stack LGTM complète (Loki + Grafana + Tempo + Mimir)
-# avec le collecteur OpenTelemetry intégré
-podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
-
-# Ou avec Docker
-docker run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm</code></pre>
-
-    <p>La configuration de télémétrie est déjà dans <code>microprofile-config.properties</code> :</p>
+    <p>La stack Grafana LGTM est déjà lancée depuis le début de l'exercice. La configuration de télémétrie est déjà dans <code>microprofile-config.properties</code> :</p>
 
     <pre><code># OpenTelemetry
 otel.exporter.otlp.endpoint=http://localhost:4318

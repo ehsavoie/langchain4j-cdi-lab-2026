@@ -47,10 +47,14 @@
         </dependency>
 
         <!-- LangChain4j-CDI Fault Tolerance -->
+        <!-- TODO: Décommenter cette dépendance une fois que vous avez ajouté les annotations
+             @Retry, @Timeout, @Fallback et @CircuitBreaker dans ChatAssistant.java -->
+        <!--
         <dependency>
             <groupId>dev.langchain4j.cdi.mp</groupId>
             <artifactId>langchain4j-cdi-fault-tolerance</artifactId>
         </dependency>
+        -->
 
         <!-- LangChain4j-CDI Telemetry -->
         <dependency>
