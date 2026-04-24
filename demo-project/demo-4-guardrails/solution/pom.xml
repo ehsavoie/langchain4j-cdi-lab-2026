@@ -93,6 +93,10 @@
                 <artifactId>wildfly-maven-plugin</artifactId>
                 <configuration>
                     <name>demo-4.war</name>
+                    <discover-provisioning-info>
+                        <failsOnError>false</failsOnError>
+                        <suggest>true</suggest>
+                    </discover-provisioning-info>
                     <packagingScripts>
                         <packaging-script>
                             <scripts>
@@ -101,6 +105,13 @@
                         </packaging-script>
                     </packagingScripts>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

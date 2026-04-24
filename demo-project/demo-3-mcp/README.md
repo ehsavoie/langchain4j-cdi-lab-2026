@@ -93,7 +93,9 @@ java -jar target/casino-dice-roller.jar
 
 ```bash
 cd demo-project/demo-3-mcp/base    # ou solution/
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh   # Linux / macOS
+target\server\bin\standalone.bat    # Windows
 ```
 
 L'application est disponible sur **http://localhost:8080/demo-3/**
@@ -293,7 +295,7 @@ La rune t'a souri — tu es digne du Valhalla !
 - **`Connection refused` sur port 8090** : Le serveur MCP n'est pas démarré — relancer `java -jar mcp-server/target/casino-dice-roller.jar`
 - **L'agent ne répond pas** : Vérifier que `HnefataflJarlAI` est annoté avec `@RegisterAIService`
 - **Les runes ne sont pas lancées** : Vérifier les logs WildFly pour les appels MCP (`logRequests=true` dans la config)
-- **Lancer la solution directement** : `cd solution && mvn clean wildfly:dev`
+- **Lancer la solution directement** : `cd solution && mvn clean install` puis `./target/server/bin/standalone.sh` (Linux/macOS) ou `target\server\bin\standalone.bat` (Windows)
 
 ## Ressources
 

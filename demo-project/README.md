@@ -30,22 +30,14 @@ curl http://localhost:11434/api/tags
 ### 2. WildFly
 
 ```bash
-# Either via the Maven plugin (downloads automatically):
+# Build and provision WildFly automatically:
 cd demo-1-ai-agent/solution
-mvn wildfly:dev
-# WildFly starts and deploys automatically
+mvn clean install
 
-# Or manually:
-# Download WildFly 39 from https://wildfly.org
-# unzip wildfly-39.0.0.Final.zip
-# ./wildfly-39.0.0.Final/bin/standalone.sh
+# Then start the server:
+./target/server/bin/standalone.sh    # Linux / macOS
+target\server\bin\standalone.bat     # Windows
 ```
-
-The `wildfly:dev` plugin is the presenter's best friend:
-- Downloads WildFly if needed
-- Starts the server
-- Deploys the app
-- **Hot-reload** on every `mvn package` (or save in IntelliJ)
 
 ### 3. IntelliJ IDEA
 
@@ -70,7 +62,7 @@ Each module contains:
 - `solution/` -- the complete working version, as a backup
 
 **Live**: work in `base/`, follow the TODOs
-**If something breaks**: `cd solution && mvn package wildfly:deploy` and move on
+**If something breaks**: `cd solution && mvn clean install` then start the server and move on
 
 ---
 
@@ -89,7 +81,7 @@ cd demo-1-ai-agent/base
 3. Add `@SystemMessage` with the prompt
 4. Open `ChatResource.java`, add `@Inject ChatAssistant`
 5. Uncomment the Ollama config in `microprofile-config.properties`
-6. `mvn package wildfly:dev`
+6. `mvn clean install` then `./target/server/bin/standalone.sh` (Linux/macOS) or `target\server\bin\standalone.bat` (Windows)
 7. Test:
 ```bash
 curl -X POST http://localhost:8080/demo1/api/chat \
@@ -176,10 +168,13 @@ curl -X POST http://localhost:8080/demo3/api/conference/query \
 ## In case of emergency
 
 ```bash
-# Backup solution for each demo:
-cd demo-1-ai-agent/solution && mvn package wildfly:deploy
-cd demo-2-ft-telemetry/solution && mvn package wildfly:deploy
-cd demo-3-mcp/solution && mvn package wildfly:deploy
+# Backup solution for each demo (Linux / macOS):
+cd demo-1-ai-agent/solution && mvn clean install && ./target/server/bin/standalone.sh
+cd demo-2-ft-telemetry/solution && mvn clean install && ./target/server/bin/standalone.sh
+cd demo-3-mcp/solution && mvn clean install && ./target/server/bin/standalone.sh
+
+# Windows:
+cd demo-1-ai-agent/solution && mvn clean install && target\server\bin\standalone.bat
 ```
 
 Breathe. Smile. "That is why we have backup slides."

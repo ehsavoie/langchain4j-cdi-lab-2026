@@ -79,7 +79,9 @@ docker run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
 
 ```bash
 cd demo-project/demo-2-ft-telemetry/base    # or solution/
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh   # Linux / macOS
+target\server\bin\standalone.bat    # Windows
 ```
 
 The app is available at **http://localhost:8080/demo-2/**.
@@ -253,13 +255,13 @@ ChatAssistant/chat/Timeout/value=45000
 - **CircuitBreaker open after test**: Restart Ollama and wait a few seconds for the circuit to close
 - **No traces in Grafana**: Verify Grafana LGTM is running (`curl http://localhost:4318`) and `otel.sdk.disabled=false`
 - **Fault Tolerance annotations ignored**: Ensure the `langchain4j-cdi-fault-tolerance` dependency is uncommented in `pom.xml`
-- **Run the solution directly**: `cd solution && mvn clean wildfly:dev`
+- **Run the solution directly**: `cd solution && mvn clean install` then `./target/server/bin/standalone.sh` (Linux/macOS) or `target\server\bin\standalone.bat` (Windows)
 
 ## Stopping Services
 
 ```bash
 # Stop WildFly
-Ctrl+C in the wildfly:dev terminal
+Ctrl+C in the WildFly terminal
 
 # Stop Grafana LGTM (--rm cleans up automatically)
 Ctrl+C in the podman/docker run terminal

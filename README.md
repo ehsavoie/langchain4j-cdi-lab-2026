@@ -54,7 +54,9 @@ mvn clean install -DskipTests
 
 ```bash
 cd demo-1-ai-agent/solution
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh   # Linux / macOS
+target\server\bin\standalone.bat    # Windows
 
 # Dans un autre terminal :
 curl -X POST -H "Content-Type: text/plain" \
@@ -104,7 +106,10 @@ Chaque démo contient un module `base/` (squelette avec TODOs pour le live codin
 ### Démo 1 — Skald Viking
 
 ```bash
-cd demo-project/demo-1-ai-agent/solution && mvn clean wildfly:dev
+cd demo-project/demo-1-ai-agent/solution
+mvn clean install
+./target/server/bin/standalone.sh   # Linux / macOS
+target\server\bin\standalone.bat    # Windows
 
 # Test : blague viking
 curl -X POST -H "Content-Type: text/plain" \
@@ -120,7 +125,10 @@ curl -X POST -H "Content-Type: text/plain" \
 ### Démo 2 — Expéditions Vikings
 
 ```bash
-cd demo-project/demo-2-ft-telemetry/solution && mvn clean wildfly:dev
+cd demo-project/demo-2-ft-telemetry/solution
+mvn clean install
+./target/server/bin/standalone.sh   # Linux / macOS
+target\server\bin\standalone.bat    # Windows
 
 # Test : recherche d'expéditions
 curl -X POST -H "Content-Type: text/plain" \
@@ -142,13 +150,19 @@ curl -X POST -H "Content-Type: text/plain" \
 cd demo-project/demo-3-mcp/mcp-server && mvn clean package && java -jar target/casino-dice-roller.jar
 
 # Lancer la démo
-cd demo-project/demo-3-mcp/solution && mvn clean wildfly:dev
+cd demo-project/demo-3-mcp/solution
+mvn clean install
+./target/server/bin/standalone.sh   # Linux / macOS
+target\server\bin\standalone.bat    # Windows
 ```
 
 ### Démo 4 — Guardrails
 
 ```bash
-cd demo-project/demo-4-guardrails/solution && mvn clean wildfly:dev
+cd demo-project/demo-4-guardrails/solution
+mvn clean install
+./target/server/bin/standalone.sh   # Linux / macOS
+target\server\bin\standalone.bat    # Windows
 
 curl -X POST -H "Content-Type: text/plain" \
   -d "Chante-moi une chanson viking" \
@@ -159,13 +173,22 @@ curl -X POST -H "Content-Type: text/plain" \
 
 ```bash
 # Terminal 1 : Creative Writer (port 8080)
-cd demo-project/demo-5-a2a/solution/a2a-creative-writer && mvn clean wildfly:dev
+cd demo-project/demo-5-a2a/solution/a2a-creative-writer
+mvn clean install
+./target/server/bin/standalone.sh                                           # Linux / macOS
+target\server\bin\standalone.bat                                            # Windows
 
 # Terminal 2 : Style Scorer (port 8081)
-cd demo-project/demo-5-a2a/solution/a2a-style-scorer && mvn clean wildfly:dev -Djboss.socket.binding.port-offset=1
+cd demo-project/demo-5-a2a/solution/a2a-style-scorer
+mvn clean install
+./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=1     # Linux / macOS
+target\server\bin\standalone.bat -Djboss.socket.binding.port-offset=1      # Windows
 
 # Terminal 3 : Orchestrateur (port 8082)
-cd demo-project/demo-5-a2a/solution/a2a-orchestrator && mvn clean wildfly:dev -Djboss.socket.binding.port-offset=2
+cd demo-project/demo-5-a2a/solution/a2a-orchestrator
+mvn clean install
+./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=2     # Linux / macOS
+target\server\bin\standalone.bat -Djboss.socket.binding.port-offset=2      # Windows
 
 curl "http://localhost:8082/api/styled-story?topic=Erik+le+Rouge+traverse+les+mers&style=epique"
 ```

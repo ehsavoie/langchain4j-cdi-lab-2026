@@ -1029,11 +1029,15 @@ $env:MISTRAL_API_KEY="your-api-key-here"</code></pre>
 
 <p>WildFly 39 est automatiquement téléchargé et provisionné par le plugin Maven. Aucune installation manuelle nécessaire :</p>
 
-<pre><code># Ceci télécharge WildFly, le démarre et déploie l'application
+<pre><code># Compiler, provisionner WildFly et déployer l'application
 cd demo-1-ai-agent/solution
-mvn clean wildfly:dev</code></pre>
+mvn clean install
 
-<p>L'objectif <code>wildfly:dev</code> est votre meilleur ami &mdash; il recharge à chaud à chaque <code>mvn package</code>.</p>
+# Démarrer le serveur
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows</code></pre>
+
+<p><code>mvn clean install</code> provisionne WildFly et déploie l'application dans <code>target/server/</code>. Lancez ensuite le serveur avec le script approprié à votre système.</p>
 
 <h3>3bis. Configurer le fournisseur LLM dans la solution</h3>
 
@@ -1063,7 +1067,9 @@ mvn clean install -DskipTests
 
 # Test rapide de vérification
 cd demo-1-ai-agent/solution
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows
 
 # Dans un autre terminal :
 curl -X POST -H "Content-Type: text/plain" \
@@ -1404,8 +1410,10 @@ dev.langchain4j.cdi.plugin.my-model.config.temperature=0.9</code></pre>
         <p>Les propriétés du builder <strong>doivent</strong> utiliser le préfixe <code>.config.</code> : <code>dev.langchain4j.cdi.plugin.&lt;name&gt;.config.&lt;prop&gt;=value</code>. Sans <code>.config.</code>, la propriété est <strong>ignorée silencieusement</strong>.</p>
     </div>
 
-    <h4>Déployer et tester</h4>
-    <pre><code>mvn clean wildfly:dev</code></pre>
+    <h4>Compiler et démarrer</h4>
+    <pre><code>mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows</code></pre>
     <pre><code># Dans un autre terminal :
 curl -X POST -H "Content-Type: text/plain" \
   -d "Tell me a saga about Java developers on a Viking voyage" \
@@ -1546,7 +1554,7 @@ curl http://localhost:8080/demo-1/api/chat/health</code></pre>
 
     <div class="callout tip">
         <div class="callout-title">&#128161; Bloqué ?</div>
-        <p>Passez à la solution : <code>cd ../solution && mvn clean wildfly:dev</code></p>
+        <p>Passez à la solution : <code>cd ../solution && mvn clean install</code> puis <code>./target/server/bin/standalone.sh</code> (Linux/macOS) ou <code>target\server\bin\standalone.bat</code> (Windows)</p>
     </div>
 </div>
 </section>
@@ -1576,7 +1584,9 @@ docker run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm</co
 <p>Puis lancez l'application dans un autre terminal :</p>
 
 <pre><code>cd demo-project/demo-2-ft-telemetry/base
-mvn clean wildfly:dev</code></pre>
+mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows</code></pre>
 
 <p>Ouvrez votre navigateur vers <a href="http://localhost:8080/demo-2" target="_blank">http://localhost:8080/demo-2</a> pour tester l'application.</p>
 
@@ -1968,9 +1978,11 @@ public class GameResource {
 
     <pre><code># Assurez-vous que le serveur MCP tourne sur le port 8090 !
 
-# Déployer
+# Compiler et démarrer
 cd demo-project/demo-3-mcp/base
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows
 
 # Démarrer une partie
 curl http://localhost:8080/demo-3/api/game/start
@@ -2240,8 +2252,10 @@ public interface SkaldAssistant {
         <p>Les guardrails sont exécutés dans l'ordre des tableaux. Ici, <code>french-input</code> est évalué avant <code>fantasy-input</code>. Si le premier échoue, le second n'est pas évalué. Le LLM n'est appelé que si <strong>tous</strong> les guardrails d'entrée passent.</p>
     </div>
 
-    <h4>Déployer</h4>
-    <pre><code>mvn clean wildfly:dev</code></pre>
+    <h4>Compiler et démarrer</h4>
+    <pre><code>mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows</code></pre>
 
     <div class="callout warning">
         <div class="callout-title">&#9888; Configuration déjà fournie</div>
@@ -2290,7 +2304,7 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
 
     <div class="callout tip">
         <div class="callout-title">&#128161; Bloqué ?</div>
-        <p>Passez à la solution : <code>cd ../solution && mvn clean wildfly:dev</code></p>
+        <p>Passez à la solution : <code>cd ../solution && mvn clean install</code> puis <code>./target/server/bin/standalone.sh</code> (Linux/macOS) ou <code>target\server\bin\standalone.bat</code> (Windows)</p>
     </div>
 
     <div class="callout success">
@@ -2637,15 +2651,21 @@ void init() {
 
     <pre><code># Terminal 1 : Creative Writer (port 8080)
 cd demo-project/demo-5-a2a/base/a2a-creative-writer
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh                                           # Linux / macOS
+target\server\bin\standalone.bat                                            # Windows
 
 # Terminal 2 : Style Scorer (port 8081)
 cd demo-project/demo-5-a2a/base/a2a-style-scorer
-mvn clean wildfly:dev -Djboss.socket.binding.port-offset=1
+mvn clean install
+./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=1     # Linux / macOS
+target\server\bin\standalone.bat -Djboss.socket.binding.port-offset=1      # Windows
 
 # Terminal 3 : Orchestrateur (port 8082)
 cd demo-project/demo-5-a2a/base/a2a-orchestrator
-mvn clean wildfly:dev -Djboss.socket.binding.port-offset=2</code></pre>
+mvn clean install
+./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=2     # Linux / macOS
+target\server\bin\standalone.bat -Djboss.socket.binding.port-offset=2      # Windows</code></pre>
 
     <div class="callout warning">
         <div class="callout-title">&#9888; Ordre de d&eacute;marrage</div>
@@ -2812,13 +2832,20 @@ curl "http://localhost:8082/api/styled-story?topic=la+bataille+de+Ragnarok&amp;s
 <div class="callout danger">
     <div class="callout-title">&#9888; Secours d'urgence</div>
     <p>Si quelque chose ne va pas, passez au module solution :</p>
-    <pre><code>cd demo-N-xxx/solution && mvn clean wildfly:dev
-# Exemple pour l'exercice 4 :
-cd demo-4-guardrails/solution && mvn clean wildfly:dev
+    <pre><code># Exemple pour l'exercice 4 :
+cd demo-4-guardrails/solution && mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows
+
 # Exemple pour l'exercice 5 (3 terminaux) :
-cd demo-5-a2a/solution/a2a-creative-writer && mvn clean wildfly:dev
-cd demo-5-a2a/solution/a2a-style-scorer && mvn clean wildfly:dev -Djboss.socket.binding.port-offset=1
-cd demo-5-a2a/solution/a2a-orchestrator && mvn clean wildfly:dev -Djboss.socket.binding.port-offset=2</code></pre>
+cd demo-5-a2a/solution/a2a-creative-writer && mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS (port 8080)
+
+cd demo-5-a2a/solution/a2a-style-scorer && mvn clean install
+./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=1    # port 8081
+
+cd demo-5-a2a/solution/a2a-orchestrator && mvn clean install
+./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=2    # port 8082</code></pre>
 </div>
 </section>
 

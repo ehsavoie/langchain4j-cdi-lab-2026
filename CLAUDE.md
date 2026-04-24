@@ -26,12 +26,22 @@ ollama pull ministral-3:3b    # demo-1, demo-3
 ollama pull qwen2.5:7b        # demo-2 (tool calling + embeddings)
 
 # Lancer une démo (remplacer N et le nom du module)
-cd demo-project/demo-1-ai-agent/solution && mvn clean wildfly:dev
-cd demo-project/demo-2-ft-telemetry/solution && mvn clean wildfly:dev
+cd demo-project/demo-1-ai-agent/solution
+mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows
+
+cd demo-project/demo-2-ft-telemetry/solution
+mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows
 
 # Demo 3 : compiler d'abord le serveur MCP
 cd demo-project/demo-3-mcp/mcp-server && mvn clean package && java -jar target/casino-dice-roller.jar
-cd demo-project/demo-3-mcp/solution && mvn clean wildfly:dev
+cd demo-project/demo-3-mcp/solution
+mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows
 
 # Tester
 curl -X POST -H "Content-Type: text/plain" -d "Raconte-moi une blague viking" http://localhost:8080/demo-1/api/chat

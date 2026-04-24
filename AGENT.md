@@ -65,12 +65,16 @@ ollama pull ministral-3:3b
 
 # Demo 1
 cd demo-project/demo-1-ai-agent/solution
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows
 # -> http://localhost:8080/demo-1/
 
 # Demo 2
 cd demo-project/demo-2-ft-telemetry/solution
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows
 # -> http://localhost:8080/demo-2/
 
 # Demo 3 (démarrer d'abord le serveur MCP sur le port 8090)
@@ -78,7 +82,9 @@ cd demo-project/demo-3-mcp/mcp-server
 mvn clean package
 java -jar target/casino-dice-roller.jar
 cd ../solution
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh          # Linux / macOS
+target\server\bin\standalone.bat           # Windows
 # -> http://localhost:8080/demo-3/
 ```
 
@@ -273,7 +279,10 @@ curl http://localhost:11434/api/tags
 # Lancer les slides : ouvrir slides/index.html dans le navigateur
 
 # Lancer une démo (remplacer N et le module)
-cd demo-project/demo-N-xxx/solution && mvn clean wildfly:dev
+cd demo-project/demo-N-xxx/solution
+mvn clean install
+./target/server/bin/standalone.sh    # Linux / macOS
+target\server\bin\standalone.bat     # Windows
 
 # Tester un endpoint de chat
 curl -X POST -H "Content-Type: text/plain" -d "Hello" http://localhost:8080/demo-1/api/chat

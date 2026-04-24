@@ -65,10 +65,12 @@ demo-1-ai-agent/
 
 ```bash
 cd demo-project/demo-1-ai-agent/base    # or solution/
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh   # Linux / macOS
+target\server\bin\standalone.bat    # Windows
 ```
 
-WildFly self-provisions via Galleon. The app is at **http://localhost:8080/demo-1/**
+WildFly is provisioned via Galleon during `mvn clean install`. The app is at **http://localhost:8080/demo-1/**
 
 The chat UI is directly accessible — no curl needed to demo!
 
@@ -226,7 +228,7 @@ dev.langchain4j.cdi.plugin.vision-model.config.model-name=pixtral-large-latest
 - **Ollama not responding**: `curl http://localhost:11434/api/tags`
 - **Port 8080 in use**: `lsof -i :8080`
 - **Model not found**: `ollama pull ministral-3:3b`
-- **Run the solution directly**: `cd solution && mvn clean wildfly:dev`
+- **Run the solution directly**: `cd solution && mvn clean install` then `./target/server/bin/standalone.sh` (Linux/macOS) or `target\server\bin\standalone.bat` (Windows)
 
 ## Resources
 

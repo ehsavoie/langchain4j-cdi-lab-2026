@@ -24,10 +24,12 @@ Produit `target/demo-3-mcp-dice-server.jar`.
 
 ```bash
 cd ../solution/
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh   # Linux / macOS
+target\server\bin\standalone.bat    # Windows
 ```
 
-WildFly se provisionne automatiquement via Galleon (première exécution ~2 minutes).
+WildFly est provisionné via Galleon lors de `mvn clean install` (première exécution ~2 minutes).
 
 ### 4. Jouer au Hnefatafl !
 

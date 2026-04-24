@@ -87,6 +87,10 @@
                 <artifactId>wildfly-maven-plugin</artifactId>
                 <configuration>
                     <name>demo-2.war</name>
+                    <discover-provisioning-info>
+                        <failsOnError>false</failsOnError>
+                        <suggest>true</suggest>
+                    </discover-provisioning-info>
                     <packagingScripts>
                         <packaging-script>
                             <scripts>
@@ -94,12 +98,14 @@
                             </scripts>
                         </packaging-script>
                     </packagingScripts>
-                    <layers>
-                        <layer>jaxrs-server</layer>
-                        <layer>microprofile-fault-tolerance</layer>
-                        <layer>microprofile-telemetry</layer>
-                    </layers>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

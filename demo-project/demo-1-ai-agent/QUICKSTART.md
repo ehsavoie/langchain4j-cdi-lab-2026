@@ -17,10 +17,12 @@ ollama serve
 
 ```bash
 cd demo-1-ai-agent/solution/
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh   # Linux / macOS
+target\server\bin\standalone.bat    # Windows
 ```
 
-WildFly self-provisions via Galleon (first run takes ~2 minutes).
+WildFly is provisioned via Galleon during `mvn clean install` (first run takes ~2 minutes).
 
 ### 3. Test the application
 

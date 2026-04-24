@@ -18,7 +18,9 @@ Leave this terminal open. Wait for the logs indicating Grafana is ready (about 1
 
 ```bash
 cd demo-2-ft-telemetry/solution/
-mvn clean wildfly:dev
+mvn clean install
+./target/server/bin/standalone.sh   # Linux / macOS
+target\server\bin\standalone.bat    # Windows
 ```
 
 ### 3. Test the application

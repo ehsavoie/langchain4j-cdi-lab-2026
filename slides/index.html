@@ -1286,14 +1286,14 @@ podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 \
         Démo 2 ! C'est là que tout se réunit -- un assistant d'expédition Viking complet avec toutes les fonctionnalités.
 
         CHECKLIST DEMO :
-        1. cd demo-project/demo-2-ft-telemetry/base && mvn clean wildfly:dev
+        1. cd demo-project/demo-2-ft-telemetry/base && mvn clean install && ./target/server/bin/standalone.sh
         2. Montrer que Memory + RAG + Tools marchent déjà
         3. Test : curl -X POST -H "Content-Type: text/plain" -H "X-Session-Id: test" -d "What does the LangChain4j-CDI session cover?" http://localhost:8080/demo-2/api/chat
         4. Ajouter les annotations FT en live : @Retry, @Timeout, @Fallback, @CircuitBreaker
         5. Hot-reload, tuer Ollama, montrer le fallback
         6. Redémarrer Ollama, montrer le retry
 
-        SECOURS : cd demo-2-ft-telemetry/solution && mvn clean wildfly:dev
+        SECOURS : cd demo-2-ft-telemetry/solution && mvn clean install && ./target/server/bin/standalone.sh
     </aside>
 </section>
 
@@ -1704,7 +1704,7 @@ public class FrenchInputGuardrail implements InputGuardrail {
         4. @RegisterAIService avec inputGuardrailNames et outputGuardrailNames
 
         CHECKLIST DEMO :
-        1. cd demo-project/demo-4-guardrails/base && mvn clean wildfly:dev
+        1. cd demo-project/demo-4-guardrails/base && mvn clean install && ./target/server/bin/standalone.sh
         2. Ouvrir index.html du navigateur (localhost:8080/demo-4)
         3. Tester sans guardrails : envoyer "Sing me a Viking song" → ça passe (skald en anglais ?)
         4. Ajouter @Named("french-input") sur FrenchInputGuardrail
@@ -1715,7 +1715,7 @@ public class FrenchInputGuardrail implements InputGuardrail {
         9. Tester avec "Compose un chant sur les nains vikings" → rejeté !
         10. Tester avec "Compose un chant sur la gloire d'Odin" → accepté !
 
-        SECOURS : cd demo-4-guardrails/solution && mvn clean wildfly:dev
+        SECOURS : cd demo-4-guardrails/solution && mvn clean install && ./target/server/bin/standalone.sh
     </aside>
 </section>
 
@@ -1919,9 +1919,9 @@ StyledWriter pipeline = AgenticServices
         On a trois services WildFly indépendants. Le Creative Writer (skald) forge une saga. Le Style Scorer (juge skald) l'évalue. L'orchestrateur câble tout avec LangChain4j Agentic : une séquence (writer puis review) et une boucle (scorer + editor local).
 
         CHECKLIST DEMO :
-        1. Démarrer le Creative Writer : cd demo-5-a2a/solution/a2a-creative-writer && mvn clean wildfly:dev
-        2. Démarrer le Style Scorer (port 8081) : cd a2a-style-scorer && mvn clean wildfly:dev -Djboss.socket.binding.port-offset=1
-        3. Démarrer l'Orchestrateur (port 8082) : cd a2a-orchestrator && mvn clean wildfly:dev -Djboss.socket.binding.port-offset=2
+        1. Démarrer le Creative Writer : cd demo-5-a2a/solution/a2a-creative-writer && mvn clean install && ./target/server/bin/standalone.sh
+        2. Démarrer le Style Scorer (port 8081) : cd a2a-style-scorer && mvn clean install && ./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=1
+        3. Démarrer l'Orchestrateur (port 8082) : cd a2a-orchestrator && mvn clean install && ./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=2
         4. Ouvrir http://localhost:8082 — l'interface Story Forge
         5. Saisir topic="dragons and wizards", style="comedy"
         6. Observer la boucle de révision dans les logs
