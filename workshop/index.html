@@ -1326,17 +1326,22 @@ assistant.chat("yann", "Bonjour !");</code></pre>
         <span class="step-number">1</span>
         <span class="step-title">Créer l'interface du service IA</span>
     </div>
-    <p>Ouvrez <code>ChatAssistant.java</code>. C'est une interface Java simple. Votre tâche : la transformer en agent IA injectable.</p>
+    <p>Ouvrez <code>ChatAssistant.java</code>. C'est une interface Java simple avec deux TODOs. Votre tâche : la transformer en agent IA injectable.</p>
 
-    <h4>Ajouter @RegisterAIService</h4>
-    <pre><code>@RegisterAIService(chatModelName = "my-model")
+    <h4>TODO 1 — Décommenter l'import</h4>
+    <pre><code>import dev.langchain4j.cdi.spi.RegisterAIService;</code></pre>
+
+    <h4>TODO 2 — Ajouter @RegisterAIService sur l'interface</h4>
+    <pre><code>@SuppressWarnings("CdiManagedBeanInconsistencyInspection")
+@RegisterAIService(chatModelName = "my-model")
 public interface ChatAssistant {
 
     @SystemMessage("""
-        You are a Viking skald (bard) entertaining warriors in a great hall.
-        You tell epic tales, sing heroic songs, compose witty verses about
-        battles, voyages, and the glorious chaos of Viking life.
-        Your style is bold, dramatic, and full of Norse spirit.
+        Tu es un skald viking qui raconte des blagues et des histoires drôles dans la grande salle.
+        Tes blagues portent sur les guerriers maladroits, les raids qui tournent mal,
+        les festins trop arrosés, les dieux nordiques et leurs facéties.
+        Tes blagues sont courtes, percutantes et font rire tout le monde.
+        Tu peux aussi raconter des anecdotes humoristiques sur la vie des vikings.
         """)
     String chat(@UserMessage String userMessage);
 }</code></pre>
@@ -1360,14 +1365,29 @@ public interface ChatAssistant {
         <span class="step-number">2</span>
         <span class="step-title">Câbler le point d'accès REST</span>
     </div>
-    <p>Ouvrez <code>ChatResource.java</code>. Injectez le service IA et appelez-le :</p>
+    <p>Ouvrez <code>ChatResource.java</code>. Il contient une méthode <code>@PostConstruct init()</code> qui instancie manuellement les modèles et les services IA — c'est exactement ce que CDI remplace. Votre tâche : supprimer ce boilerplate et le remplacer par de l'injection.</p>
 
-    <pre><code>@Path("/chat")
+    <h4>TODO 1 — Supprimer les 4 imports inutiles en haut du fichier</h4>
+    <pre><code>// Supprimer ces 4 imports :
+import dev.langchain4j.model.mistralai.MistralAiChatModel;
+import dev.langchain4j.model.mistralai.MistralAiStreamingChatModel;
+import dev.langchain4j.service.AiServices;
+import jakarta.annotation.PostConstruct;</code></pre>
+
+    <h4>TODO 2 — Décommenter l'import CDI et remplacer les champs + @PostConstruct</h4>
+    <pre><code>import jakarta.inject.Inject;
+
+@Path("/chat")
 @ApplicationScoped
 public class ChatResource {
 
     @Inject
-    ChatAssistant assistant;  // CDI injection!
+    ChatAssistant assistant;
+
+    @Inject
+    ChatAssistantStreaming streamingAssistant;
+
+    // Supprimer toute la méthode @PostConstruct init() ci-dessous
 
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
@@ -1375,6 +1395,8 @@ public class ChatResource {
     public String chat(String message) {
         return assistant.chat(message);
     }
+
+    // Le point d'accès /stream est déjà implémenté, rien à modifier ici.
 }</code></pre>
 
     <div class="callout success">
@@ -1391,14 +1413,21 @@ public class ChatResource {
         <span class="step-number">3</span>
         <span class="step-title">Configurer le modèle</span>
     </div>
-    <p>Ouvrez <code>src/main/resources/META-INF/microprofile-config.properties</code> et décommentez/ajoutez la configuration du modèle :</p>
+    <p>Ouvrez <code>src/main/resources/META-INF/microprofile-config.properties</code>. La configuration est déjà prête &mdash; vérifiez simplement que le bon fournisseur est actif.</p>
 
-    <pre><code># Chat model (Mistral AI)
-dev.langchain4j.cdi.plugin.my-model.class=\
-    dev.langchain4j.model.mistralai.MistralAiChatModel
+    <p>Par défaut, <strong>l'Option A (Mistral AI) est déjà décommentée</strong> :</p>
+    <pre><code># ---- Option A : Mistral AI (distant) ---- [ACTIVE PAR DÉFAUT]
+dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.mistralai.MistralAiChatModel
 dev.langchain4j.cdi.plugin.my-model.config.api-key=${MISTRAL_API_KEY}
 dev.langchain4j.cdi.plugin.my-model.config.model-name=mistral-small-latest
-dev.langchain4j.cdi.plugin.my-model.config.temperature=0.9</code></pre>
+
+# ---- Option B : Ollama (local) ---- [commenté par défaut]
+#dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.ollama.OllamaChatModel
+#dev.langchain4j.cdi.plugin.my-model.config.base-url=http://localhost:11434
+#dev.langchain4j.cdi.plugin.my-model.config.model-name=ministral-3:3b
+
+dev.langchain4j.cdi.plugin.my-model.config.temperature=0.9
+dev.langchain4j.cdi.plugin.my-model.config.log-requests=true</code></pre>
 
     <div class="callout tip">
         <div class="callout-title">🏠 Ollama local</div>
@@ -1416,7 +1445,7 @@ dev.langchain4j.cdi.plugin.my-model.config.temperature=0.9</code></pre>
 target\server\bin\standalone.bat           # Windows</code></pre>
     <pre><code># Dans un autre terminal :
 curl -X POST -H "Content-Type: text/plain" \
-  -d "Tell me a saga about Java developers on a Viking voyage" \
+  -d "Raconte-moi une blague viking !" \
   http://localhost:8080/demo-1/api/chat</code></pre>
 </div>
 </section>
@@ -1428,51 +1457,45 @@ curl -X POST -H "Content-Type: text/plain" \
         <span class="step-number">4</span>
         <span class="step-title">Ajouter les réponses en streaming</span>
     </div>
-    <p>Ouvrez <code>ChatAssistantStreaming.java</code> et créez un service IA en streaming :</p>
+    <p>Ouvrez <code>ChatAssistantStreaming.java</code>. Comme pour <code>ChatAssistant</code>, elle a deux TODOs :</p>
 
-    <pre><code>@RegisterAIService(streamingChatModelName = "my-streaming-model")
+    <h4>TODO 1 — Décommenter l'import</h4>
+    <pre><code>import dev.langchain4j.cdi.spi.RegisterAIService;</code></pre>
+
+    <h4>TODO 2 — Ajouter @RegisterAIService sur l'interface</h4>
+    <pre><code>@SuppressWarnings("CdiManagedBeanInconsistencyInspection")
+@RegisterAIService(streamingChatModelName = "my-streaming-model")
 public interface ChatAssistantStreaming {
 
-    @SystemMessage("You are a Viking storyteller in a great hall...")
+    @SystemMessage("""
+        Tu es un skald viking, un conteur et poète de la grande salle.
+        Tu chantes des récits épiques sur les batailles glorieuses, les raids audacieux,
+        la bravoure des guerriers, les voyages en drakkar et la route vers le Valhalla.
+        Tes chants sont rythmés, héroïques et pleins d'honneur.
+        """)
     TokenStream chatStream(@UserMessage String userMessage);
 }</code></pre>
 
-    <p>Puis dans <code>ChatResource.java</code>, ajoutez le point d'accès SSE :</p>
+    <div class="callout info">
+        <div class="callout-title">&#128161; Le point d'accès SSE est déjà là</div>
+        <p>Dans <code>ChatResource.java</code>, le point d'accès <code>GET /stream</code> est <strong>déjà implémenté</strong>. Il sera fonctionnel dès que l'injection <code>streamingAssistant</code> sera en place (étape 2). Rien d'autre à modifier ici.</p>
+    </div>
 
-    <pre><code>@Inject
-ChatAssistantStreaming streamingAssistant;
+    <p>La configuration du modèle streaming est également déjà présente dans <code>microprofile-config.properties</code> &mdash; vérifiez que le bon fournisseur est actif (Option A ou B) :</p>
 
-@GET
-@Path("/stream")
-@Produces(MediaType.SERVER_SENT_EVENTS)
-public void chatStream(@QueryParam("message") String message,
-                       @Context SseEventSink sink, @Context Sse sse) {
-    TokenStream tokenStream = streamingAssistant.chatStream(message);
-
-    tokenStream
-        .onPartialResponse(token ->
-            sink.send(sse.newEvent("token", token)))
-        .onCompleteResponse(resp -> {
-            sink.send(sse.newEvent("done", ""));
-            sink.close();
-        })
-        .onError(error -> {
-            sink.send(sse.newEvent("error", error.getMessage()));
-            sink.close();
-        })
-        .start();
-}</code></pre>
-
-    <p>Ajoutez la configuration du modèle streaming dans <code>microprofile-config.properties</code> :</p>
-
-    <pre><code>dev.langchain4j.cdi.plugin.my-streaming-model.class=\
-    dev.langchain4j.model.mistralai.MistralAiStreamingChatModel
+    <pre><code># ---- Option A : Mistral AI (distant) ---- [ACTIVE PAR DÉFAUT]
+dev.langchain4j.cdi.plugin.my-streaming-model.class=dev.langchain4j.model.mistralai.MistralAiStreamingChatModel
 dev.langchain4j.cdi.plugin.my-streaming-model.config.api-key=${MISTRAL_API_KEY}
-dev.langchain4j.cdi.plugin.my-streaming-model.config.model-name=mistral-small-latest</code></pre>
+dev.langchain4j.cdi.plugin.my-streaming-model.config.model-name=mistral-small-latest
+
+# ---- Option B : Ollama (local) ----
+#dev.langchain4j.cdi.plugin.my-streaming-model.class=dev.langchain4j.model.ollama.OllamaStreamingChatModel
+#dev.langchain4j.cdi.plugin.my-streaming-model.config.base-url=http://localhost:11434
+#dev.langchain4j.cdi.plugin.my-streaming-model.config.model-name=ministral-3:3b</code></pre>
 
     <div class="callout tip">
         <div class="callout-title">🏠 Ollama local</div>
-        <p>Même principe : commentez l'<strong>Option A</strong> du streaming model et décommentez l'<strong>Option B</strong> dans <code>microprofile-config.properties</code>.</p>
+        <p>Commentez l'<strong>Option A</strong> du streaming model et décommentez l'<strong>Option B</strong> dans <code>microprofile-config.properties</code>.</p>
     </div>
 </div>
 </section>
@@ -1500,7 +1523,7 @@ public class ImageAnalyzerServlet extends HttpServlet {
         Part file = request.getPart("file");
 
         UserMessage userMessage = UserMessage.from(
-            TextContent.from("Describe this image in detail"),
+            TextContent.from("Décris cette image en détails."),
             ImageContent.from(encodeBase64(file.getInputStream()),
                             file.getContentType())
         );
@@ -1534,7 +1557,7 @@ dev.langchain4j.cdi.plugin.vision-model.config.model-name=pixtral-large-latest</
 
     <pre><code># Chat standard
 curl -X POST -H "Content-Type: text/plain" \
-  -d "What is CDI in 2 sentences?" \
+  -d "Raconte-moi une blague viking !" \
   http://localhost:8080/demo-1/api/chat
 
 # Streaming (ouvrir dans le navigateur)
