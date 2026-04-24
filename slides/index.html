@@ -489,6 +489,84 @@ String response = assistant.chat("Book me a table");
     </aside>
 </section>
 
+<!-- Slide 7bis: Spring AI vs LangChain4j-CDI -->
+<section>
+    <span class="speaker-tag speaker-both">Les deux</span>
+    <h2>Spring AI vs LangChain4j-CDI</h2>
+    <p class="medium" style="margin-bottom: 0.5em;">
+        Même puissance. <span class="accent">ADN différent.</span>
+    </p>
+    <div class="two-col" style="font-size: 0.65em;">
+        <div class="box">
+            <h3 style="color: #6db33f;">☘ Spring AI / Spring Boot 3.x</h3>
+            <pre><code class="language-java" data-trim>
+// Configuration bean
+@Configuration
+public class AssistantConfig {
+    @Bean
+    ChatClient chatClient(
+            ChatClient.Builder b,
+            VectorStore vs, ChatMemory mem) {
+        return b.defaultSystem("You are helpful")
+            .defaultAdvisors(
+                new QuestionAnswerAdvisor(vs),
+                new MessageChatMemoryAdvisor(mem))
+            .defaultTools(new WeatherTools())
+            .build();
+    }
+}
+// Service that uses it
+@Service
+public class AssistantService {
+    private final ChatClient client;
+    String chat(String user, String msg) {
+        return client.prompt().user(msg)
+            .advisors(a -> a.param(CONV_ID, user))
+            .call().content();
+    }
+}
+            </code></pre>
+            <p class="small" style="color: #999;">~25 lignes · 2 classes · 1 builder chain</p>
+        </div>
+        <div class="box box-blue">
+            <h3>◆ LangChain4j-CDI / Jakarta EE</h3>
+            <pre><code class="language-java" data-trim>
+// That's it. One interface.
+@RegisterAIService(
+    chatMemoryProviderSupplier
+        = MemoryProvider.class,
+    tools = WeatherTools.class,
+    retrievalAugmentor = RagAugmentor.class)
+public interface Assistant {
+
+    @SystemMessage("You are helpful")
+    String chat(@MemoryId String user,
+                @UserMessage String msg);
+}
+
+// Inject anywhere. Done.
+@Inject
+Assistant assistant;
+assistant.chat("yann", "Bonjour !");
+            </code></pre>
+            <p class="small" style="color: var(--accent-green);">~10 lignes · 1 interface · 0 passe-partout</p>
+        </div>
+    </div>
+    <p class="fragment medium" style="margin-top: 0.4em;">
+        <span class="accent">Déclaratif. Injectable. Portable.</span>
+        <span class="small" style="color: #999;"> — Juste CDI qui fait ce que CDI fait de mieux.</span>
+    </p>
+    <aside class="notes">
+        Petite comparaison pour ceux qui viendraient du monde Spring Boot.
+
+        Spring AI est un excellent framework dans son écosystème. Mais vous remarquerez qu'il faut quand même configurer manuellement le ChatClient, câbler les advisors et les outils dans un @Configuration. Ça reste du code de plomberie -- élégant, mais du code.
+
+        Avec LangChain4j-CDI : une interface, quelques annotations, un @Inject. CDI fait tout le reste.
+
+        Le message : "Même puissance, ADN différent." Si vous vivez dans Jakarta EE, langchain4j-cdi va se sentir naturel -- comme un EntityManager, comme un client REST. Vous ne sortez pas de votre monde.
+    </aside>
+</section>
+
 <!-- Slide 8: Humour - Injection -->
 <section class="joke-slide">
     <p class="emoji-big">💉</p>

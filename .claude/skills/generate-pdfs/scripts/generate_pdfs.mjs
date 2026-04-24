@@ -17,7 +17,7 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PROJECT_ROOT = resolve(__dirname, '../../..');
+const PROJECT_ROOT = resolve(__dirname, '../../../..');
 
 // Locate puppeteer: try local /tmp install first, then global
 async function loadPuppeteer() {
@@ -41,7 +41,10 @@ function generateReadme() {
   const src = resolve(PROJECT_ROOT, 'README.md');
   const out = resolve(PROJECT_ROOT, 'README.pdf');
   console.log('Generating README.pdf...');
-  execSync(`npx md-to-pdf "${src}" --dest "${out}"`, { stdio: 'inherit' });
+  execSync(
+    `npx md-to-pdf "${src}" --launch-options '{"executablePath":"/usr/bin/google-chrome","args":["--no-sandbox","--disable-setuid-sandbox"]}'`,
+    { stdio: 'inherit' }
+  );
   console.log(`  → ${out}`);
 }
 
@@ -54,6 +57,7 @@ async function generateHtmlPage(puppeteer, { htmlFile, outputFile, label }) {
 
   const browser = await puppeteer.launch({
     headless: true,
+    executablePath: '/usr/bin/google-chrome',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
@@ -103,15 +107,16 @@ async function generateHtmlPage(puppeteer, { htmlFile, outputFile, label }) {
   }
 }
 
-// ── Slides (Reveal.js) ────────────────────────────────────────────────────────
+// ── Reveal.js presentation (slides / introduction) ────────────────────────────
 
-async function generateSlides(puppeteer) {
-  const src = resolve(PROJECT_ROOT, 'slides', 'index.html');
-  const out = resolve(PROJECT_ROOT, 'slides.pdf');
-  console.log('Generating slides.pdf...');
+async function generateRevealDeck(puppeteer, { htmlFile, outputFile }) {
+  const src = resolve(PROJECT_ROOT, htmlFile);
+  const out = resolve(PROJECT_ROOT, outputFile);
+  console.log(`Generating ${outputFile}...`);
 
   const browser = await puppeteer.launch({
     headless: true,
+    executablePath: '/usr/bin/google-chrome',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
@@ -138,7 +143,7 @@ async function generateSlides(puppeteer) {
       });
     });
 
-    // ?print-pdf activates Reveal.js print layout
+    // ?print-pdf activates Reveal.js print layout with full-bleed backgrounds
     await page.goto(`file://${src}?print-pdf`, {
       waitUntil: 'networkidle0',
       timeout: 60000,
@@ -193,15 +198,17 @@ if (needsPuppeteer) {
   }
 
   if (doIntroduction) {
-    await generateHtmlPage(puppeteer, {
+    await generateRevealDeck(puppeteer, {
       htmlFile: 'introduction/index.html',
       outputFile: 'introduction.pdf',
-      label: 'introduction',
     });
   }
 
   if (doSlides) {
-    await generateSlides(puppeteer);
+    await generateRevealDeck(puppeteer, {
+      htmlFile: 'slides/index.html',
+      outputFile: 'slides.pdf',
+    });
   }
 }
 

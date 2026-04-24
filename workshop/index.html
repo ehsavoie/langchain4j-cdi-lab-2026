@@ -713,6 +713,9 @@
         <a href="#architecture" class="sidebar-link">
             <span class="icon">&#127959;</span> Architecture
         </a>
+        <a href="#spring-ai-vs-lc4j" class="sidebar-link">
+            <span class="icon">&#9878;</span> Spring AI vs LangChain4j-CDI
+        </a>
     </div>
 
     <div class="sidebar-section">
@@ -1150,6 +1153,75 @@ public interface Assistant {
 Assistant assistant;</code></pre>
     </div>
 </div>
+
+<h3 id="spring-ai-vs-lc4j" class="section-anchor">LangChain4j-CDI vs Spring AI</h3>
+
+<p>Si vous venez du monde Spring, vous connaissez peut-être <strong>Spring AI</strong>. Les deux frameworks offrent des capacités similaires — voici comment ils se comparent en termes de style d'API :</p>
+
+<div class="callout info">
+    <div class="callout-title">&#9874; Même puissance. ADN différent.</div>
+    <p>Spring AI est excellent dans son écosystème. LangChain4j-CDI fait le même travail avec l'idiome Jakarta EE : déclaratif, injectable, portable.</p>
+</div>
+
+<div class="compare-grid">
+    <div class="compare-box">
+        <h4 style="color: #6db33f;">☘ Spring AI / Spring Boot 3.x</h4>
+        <pre><code>// Configuration bean
+@Configuration
+public class AssistantConfig {
+    @Bean
+    ChatClient chatClient(
+            ChatClient.Builder b,
+            VectorStore vs,
+            ChatMemory mem) {
+        return b
+            .defaultSystem("You are helpful")
+            .defaultAdvisors(
+                new QuestionAnswerAdvisor(vs),
+                new MessageChatMemoryAdvisor(mem))
+            .defaultTools(new WeatherTools())
+            .build();
+    }
+}
+
+// Service that uses it
+@Service
+public class AssistantService {
+    private final ChatClient client;
+
+    String chat(String user, String msg) {
+        return client.prompt().user(msg)
+            .advisors(a -> a.param(CONV_ID, user))
+            .call().content();
+    }
+}</code></pre>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">~25 lignes · 2 classes · 1 builder chain</p>
+    </div>
+    <div class="compare-box" style="border-color: var(--accent-blue);">
+        <h4 style="color: var(--accent-blue);">◆ LangChain4j-CDI / Jakarta EE</h4>
+        <pre><code>// That's it. One interface.
+@RegisterAIService(
+    chatMemoryProviderSupplier
+        = MemoryProvider.class,
+    tools = WeatherTools.class,
+    retrievalAugmentor = RagAugmentor.class)
+public interface Assistant {
+
+    @SystemMessage("You are helpful")
+    String chat(
+        @MemoryId String user,
+        @UserMessage String msg);
+}
+
+// Inject anywhere. Done.
+@Inject
+Assistant assistant;
+assistant.chat("yann", "Bonjour !");</code></pre>
+        <p style="font-size: 0.8rem; color: var(--accent-green); margin-top: 0.5rem;">~10 lignes · 1 interface · 0 passe-partout</p>
+    </div>
+</div>
+
+<p>Les deux approches sont valides. La différence : avec LangChain4j-CDI, il n'y a pas de code de configuration à écrire. CDI découvre l'interface, crée le bean synthétique, résout les dépendances — tout en convention over configuration.</p>
 
 <h3>Double support d'extension CDI</h3>
 

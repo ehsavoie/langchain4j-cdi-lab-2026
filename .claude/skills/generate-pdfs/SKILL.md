@@ -25,12 +25,16 @@ Output files land in the project root directory.
 
 ## Prerequisites
 
-Puppeteer must be available. Install once if missing:
+**Chrome** must be installed (used by both `md-to-pdf` and Puppeteer):
+- Expected at `/usr/bin/google-chrome` (already present on this machine)
+
+**Puppeteer** must be installed at `/tmp`. Install once if missing:
 
 ```bash
-cd /tmp && npm install puppeteer
+cd /tmp && PUPPETEER_SKIP_DOWNLOAD=true npm install puppeteer
 ```
 
+`PUPPETEER_SKIP_DOWNLOAD=true` skips downloading a bundled Chrome (we use the system one).
 The script auto-detects puppeteer at `/tmp/node_modules/puppeteer` and falls back
 to trying a global import.
 
@@ -38,8 +42,8 @@ to trying a global import.
 
 ### README → PDF (`npx md-to-pdf`)
 
-Simple Markdown-to-PDF via `md-to-pdf`. No browser needed.
-CSS is embedded directly in the generated HTML for clean typography.
+Simple Markdown-to-PDF via `md-to-pdf`. Uses the system Chrome (passed via `--launch-options`).
+The output PDF is written to the same directory as the source file (project root for README.md).
 
 ### Workshop / Introduction HTML → PDF (Puppeteer)
 
