@@ -1,28 +1,33 @@
 # Démo 3 - Hnefatafl au Grand Thing avec MCP
 
-Troisième démo pour Devoxx France : jouez au **Hnefatafl** (jeu de pierres runiques nordique) contre une IA qui utilise le protocole **MCP** pour gérer les lancers sur WildFly.
+Troisième démo pour Devoxx France : jouez au **Hnefatafl** (jeu de pierres runiques nordique) contre une IA qui utilise le protocole **MCP** (Model Context Protocol) pour gérer les lancers de dés sur WildFly.
 
 ## Vue d'ensemble
 
-1. Un **serveur MCP autonome** expose un outil de lancer de dés (`roll` pour 2d6)
-2. Un **agent IA Jarl** (Ragnar le Skald) se connecte à ce serveur via `McpToolProvider`
-3. L'agent anime une partie de Hnefatafl : lance les runes via MCP, applique les règles, et annonce le destin du guerrier
+1. Un **serveur MCP autonome** (`mcp-server/`) expose un outil de lancer de dés (`roll` pour 2d6) via Streamable HTTP
+2. Un **agent IA Jarl** (`HnefataflJarlAI`) se connecte à ce serveur via `McpToolProvider`
+3. L'agent incarne Ragnar le Skald au Grand Thing : il lance les runes via MCP, applique les règles du Hnefatafl, et annonce le destin du guerrier
 4. Une **interface web thème viking** permet de jouer en temps réel
 
-**MCP pour le jeu** : Vos agents Jakarta EE peuvent piloter des mécaniques de jeu externes via des outils standardisés !
+**Message clé** : « MCP est le JDBC de l'IA — vos agents Jakarta EE communiquent avec n'importe quel serveur d'outils externe »
 
 ## Prérequis
 
 - **Java 21+**, **Maven 3.8+**
-- **Ollama** avec `ministral-3:3b` :
-  ```bash
-  ollama pull ministral-3:3b
-  ollama serve
-  ```
+- **Ollama** (local) ou une **clé API Mistral AI** (distant)
+
+```bash
+# Option A : Ollama (local)
+ollama pull ministral-3:3b
+ollama serve
+
+# Option B : Mistral AI (distant)
+export MISTRAL_API_KEY=your-key-here
+```
 
 ## Règles du Hnefatafl (lancer de pierres runiques)
 
-Le **Hnefatafl** utilise 2 pierres runiques à six faces :
+Le **Hnefatafl** utilise 2 pierres runiques à six faces (2d6) :
 
 **Lancer d'ouverture (premier lancer d'un tour) :**
 - **7 ou 11** : Faveur d'Odin — le guerrier **GAGNE** immédiatement !
@@ -39,85 +44,121 @@ Le **Hnefatafl** utilise 2 pierres runiques à six faces :
 
 ```
 demo-3-mcp/
-├── pom.xml                          # POM agrégateur
-├── mcp-server/                      # Serveur MCP de lancer de dés (JAR)
+├── pom.xml                               # POM agrégateur
+├── mcp-server/                           # Serveur MCP de lancer de dés (JAR autonome)
+│   ├── pom.xml                           # Helidon 4 + langchain4j-cdi-mcp-server
 │   └── src/main/java/org/acme/
-│       └── DiceRoller.java          # Outil MCP : lance N dés à 6 faces
-├── base/                            # Base pour le live coding
+│       └── DiceRoller.java               # @Tool: roll(numberOfDice) → résultats des dés
+│
+├── base/                                 # Squelette pour le live coding
+│   ├── pom.xml
 │   ├── src/main/java/com/example/demo3/
 │   │   ├── JaxRsActivator.java
-│   │   ├── CasinoDealerAI.java      # TODO : @RegisterAIService (Jarl du Thing)
-│   │   └── GameResource.java        # TODO : @Inject + appel
+│   │   ├── HnefataflJarlAI.java          # TODO: @RegisterAIService + @SystemMessage
+│   │   └── GameResource.java             # TODO: @Inject + appeler l'agent
 │   └── src/main/webapp/
 │       ├── WEB-INF/beans.xml
-│       └── index.html               # Interface viking (prête !)
-└── solution/                        # Solution complète
+│       └── index.html                    # Interface viking (prête !)
+│
+└── solution/                             # Implémentation de référence complète
+    ├── pom.xml
     ├── src/main/java/com/example/demo3/
-    │   ├── CasinoDealerAI.java      # Complet (Ragnar le Skald, Jarl)
-    │   ├── ChatMemoryProviderBean.java
-    │   ├── LastDiceRollChatMemory.java
-    │   └── GameResource.java        # Complet
+    │   ├── HnefataflJarlAI.java          # Complet : Ragnar le Skald, toutes les règles
+    │   ├── ChatMemoryProviderBean.java   # Mémoire de session
+    │   ├── LastDiceRollChatMemory.java   # Suivi de la rune marquée
+    │   └── GameResource.java             # Complet
     └── src/main/webapp/
         ├── WEB-INF/beans.xml
-        └── index.html               # Interface viking
+        └── index.html                    # Interface viking
 ```
 
 ## Démarrage
 
-### Option 1 : Démarrage rapide avec wildfly:dev (recommandé pour le live coding)
+### Étape 1 : Compiler le serveur MCP de dés
 
 ```bash
-# 1. Compiler le serveur MCP de dés
-cd demo-3-mcp/mcp-server
+cd demo-project/demo-3-mcp/mcp-server
 mvn clean package
+```
 
-# 2. Lancer l'application avec hot reload (base ou solution)
-cd ../base    # ou ../solution
+Cela produit `target/casino-dice-roller.jar`. Le serveur expose l'outil `roll` en Streamable HTTP sur le port 8090.
+
+Le serveur démarre automatiquement avec WildFly via le plugin Maven. Alternativement, lancez-le manuellement :
+
+```bash
+java -jar target/casino-dice-roller.jar
+```
+
+### Étape 2 : Lancer l'application WildFly
+
+```bash
+cd demo-project/demo-3-mcp/base    # ou solution/
 mvn clean wildfly:dev
 ```
 
-L'application est disponible sur **http://localhost:8080/demo-3/** avec l'interface viking.
-
-### Option 2 : Build complet avec serveur provisionné
-
-```bash
-# 1. Builder l'ensemble (serveur MCP + WAR avec WildFly provisionné)
-cd demo-3-mcp/solution  # ou base
-mvn clean install
-
-# 2. Démarrer le serveur WildFly provisionné
-./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=10
-```
-
-L'application est alors disponible sur **http://localhost:8090/** (port 8080 + décalage 10).
+L'application est disponible sur **http://localhost:8080/demo-3/**
 
 ### Vérification
 
 ```bash
-# Vérification de santé
+# Santé de l'application
 curl http://localhost:8080/demo-3/api/game/health
-# ou avec décalage
-curl http://localhost:8090/api/game/health
+
+# Démarrer une partie directement
+curl http://localhost:8080/demo-3/api/game/start
 ```
 
 ## Guide du Live Coding
 
 ### Étape 1 : Comprendre le serveur MCP de dés
 
-Examiner `DiceRoller.java` : outil MCP qui lance N dés à 6 faces via stdio/JSON-RPC 2.0.
-
-L'outil principal :
-- `roll` : Lance N dés avec `{"numberOfDice": 2}`
-
-### Étape 2 : Annoter CasinoDealerAI (le Jarl du Thing)
+Examiner `DiceRoller.java` — un simple bean CDI annoté `@Tool` qui lance N dés via `java.util.Random` :
 
 ```java
+@ApplicationScoped
+public class DiceRoller {
+
+    @Tool(description = "Lance un nombre de dés et retourne les résultats")
+    public String roll(@ToolArg(description = "Le nombre de dés") int numberOfDice) {
+        int[] result = new int[numberOfDice];
+        for (int i = 0; i < numberOfDice; i++) {
+            result[i] = new Random().nextInt(1, 7);
+        }
+        return Arrays.toString(result);
+    }
+}
+```
+
+Le framework `langchain4j-cdi-mcp-server` expose cet outil en JSON-RPC 2.0 via Streamable HTTP — aucun serveur HTTP à écrire.
+
+### Étape 2 : Annoter HnefataflJarlAI
+
+Ouvrir `HnefataflJarlAI.java` et ajouter `@RegisterAIService` avec `toolProviderName = "mcp"` :
+
+```java
+import dev.langchain4j.cdi.spi.RegisterAIService;
+import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage;
+
 @RegisterAIService(chatModelName = "mistral", toolProviderName = "mcp")
-public interface CasinoDealerAI {
+public interface HnefataflJarlAI {
+
     @SystemMessage("""
-        Tu es Ragnar le Skald, le Jarl qui anime le Hnefatafl au Grand Thing...
-        [règles du Hnefatafl]
-        [format : RUNES: [X, Y] / TOTAL: [somme] / DESTIN: [résultat]]
+        Tu es Ragnar le Skald, le Jarl qui anime le Hnefatafl au Grand Thing des guerriers du Nord.
+
+        RÈGLES DU HNEFATAFL :
+        - Lance 2 pierres runiques avec roll(numberOfDice=2).
+        - Lancer d'ouverture : 7 ou 11 → Faveur d'Odin (GAGNE) !
+          2, 3 ou 12 → Malédiction des Nornes (PERD) !
+          Autre → ce total devient la Rune Marquée.
+        - Phase de la Rune : relance jusqu'à atteindre la Rune Marquée (GAGNE) ou un 7 (PERD).
+
+        FORMAT OBLIGATOIRE pour chaque lancer :
+        RUNES: [X, Y]
+        TOTAL: [somme]
+        DESTIN: [ce qui s'est passé]
+
+        Réponds en français, sois concis, expressions nordiques bienvenues !
         """)
     String play(@UserMessage String playerAction);
 }
@@ -125,23 +166,54 @@ public interface CasinoDealerAI {
 
 ### Étape 3 : Câbler le endpoint REST
 
+Ouvrir `GameResource.java` et injecter l'agent :
+
 ```java
-@Inject CasinoDealerAI gameMaster;
+@Inject
+HnefataflJarlAI gameMaster;
 
 @POST @Path("/play")
+@Consumes(MediaType.TEXT_PLAIN) @Produces(MediaType.TEXT_PLAIN)
 public String play(String playerAction) {
     return gameMaster.play(playerAction);
 }
+
+@GET @Path("/start")
+@Produces(MediaType.TEXT_PLAIN)
+public String start() {
+    return gameMaster.play("Salve ! Je suis prêt à jouer au Hnefatafl.");
+}
 ```
 
-### Étape 4 : Configurer et tester
+### Étape 4 : Configurer le modèle et le transport MCP
 
 Décommenter dans `microprofile-config.properties` :
+
 ```properties
-dev.langchain4j.cdi.plugin.mistral.class=dev.langchain4j.model.ollama.OllamaChatModel
-dev.langchain4j.cdi.plugin.mistral.config.base-url=http://localhost:11434
-dev.langchain4j.cdi.plugin.mistral.config.model-name=ministral-3:3b
+# Modèle IA (Option A : Mistral AI)
+dev.langchain4j.cdi.plugin.mistral.class=dev.langchain4j.model.mistralai.MistralAiChatModel
+dev.langchain4j.cdi.plugin.mistral.config.api-key=${MISTRAL_API_KEY}
+dev.langchain4j.cdi.plugin.mistral.config.model-name=mistral-small-latest
+
+# Modèle IA (Option B : Ollama)
+# dev.langchain4j.cdi.plugin.mistral.class=dev.langchain4j.model.ollama.OllamaChatModel
+# dev.langchain4j.cdi.plugin.mistral.config.base-url=http://localhost:11434
+# dev.langchain4j.cdi.plugin.mistral.config.model-name=ministral-3:3b
+
+# Transport MCP (Streamable HTTP → serveur de dés)
+dev.langchain4j.cdi.plugin.ssetransport.class=dev.langchain4j.mcp.client.transport.http.StreamableHttpMcpTransport
+dev.langchain4j.cdi.plugin.ssetransport.config.url=http://localhost:8090/mcp
+
+# Client MCP
+dev.langchain4j.cdi.plugin.mcpclient.class=dev.langchain4j.mcp.client.DefaultMcpClient
+dev.langchain4j.cdi.plugin.mcpclient.config.transport=lookup:@ssetransport
+
+# Tool Provider (nommé "mcp" pour @RegisterAIService)
+dev.langchain4j.cdi.plugin.mcp.class=dev.langchain4j.mcp.McpToolProvider
+dev.langchain4j.cdi.plugin.mcp.config.mcpClients=lookup:@mcpclient
 ```
+
+### Étape 5 : Jouer
 
 Ouvrir **http://localhost:8080/demo-3/** et jouer :
 
@@ -154,25 +226,24 @@ Ouvrir **http://localhost:8080/demo-3/** et jouer :
 - `Relance`
 - `Continue`
 
-## Flux d'Exécution (simplifié)
+## Flux d'Exécution
 
 ```
-Endpoint REST -> CasinoDealerAI.play()
-    -> Le LLM reçoit : "Lance les runes"
-    -> Le LLM décide d'utiliser roll(numberOfDice=2)
-    -> McpToolProvider -> JSON-RPC -> Serveur MCP de dés
-    -> Le serveur lance 2d6 et retourne [4, 3]
-    -> Le LLM reçoit le résultat brut
-    -> Le LLM affiche le FORMAT OBLIGATOIRE :
+Navigateur → GET /api/game/start
+  → HnefataflJarlAI.play("Salve ! Je suis prêt à jouer au Hnefatafl.")
+    → Le LLM décide d'appeler roll(numberOfDice=2)
+    → McpToolProvider → HTTP JSON-RPC → Serveur MCP (port 8090)
+    → Serveur lance 2d6, retourne [4, 3]
+    → Le LLM reçoit le résultat et rédige la réponse :
+
        RUNES: [4, 3]
        TOTAL: 7
        DESTIN: Faveur d'Odin ! Le guerrier gagne !
-    -> Réponse complète renvoyée au guerrier
+
+       Par les dieux du Nord, un 7 ! La victoire est tienne !
 ```
 
 ## Exemples d'Interaction
-
-### Exemple 1 : Faveur d'Odin
 
 **Guerrier :** `Lance les runes`
 
@@ -184,27 +255,14 @@ RUNES: [4, 3]
 TOTAL: 7
 DESTIN: Faveur d'Odin ! Le guerrier gagne !
 
-Par les dieux du Nord, un 7 ! La victoire est tienne !
+Par les dieux du Nord ! La victoire est tienne, guerrier !
 ```
 
-### Exemple 2 : Malédiction des Nornes
+---
 
 **Guerrier :** `Nouvelle partie`
 
 **Ragnar le Skald :**
-```
-RUNES: [1, 1]
-TOTAL: 2
-DESTIN: Yeux de serpent ! Malédiction des Nornes — le guerrier perd !
-
-Les Nornes n'ont pas été clémentes... Tente ta chance à nouveau !
-```
-
-### Exemple 3 : Rune marquée puis atteinte
-
-**Guerrier :** `Lance les runes`
-
-**Ragnar :**
 ```
 RUNES: [3, 5]
 TOTAL: 8
@@ -213,32 +271,33 @@ DESTIN: La rune marquée est 8. Continue de lancer, guerrier !
 
 **Guerrier :** `Relance`
 
-**Ragnar :**
+**Ragnar le Skald :**
 ```
 RUNES: [2, 6]
 TOTAL: 8
 DESTIN: Rune atteinte ! Le guerrier gagne !
 
-La rune t'a souri — tu es digne de Valhalla !
+La rune t'a souri — tu es digne du Valhalla !
 ```
 
-## Points Clés
+## Points Clés MCP
 
-1. **MCP pour le jeu** : Les mécaniques de jeu sont externalisées dans un serveur MCP
-2. **L'IA comme Jarl** : Le LLM lance les runes via MCP, applique les règles et annonce le destin
-3. **Séparation des responsabilités** : Le serveur MCP gère le hasard, l'IA gère la logique de jeu
-4. **Extensibilité** : Facile d'ajouter d'autres jeux de dés nordiques
+1. **Découplage** : le serveur de dés est un processus indépendant (autre JVM, autre langage possible) — `McpToolProvider` fait le pont
+2. **Protocole standard** : JSON-RPC 2.0 sur Streamable HTTP — n'importe quel serveur MCP compatible peut être branché
+3. **Configuration pure** : le transport, le client, et le tool provider sont tous enregistrés via MicroProfile Config — aucun code Java à écrire dans l'application WildFly
+4. **`lookup:@`** : le préfixe `lookup:@ssetransport` dans la config MCP indique à LangChain4j-CDI d'injecter le bean portant le nom `ssetransport`
 
 ## Résolution de Problèmes
 
-- **Le serveur MCP ne démarre pas** : Vérifier que le JAR est compilé (`cd mcp-server && mvn package`)
-- **L'agent ne répond pas** : Vérifier que `CasinoDealerAI` est annoté avec `@RegisterAIService`
-- **Les runes ne sont pas lancées** : Vérifier les logs WildFly pour les appels d'outils MCP
-- **Lancer la solution** : `cd solution && mvn clean wildfly:dev`
+- **Le serveur MCP ne démarre pas** : Vérifier que le JAR est compilé (`cd mcp-server && mvn clean package`)
+- **`Connection refused` sur port 8090** : Le serveur MCP n'est pas démarré — relancer `java -jar mcp-server/target/casino-dice-roller.jar`
+- **L'agent ne répond pas** : Vérifier que `HnefataflJarlAI` est annoté avec `@RegisterAIService`
+- **Les runes ne sont pas lancées** : Vérifier les logs WildFly pour les appels MCP (`logRequests=true` dans la config)
+- **Lancer la solution directement** : `cd solution && mvn clean wildfly:dev`
 
 ## Ressources
 
 - **Protocole MCP** : https://modelcontextprotocol.io
 - **LangChain4j-CDI** : https://github.com/langchain4j/langchain4j-cdi
-- **LangChain4j** : https://docs.langchain4j.dev
+- **LangChain4j MCP** : https://docs.langchain4j.dev/integrations/mcp
 - **WildFly** : https://www.wildfly.org

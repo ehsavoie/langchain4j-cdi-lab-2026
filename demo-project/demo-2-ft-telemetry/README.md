@@ -1,179 +1,218 @@
 # Demo 2 - Fault Tolerance + Telemetry
 
-Second Devoxx France demo: adding **resilience** (MicroProfile Fault Tolerance) and **telemetry** (OpenTelemetry) to LangChain4j-CDI AI Services.
+Second Devoxx France demo: adding **resilience** (MicroProfile Fault Tolerance) and **observability** (OpenTelemetry) to a LangChain4j-CDI AI agent that already uses Memory, RAG, and Tools.
 
 ## Goals
 
-- Show that AI Services are **full-fledged CDI beans**
-- Use **Tools** for function calling
+- Show that AI Services are **full-fledged CDI beans** — MicroProfile interceptors apply automatically
+- Use **Tools** (`@Tool`) for function calling: list, enroll, cancel, and check expedition slots
 - Add **resilience** with `@Retry`, `@Timeout`, `@Fallback`, `@CircuitBreaker`
-- Observe **telemetry** in action
+- Observe **distributed traces** in Grafana/Tempo via OpenTelemetry
+
+**Key message**: "AI Services = CDI beans → all MicroProfile interceptors apply for free"
 
 ## Prerequisites
 
-- Demo 1 working
-- **Ollama** with `ministral-3:3b`:
-  ```bash
-  ollama pull ministral-3:3b
-  ollama serve
-  ```
-- **Grafana LGTM Stack** (optional, to observe traces):
-  ```bash
-  # Start the full LGTM stack (Loki + Grafana + Tempo + Mimir)
-  # with integrated OpenTelemetry Collector
-  podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
+- **Java 21+**, **Maven 3.8+**
+- **Ollama** (local) or a **Mistral AI API key** (remote)
 
-  # Or with Docker
-  docker run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
-  ```
+```bash
+# Option A: Ollama (local) — tool calling requires a capable model
+ollama pull qwen2.5:7b
+ollama serve
+
+# Option B: Mistral AI (remote)
+export MISTRAL_API_KEY=your-key-here
+```
+
+- **Docker or Podman** — for the Grafana LGTM observability stack
 
 ## Project Structure
 
 ```
 demo-2-ft-telemetry/
-├── base/                          # TODO version (to complete)
+├── base/                          # Live coding skeleton (FT annotations as TODOs)
 │   ├── src/main/java/com/example/demo2/
 │   │   ├── JaxRsActivator.java
-│   │   ├── ChatAssistant.java    # TODOs for FT
-│   │   ├── BookingTools.java     # Tools (complete)
-│   │   └── ChatResource.java
+│   │   ├── ChatAssistant.java             # TODO: Add @Retry, @Timeout, @Fallback, @CircuitBreaker
+│   │   ├── ChatMemoryProviderBean.java    # Complete — per-session conversation memory
+│   │   ├── ChatResource.java              # Complete — REST endpoints
+│   │   ├── Expedition.java               # Complete — domain model
+│   │   ├── ExpeditionRepository.java     # Complete — in-memory data store
+│   │   ├── ExpeditionTools.java          # Complete — 5 @Tool methods
+│   │   └── ExpeditionDetailsProvider.java # Complete — RAG content retriever
 │   └── src/main/webapp/
 │       ├── WEB-INF/beans.xml
-│       └── index.html             # Chat UI with FT hints
+│       └── index.html             # Chat UI with session memory
 │
-├── solution/                      # Complete version
-│   ├── src/main/java/com/example/demo2/
-│   │   ├── ChatAssistant.java    # With FT annotations
-│   │   ├── BookingTools.java
-│   │   └── ChatResource.java
-│   └── src/main/webapp/
-│       ├── WEB-INF/beans.xml
-│       └── index.html             # UI with "stop Ollama" tip
-│
-└── README.md
+└── solution/                      # Complete reference implementation
+    ├── src/main/java/com/example/demo2/
+    │   ├── ChatAssistant.java             # With all 4 FT annotations + fallback
+    │   └── (all other files identical to base)
+    └── src/main/webapp/
+        ├── WEB-INF/beans.xml
+        └── index.html
 ```
 
-## Running
+## Launch
 
-### 1. Start the Grafana LGTM stack (optional)
+### 1. Start the Grafana LGTM stack first
+
+Start this before the application so it's ready when you reach the telemetry step:
 
 ```bash
+# Podman
 podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
+
+# Or Docker
+docker run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
 ```
 
-> **Note**: Use `docker` instead of `podman` if you prefer Docker.
-
-**Grafana LGTM** (Loki, Grafana, Tempo, Mimir) is an all-in-one stack that provides:
-- **OpenTelemetry Collector** built-in: receives traces on ports 4317 (gRPC) and 4318 (HTTP)
-- **Tempo**: distributed trace storage
-- **Loki**: log storage
-- **Mimir**: metrics storage
-- **Grafana**: unified visualization at http://localhost:3000
-
-Benefits:
-- Zero configuration - everything is pre-configured
-- Single command (podman/docker run)
-- Automatic correlation between traces, logs, and metrics
-- Pre-configured datasources in Grafana
+**Grafana LGTM** bundles the full observability stack:
+- **OpenTelemetry Collector** — receives traces on ports 4317 (gRPC) and 4318 (HTTP)
+- **Tempo** — distributed trace storage
+- **Loki** — log storage
+- **Mimir** — metrics storage
+- **Grafana** — unified visualization at http://localhost:3000
 
 ### 2. Start the application
 
 ```bash
-cd demo-2-ft-telemetry/base    # or solution/
+cd demo-project/demo-2-ft-telemetry/base    # or solution/
 mvn clean wildfly:dev
 ```
 
-The app is available at **http://localhost:8080/demo-2/** with a built-in chat UI.
-
-The UI shows the available Tools (findSessions, reservePlace, placesRestantes) and the FT annotations to add.
+The app is available at **http://localhost:8080/demo-2/**.
 
 ### 3. Observe traces in Grafana
 
-After sending a few messages in the chat:
+After sending a few messages:
 
-1. **Open Grafana**: http://localhost:3000
+1. Open **http://localhost:3000** (Grafana)
 2. Go to **Explore** (compass icon in the left menu)
 3. Select the **Tempo** datasource
-4. In "Query type", choose **Search**
+4. Choose **Search** as query type
 5. Filter by `Service Name = demo-2-langchain4j-cdi`
-6. Click on a trace to see:
-   - LLM call latency
-   - Tokens consumed (input/output)
-   - Tool calls (function calling)
-   - Errors and retries
-   - Correlation with logs and metrics
+6. Click any trace to see:
+   - LLM call latency and token counts (input/output)
+   - Tool calls and their duration
+   - RAG retrieval steps
+   - Errors and retries from Fault Tolerance
+
+## What's Already Working in `base/`
+
+The base module ships with Memory, RAG, and Tools fully wired — the only thing missing is the Fault Tolerance annotations:
+
+| Feature | Class | Description |
+|---|---|---|
+| Memory | `ChatMemoryProviderBean` | Per-session `MessageWindowChatMemory` (20 messages), identified by `X-Session-Id` header |
+| RAG | `ExpeditionDetailsProvider` | Ingests expedition data into an in-memory vector store using Mistral embeddings |
+| Tools | `ExpeditionTools` | 5 `@Tool` methods: `listExpeditions`, `enrollWarrior`, `cancelEnrollment`, `remainingSlots`, `myEnrollments` |
+
+Test that everything works before adding Fault Tolerance:
+
+```bash
+curl -X POST -H "Content-Type: text/plain" \
+  -H "X-Session-Id: test-123" \
+  -d "Quelles expéditions sont disponibles ?" \
+  http://localhost:8080/demo-2/api/chat
+```
 
 ## Live Coding Walkthrough
 
-### Step 1: Verify the agent with Tools
+### Step 1: Add @Retry
 
-The agent already has Tools in `BookingTools.java`:
+Open `ChatAssistant.java`. The interface already has `@RegisterAIService` with memory, RAG, and tools.
+
+Add `@Retry` on the `chat` method:
+
 ```java
-@ApplicationScoped
-public class BookingTools {
-    @Tool("Searches for Devoxx France sessions for a given date")
-    public List<String> findSessions(@P("Date") String date) { ... }
+import org.eclipse.microprofile.faulttolerance.Retry;
 
-    @Tool("Registers a seat for a session")
-    public String reservePlace(@P("Name") String name, @P("Session") String session) { ... }
+// existing @RegisterAIService + @SystemMessage stay as-is
+@Retry(maxRetries = 3, delay = 1000)
+String chat(@MemoryId String sessionId, @UserMessage String message);
+```
 
-    @Tool("Number of remaining seats")
-    public int placesRestantes(@P("Session") String session) { ... }
+Because `@RegisterAIService` produces a CDI bean, the CDI container wraps the proxy with the Fault Tolerance interceptor — no wiring needed.
+
+### Step 2: Add @Timeout and @Fallback
+
+```java
+import org.eclipse.microprofile.faulttolerance.*;
+import java.time.temporal.ChronoUnit;
+
+@Retry(maxRetries = 3, delay = 1000)
+@Timeout(value = 30, unit = ChronoUnit.SECONDS)
+@Fallback(fallbackMethod = "chatFallback")
+String chat(@MemoryId String sessionId, @UserMessage String message);
+
+default String chatFallback(String sessionId, String message) {
+    return "Oups ! Le LLM fait une sieste. Veuillez réessayer dans un moment.";
 }
 ```
 
-Test: "What sessions are on Day 1?" or "Register Yann for a session".
-
-### Step 2: Ask the critical question
-
-"What happens if Ollama stops?" -> Exception, timeout, 500 error.
-
-### Step 3: Add @Retry + @Timeout
+### Step 3: Add @CircuitBreaker
 
 ```java
 @Retry(maxRetries = 3, delay = 1000)
 @Timeout(value = 30, unit = ChronoUnit.SECONDS)
-@SystemMessage(...)
-String chat(@UserMessage String message);
-```
-
-### Step 4: Add @Fallback
-
-```java
 @Fallback(fallbackMethod = "chatFallback")
-String chat(@UserMessage String message);
-
-default String chatFallback(String message) {
-    return "Oops! The LLM is taking a nap. Please try again in a moment.";
-}
-```
-
-### Step 5: Add @CircuitBreaker
-
-```java
 @CircuitBreaker(requestVolumeThreshold = 5, failureRatio = 0.5)
+String chat(@MemoryId String sessionId, @UserMessage String message);
 ```
 
-### Step 6: Test resilience
+### Step 4: Uncomment the Fault Tolerance dependency
 
-Stop Ollama (`killall ollama`) and send messages in the UI. The fallback activates!
+Open `pom.xml` and uncomment the `langchain4j-cdi-fault-tolerance` dependency (marked with `TODO`):
 
-Restart Ollama -> the circuit closes, everything works again.
+```xml
+<dependency>
+    <groupId>dev.langchain4j.cdi.mp</groupId>
+    <artifactId>langchain4j-cdi-fault-tolerance</artifactId>
+</dependency>
+```
+
+Without this dependency, the annotations are present but no interceptor is registered — they are silently ignored.
+
+### Step 5: Test resilience
+
+Stop Ollama (or disconnect the network) and send messages. You should see:
+- Retry attempts in WildFly logs
+- Then the fallback message in the chat UI
+
+Restart Ollama → the circuit breaker resets and normal operation resumes.
+
+```bash
+# Kill Ollama to simulate an outage
+pkill -f ollama
+
+# Send requests — should get fallback after retries
+curl -X POST -H "Content-Type: text/plain" \
+  -H "X-Session-Id: test-resilience" \
+  -d "Quelles expéditions sont disponibles ?" \
+  http://localhost:8080/demo-2/api/chat
+```
 
 ## Configuration
 
 ### LangChain4j Model
 
 ```properties
-dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.ollama.OllamaChatModel
-dev.langchain4j.cdi.plugin.my-model.config.base-url=http://localhost:11434
-dev.langchain4j.cdi.plugin.my-model.config.model-name=ministral-3:3b
+# Option A: Mistral AI (remote)
+dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.mistralai.MistralAiChatModel
+dev.langchain4j.cdi.plugin.my-model.config.api-key=${MISTRAL_API_KEY}
+dev.langchain4j.cdi.plugin.my-model.config.model-name=mistral-small-latest
+
+# Option B: Ollama (local) — use a model that supports tool calling
+# dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.ollama.OllamaChatModel
+# dev.langchain4j.cdi.plugin.my-model.config.base-url=http://localhost:11434
+# dev.langchain4j.cdi.plugin.my-model.config.model-name=qwen2.5:7b
 ```
 
 ### OpenTelemetry
 
 ```properties
-# MicroProfile OpenTelemetry - OTLP Exporter
 otel.exporter.otlp.endpoint=http://localhost:4318
 otel.exporter.otlp.protocol=http/protobuf
 otel.service.name=demo-2-langchain4j-cdi
@@ -181,61 +220,49 @@ otel.traces.exporter=otlp
 otel.metrics.exporter=otlp
 otel.logs.exporter=otlp
 
-# LangChain4j-CDI Telemetry - Listeners
+# LangChain4j-CDI telemetry listeners
 dev.langchain4j.cdi.plugin.my-model.config.listeners=\
     dev.langchain4j.cdi.telemetry.SpanChatModelListener,\
     dev.langchain4j.cdi.telemetry.MetricsChatModelListener
 ```
 
 **Ports exposed by Grafana LGTM**:
-- `3000`: Grafana UI (visualization)
-- `4317`: OTLP gRPC endpoint (for the application)
-- `4318`: OTLP HTTP endpoint (used by default)
-- `3100`: Loki (logs)
-- `3200`: Tempo (traces)
-- `9009`: Mimir (metrics)
+- `3000`: Grafana UI
+- `4317`: OTLP gRPC
+- `4318`: OTLP HTTP (default for this demo)
 
-**What the traces capture**:
-- LLM call latency (response time)
-- Tokens consumed (input/output)
-- Tool calls (function calling with parameters)
-- Errors and retries (MicroProfile Fault Tolerance)
-- Full context of each request
-
-**Visualization in Grafana**:
-- Tempo Dashboard: http://localhost:3000/explore
-- Search by service, operation, duration, error
-- Correlation traces <-> logs <-> metrics
-
-### Fault Tolerance (optional override)
+### Fault Tolerance overrides via config (optional)
 
 ```properties
+# Override annotation values without recompiling
 ChatAssistant/chat/Retry/maxRetries=5
 ChatAssistant/chat/Timeout/value=45000
 ```
 
 ## Key Takeaways
 
-1. **AI Services = CDI Beans**: MicroProfile FT annotations work directly
-2. **Tools = Regular Beans**: Inject any CDI service into BookingTools
-3. **Declarative resilience**: 4 annotations instead of 200 lines of code
-4. **Production-ready**: Fault Tolerance + Telemetry = app that stays up
+1. **AI Services = CDI Beans**: `@RegisterAIService` makes the service a real CDI bean → MicroProfile FT interceptors apply without any extra configuration
+2. **Declarative resilience**: 4 annotations replace ~200 lines of retry/timeout/breaker logic
+3. **Tools = Regular Beans**: `ExpeditionTools` is `@ApplicationScoped` — inject any CDI service into it
+4. **Full observability**: SpanChatModelListener + MetricsChatModelListener capture LLM calls, tool invocations, and RAG steps in OpenTelemetry traces
 
 ## Troubleshooting
 
-- **Timeout during chat**: Increase `@Timeout` to 60 seconds
-- **CircuitBreaker open**: Restart Ollama and wait a few seconds
-- **Deploy the solution**: `cd solution && mvn clean wildfly:dev`
+- **Fallback activating immediately**: Check that the Ollama model supports tool calling (`qwen2.5:7b` recommended)
+- **Timeout during chat**: Increase `@Timeout` to 60 seconds for slower models
+- **CircuitBreaker open after test**: Restart Ollama and wait a few seconds for the circuit to close
+- **No traces in Grafana**: Verify Grafana LGTM is running (`curl http://localhost:4318`) and `otel.sdk.disabled=false`
+- **Fault Tolerance annotations ignored**: Ensure the `langchain4j-cdi-fault-tolerance` dependency is uncommented in `pom.xml`
+- **Run the solution directly**: `cd solution && mvn clean wildfly:dev`
 
-## Stopping services
+## Stopping Services
 
 ```bash
 # Stop WildFly
-# Ctrl+C in the wildfly:dev terminal
+Ctrl+C in the wildfly:dev terminal
 
-# Stop Grafana LGTM
-# Ctrl+C in the podman/docker run terminal
-# (the --rm flag automatically cleans up the container)
+# Stop Grafana LGTM (--rm cleans up automatically)
+Ctrl+C in the podman/docker run terminal
 ```
 
 ## Resources
@@ -245,6 +272,3 @@ ChatAssistant/chat/Timeout/value=45000
 - **LangChain4j-CDI**: https://github.com/langchain4j/langchain4j-cdi
 - **OpenTelemetry**: https://opentelemetry.io
 - **Grafana LGTM Stack**: https://grafana.com/docs/lgtm/
-- **Grafana Tempo**: https://grafana.com/oss/tempo/
-- **Grafana Loki**: https://grafana.com/oss/loki/
-- **Grafana Mimir**: https://grafana.com/oss/mimir/
