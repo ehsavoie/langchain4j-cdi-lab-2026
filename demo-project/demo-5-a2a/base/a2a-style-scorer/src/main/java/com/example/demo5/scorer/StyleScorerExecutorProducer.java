@@ -49,10 +49,7 @@ public class StyleScorerExecutorProducer {
         public void execute(RequestContext context, EventQueue eventQueue) throws JSONRPCError {
             TaskUpdater updater = new TaskUpdater(context, eventQueue);
 
-            // TODO ÉTAPE 1 : Marquer la tâche comme soumise et commencer le travail
-            // if (context.getTask() == null) {
-            //     updater.submit();
-            // }
+            // TODO ÉTAPE 1 : Démarrer le traitement de la tâche
             // updater.startWork();
 
             // TODO ÉTAPE 2 : Extraire les arguments (story et style) du message A2A

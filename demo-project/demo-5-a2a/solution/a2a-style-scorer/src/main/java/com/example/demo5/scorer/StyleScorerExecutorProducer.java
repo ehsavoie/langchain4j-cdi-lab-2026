@@ -39,10 +39,6 @@ public class StyleScorerExecutorProducer {
         public void execute(RequestContext context, EventQueue eventQueue) throws JSONRPCError {
             TaskUpdater updater = new TaskUpdater(context, eventQueue);
 
-            // mark the task as submitted and start working on it
-            if (context.getTask() == null) {
-                updater.submit();
-            }
             updater.startWork();
 
             // extract the text from the message

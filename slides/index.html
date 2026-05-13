@@ -1870,31 +1870,35 @@ public AgentCard agentCard() {
 <section>
     <span class="speaker-tag speaker-both">Les deux</span>
     <h2>Orchestrateur : séquence + boucle</h2>
-    <pre><code class="language-java" data-trim data-line-numbers="1-3|5-7|9-12|14-16">
-A2ACreativeWriter writer = AgenticServices
-    .a2aBuilder(writerUrl, A2ACreativeWriter.class)
-    .outputKey("story").build();
+    <pre><code class="language-java" data-trim data-line-numbers="1-3|5-8|10-15|17-18">
+@RegisterAgent(name="creative-writer", topology=A2A,
+    a2aServerUrl="${a2a.creative-writer.url}", outputKey="story")
+interface A2ACreativeWriter { String generateStory(@V("topic") String topic); }
 
-UntypedAgent reviewLoop = AgenticServices.loopBuilder()
-    .subAgents(styleScorer, styleEditor)
-    .maxIterations(5)
-    .exitCondition(scope -> scope.readState("score", 0.0) >= 0.8)
-    .build();
+@RegisterAgent(topology=SEQUENCE,
+    subAgentNames={"creative-writer","style-review-loop"}, outputKey="story")
+interface StyledWriter extends AgenticScopeAccess {
+    ResultWithAgenticScope&lt;String&gt; writeStoryWithStyle(@V("topic") String topic, @V("style") String style); }
 
-StyledWriter pipeline = AgenticServices
-    .sequenceBuilder(StyledWriter.class)
-    .subAgents(writer, reviewLoop)
-    .outputKey("story").build();
+@Produces @Named("style-review-loop")
+UntypedAgent styleReviewLoop() {
+    return AgenticServices.loopBuilder()
+        .subAgents(toAgentExecutor(scorer), toAgentExecutor(editor))
+        .maxIterations(5).exitCondition(s -> s.readState("score", 0.0) >= 0.8)
+        .build(); }
+
+@Inject StyledWriter styledWriter;
+// styledWriter.writeStoryWithStyle(topic, style).result()
     </code></pre>
     <p class="fragment small">
-        <span class="accent-red">a2aBuilder</span> → agent distant via A2A |
-        <span class="accent-blue">loopBuilder</span> → boucle avec condition de sortie |
-        <span class="accent-green">sequenceBuilder</span> → pipeline séquentiel
+        <span class="accent-red">@RegisterAgent(topology=A2A)</span> → proxy vers agent distant |
+        <span class="accent-green">@RegisterAgent(topology=SEQUENCE)</span> → pipeline séquentiel |
+        <span class="accent-blue">loopBuilder</span> → boucle avec condition de sortie
     </p>
     <aside class="notes">
-        L'orchestrateur câble le pipeline avec LangChain4j Agentic. Trois builders : a2aBuilder pour les agents distants, loopBuilder pour la boucle de révision, et sequenceBuilder pour le pipeline complet.
+        L'orchestrateur utilise @RegisterAgent pour déclarer les interfaces : A2A pour les agents distants, SEQUENCE pour le pipeline complet. CDI gère le câblage automatiquement — plus besoin de builders manuels pour les proxies A2A et le pipeline.
 
-        La boucle vérifie le score de style à chaque itération. Si le score dépasse 0.8, on sort. Sinon, le StyleEditor (maître skald) retravaille la saga et on recommence. Maximum 5 itérations pour éviter les boucles infinies.
+        Seule la boucle nécessite un builder explicite, parce qu'elle a une logique de sortie dynamique (score >= 0.8). Le @Inject StyledWriter suffit dans l'orchestrateur : LangChain4j-CDI construit le pipeline SEQUENCE automatiquement.
     </aside>
 </section>
 
@@ -1941,7 +1945,6 @@ public AgentExecutor agentExecutor() {
         public void execute(RequestContext context, EventQueue eventQueue)
                 throws JSONRPCError {
             TaskUpdater updater = new TaskUpdater(context, eventQueue);
-            if (context.getTask() == null) { updater.submit(); }
             updater.startWork();
 
             String userMessage = extractTextFromMessage(context.getMessage());
@@ -1961,7 +1964,7 @@ public AgentExecutor agentExecutor() {
     <aside class="notes">
         SECOURS si la démo live ne marche pas.
 
-        L'AgentExecutor reçoit les requêtes A2A. Il crée un TaskUpdater pour gérer le cycle de vie de la tâche A2A : submit, startWork, addArtifact, complete.
+        L'AgentExecutor reçoit les requêtes A2A. Il crée un TaskUpdater pour gérer le cycle de vie de la tâche A2A : startWork, addArtifact, complete.
 
         Le message A2A contient des TextParts. On extrait le texte, on appelle le service IA, on renvoie la réponse comme artifact.
     </aside>

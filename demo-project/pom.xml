@@ -27,16 +27,16 @@
         <!-- Versions -->
         <jakartaee.version>10.0.0</jakartaee.version>
         <microprofile.version>6.1</microprofile.version>
-        <langchain4j.version>1.13.0</langchain4j.version>
-        <langchain4j-cdi.version>1.2.0-Beta1</langchain4j-cdi.version>
+        <langchain4j.version>1.14.1</langchain4j.version>
+        <langchain4j-cdi.version>1.2.0</langchain4j-cdi.version>
         <wildfly.version>39.0.1.Final</wildfly.version>
 
         <!-- Mistral AI -->
         <mistral.model>mistral-small-latest</mistral.model>
 
         <!-- LangChain4j MCP / Agentic (beta versioning) -->
-        <langchain4j-mcp.version>1.13.0-beta23</langchain4j-mcp.version>
-        <langchain4j-agentic.version>1.13.0-beta23</langchain4j-agentic.version>
+        <langchain4j-mcp.version>1.14.1-beta24</langchain4j-mcp.version>
+        <langchain4j-agentic.version>1.14.1-beta24</langchain4j-agentic.version>
 
         <!-- A2A SDK -->
         <a2a-sdk.version>0.3.2.Final</a2a-sdk.version>
@@ -89,6 +89,12 @@
             <dependency>
                 <groupId>dev.langchain4j.cdi.mp</groupId>
                 <artifactId>langchain4j-cdi-telemetry</artifactId>
+                <version>${langchain4j-cdi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>dev.langchain4j.cdi</groupId>
+                <artifactId>langchain4j-cdi-a2a</artifactId>
                 <version>${langchain4j-cdi.version}</version>
             </dependency>
 

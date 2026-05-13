@@ -2404,8 +2404,12 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
 <table>
     <thead><tr><th>Fichier</th><th>R&ocirc;le</th><th>TODO</th></tr></thead>
     <tbody>
-        <tr><td><code>Agents.java</code></td><td>Interfaces des agents du pipeline</td><td>Ajouter <code>@Agent</code>, <code>@UserMessage</code>, <code>AgenticScopeAccess</code></td></tr>
-        <tr><td><code>OrchestratorService.java</code></td><td>C&acirc;ble le pipeline agentic</td><td>Cr&eacute;er les builders <code>a2a</code>, <code>loop</code>, <code>sequence</code></td></tr>
+        <tr><td><code>A2ACreativeWriter.java</code></td><td>Proxy CDI vers le Creative Writer distant</td><td>Ajouter <code>@RegisterAgent(topology=A2A, a2aServerUrl=...)</code></td></tr>
+        <tr><td><code>A2AStyleScorer.java</code></td><td>Proxy CDI vers le Style Scorer distant</td><td>Ajouter <code>@RegisterAgent(topology=A2A, a2aServerUrl=...)</code></td></tr>
+        <tr><td><code>StyleEditor.java</code></td><td>Agent local de r&eacute;&eacute;criture (Ollama)</td><td>Ajouter <code>@RegisterAgent(chatModelName="ollama")</code></td></tr>
+        <tr><td><code>StyledWriter.java</code></td><td>Pipeline SEQUENCE complet</td><td>Ajouter <code>@RegisterAgent(topology=SEQUENCE, subAgentNames=...)</code></td></tr>
+        <tr><td><code>AgentProducers.java</code></td><td>Produit la boucle de r&eacute;vision CDI</td><td>Impl&eacute;menter <code>styleReviewLoop()</code> avec <code>loopBuilder()</code></td></tr>
+        <tr><td><code>OrchestratorService.java</code></td><td>Injecte et appelle le pipeline</td><td>Injecter <code>StyledWriter</code> et appeler <code>writeStoryWithStyle()</code></td></tr>
         <tr><td><code>StyledWriterEndpoint.java</code></td><td>Point d'acc&egrave;s REST (d&eacute;j&agrave; c&acirc;bl&eacute;)</td><td>Rien &mdash; d&eacute;j&agrave; impl&eacute;ment&eacute;</td></tr>
     </tbody>
 </table>
@@ -2539,8 +2543,7 @@ public AgentCard agentCard() {
 public void execute(RequestContext context, EventQueue eventQueue) throws JSONRPCError {
     TaskUpdater updater = new TaskUpdater(context, eventQueue);
 
-    // &Eacute;TAPE 1 : Soumettre et d&eacute;marrer
-    if (context.getTask() == null) { updater.submit(); }
+    // &Eacute;TAPE 1 : D&eacute;marrer le traitement
     updater.startWork();
 
     // &Eacute;TAPE 2 : Extraire le texte du message A2A
@@ -2573,100 +2576,96 @@ public void execute(RequestContext context, EventQueue eventQueue) throws JSONRP
         <span class="step-title">C&acirc;bler l'orchestrateur agentic</span>
     </div>
 
-    <h4>D&eacute;finir les interfaces d'agents</h4>
-    <p>Ouvrez <code>a2a-orchestrator/src/.../orchestrator/Agents.java</code> et ajoutez les annotations :</p>
+    <h4>&Eacute;tape 4a &mdash; Annoter les proxies A2A (<code>A2ACreativeWriter.java</code>, <code>A2AStyleScorer.java</code>)</h4>
+    <p>Chaque interface devient un bean CDI gr&acirc;ce &agrave; <code>@RegisterAgent(topology = A2A)</code>. L'URL de l'agent est lue depuis la configuration MicroProfile :</p>
 
-    <pre><code>import dev.langchain4j.agentic.Agent;
-import dev.langchain4j.agentic.scope.AgenticScopeAccess;
-import dev.langchain4j.agentic.scope.ResultWithAgenticScope;
-import dev.langchain4j.service.UserMessage;
+    <pre><code>import dev.langchain4j.cdi.agent.AgentTopologyType;
+import dev.langchain4j.cdi.spi.RegisterAgent;
 import dev.langchain4j.service.V;
 
-public class Agents {
+@RegisterAgent(
+        name = "creative-writer",
+        topology = AgentTopologyType.A2A,
+        a2aServerUrl = "${a2a.creative-writer.url}",   // lu dans microprofile-config.properties
+        outputKey = "story",
+        description = "Generate a Norse saga based on the given topic")
+public interface A2ACreativeWriter {
+    String generateStory(@V("topic") String topic);
+}
 
-    public interface A2ACreativeWriter {
-        @Agent(description = "Generate a Norse saga based on the given topic",
-               outputKey = "story")
-        String generateStory(@V("topic") String topic);
-    }
-
-    public interface A2AStyleScorer {
-        @Agent(description = "Score a saga based on how well it captures a given style",
-               outputKey = "score")
-        double scoreStyle(@V("story") String story, @V("style") String style);
-    }
-
-    public interface StyleEditor {
-        @UserMessage("""
-                You are a master Norse skald who shapes and tempers sagas like a smith forges steel.
-                Rewrite the following saga to better honor and embody the {{style}} style.
-                Return only the saga and nothing else.
-                The saga is "{{story}}".
-                """)
-        @Agent(description = "Reforge a saga to better capture a given style",
-               outputKey = "story")
-        String editStory(@V("story") String story, @V("style") String style);
-    }
-
-    public interface StyleReviewLoop {
-        @Agent("Judge the saga by the standards of the specified style, as a Viking elder would at the Thing")
-        String scoreAndReview(@V("story") String story, @V("style") String style);
-    }
-
-    public interface StyledWriter extends AgenticScopeAccess {
-        @Agent
-        ResultWithAgenticScope&lt;String&gt; writeStoryWithStyle(
-                @V("topic") String topic, @V("style") String style);
-    }
+@RegisterAgent(
+        name = "style-scorer",
+        topology = AgentTopologyType.A2A,
+        a2aServerUrl = "${a2a.style-scorer.url}",
+        outputKey = "score",
+        description = "Score a saga based on how well it captures a given style")
+public interface A2AStyleScorer {
+    double scoreStyle(@V("story") String story, @V("style") String style);
 }</code></pre>
 
-    <h4>C&acirc;bler le pipeline dans <code>OrchestratorService.java</code></h4>
-    <p>D&eacute;commentez les 6 &eacute;tapes dans <code>init()</code> :</p>
+    <h4>&Eacute;tape 4b &mdash; Annoter l'&eacute;diteur local (<code>StyleEditor.java</code>)</h4>
+    <pre><code>import dev.langchain4j.cdi.spi.RegisterAgent;
 
-    <pre><code>@PostConstruct
-void init() {
-    // &Eacute;TAPE 1 : ChatModel local pour le StyleEditor
-    ChatModel chatModel = OllamaChatModel.builder()
-            .baseUrl(ollamaBaseUrl).modelName(ollamaModelName)
-            .timeout(Duration.ofMinutes(10)).temperature(0.0)
-            .logRequests(true).logResponses(true).build();
+@RegisterAgent(
+        name = "style-editor",
+        description = "Reforge a saga to better capture a given style",
+        outputKey = "story",
+        chatModelName = "ollama")
+public interface StyleEditor {
+    @UserMessage("""
+            You are a master Norse skald...
+            Rewrite the saga "{{story}}" in the {{style}} style.
+            """)
+    String editStory(@V("story") String story, @V("style") String style);
+}</code></pre>
 
-    // &Eacute;TAPE 2 : Agent A2A distant &mdash; Creative Writer
-    A2ACreativeWriter creativeWriter = AgenticServices
-            .a2aBuilder(creativeWriterUrl, A2ACreativeWriter.class)
-            .outputKey("story").build();
+    <h4>&Eacute;tape 4c &mdash; Construire la boucle dans <code>AgentProducers.java</code></h4>
+    <p>La boucle ne peut pas &ecirc;tre exprim&eacute;e par annotation (la <code>exitCondition</code> est une lambda). Elle est construite programmatiquement et expos&eacute;e comme bean <code>@Named</code> :</p>
 
-    // &Eacute;TAPE 3 : Agent A2A distant &mdash; Style Scorer
-    A2AStyleScorer styleScorer = AgenticServices
-            .a2aBuilder(styleScorerUrl, A2AStyleScorer.class)
-            .outputKey("score").build();
+    <pre><code>@Inject @Named("style-editor")  StyleEditor styleEditor;
+@Inject @Named("style-scorer")  A2AStyleScorer styleScorerInstance;
 
-    // &Eacute;TAPE 4 : Agent local &mdash; Style Editor
-    StyleEditor styleEditor = AgenticServices.agentBuilder(StyleEditor.class)
-            .chatModel(chatModel).outputKey("story").build();
-
-    // &Eacute;TAPE 5 : Boucle de r&eacute;vision (max 5 it&eacute;rations, sort si score &ge; 0.8)
-    UntypedAgent styleReviewLoop = AgenticServices.loopBuilder()
-            .subAgents(styleScorer, styleEditor)
+@Produces
+@Named("style-review-loop")
+public UntypedAgent styleReviewLoop() {
+    return AgenticServices.loopBuilder()
+            .subAgents(CommonAgentCreator.toAgentExecutor(styleScorerInstance),
+                       CommonAgentCreator.toAgentExecutor(styleEditor))
             .maxIterations(5)
-            .exitCondition(scope -&gt; scope.readState("score", 0.0) &gt;= 0.8)
+            .exitCondition(scope -&gt; {
+                Object raw = scope.readState("score");
+                if (raw instanceof Number n) return n.doubleValue() &gt;= 0.8;
+                try { return Double.parseDouble(raw.toString()) &gt;= 0.8; }
+                catch (NumberFormatException e) { return false; }
+            })
             .build();
+}</code></pre>
 
-    // &Eacute;TAPE 6 : S&eacute;quence compl&egrave;te
-    styledWriter = AgenticServices.sequenceBuilder(StyledWriter.class)
-            .subAgents(creativeWriter, styleReviewLoop)
-            .outputKey("story").build();
+    <h4>&Eacute;tape 4d &mdash; Annoter le pipeline (<code>StyledWriter.java</code>) et simplifier <code>OrchestratorService.java</code></h4>
+    <pre><code>@RegisterAgent(
+        topology = AgentTopologyType.SEQUENCE,
+        subAgentNames = {"creative-writer", "style-review-loop"},
+        outputKey = "story")
+public interface StyledWriter extends AgenticScopeAccess {
+    ResultWithAgenticScope&lt;String&gt; writeStoryWithStyle(
+            @V("topic") String topic, @V("style") String style);
+}</code></pre>
+
+    <pre><code>@ApplicationScoped
+public class OrchestratorService {
+
+    @Inject
+    StyledWriter styledWriter;   // injecté automatiquement par @RegisterAgent
+
+    public String writeStyledStory(String topic, String style) {
+        ResultWithAgenticScope&lt;String&gt; result = styledWriter.writeStoryWithStyle(topic, style);
+        return result.result();
+    }
 }</code></pre>
 
     <div class="callout info">
-        <div class="callout-title">&#128161; LangChain4j Agentic</div>
-        <p>Trois builders pour orchestrer des agents :</p>
-        <ul>
-            <li><code>a2aBuilder()</code> &mdash; proxy vers un agent A2A distant</li>
-            <li><code>loopBuilder()</code> &mdash; boucle avec condition de sortie</li>
-            <li><code>sequenceBuilder()</code> &mdash; pipeline s&eacute;quentiel</li>
-        </ul>
-        <p>L'<code>outputKey</code> permet de partager des donn&eacute;es entre agents via le scope agentic.</p>
+        <div class="callout-title">&#128161; @RegisterAgent vs builders manuels</div>
+        <p>Avec <code>@RegisterAgent</code>, LangChain4j-CDI enregistre automatiquement les agents A2A et les agents simples comme beans CDI <code>@Named</code>. L'URL <code>${a2a.creative-writer.url}</code> est r&eacute;solue via <code>MicroProfile Config</code> au d&eacute;marrage. Pour la boucle (qui n&eacute;cessite une <code>exitCondition</code>), un producteur CDI programmatique reste n&eacute;cessaire.</p>
     </div>
 
     <h4>D&eacute;marrer les trois services</h4>
