@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LangChain4j-CDI — Devoxx France 2026</title>
+    <title>LangChain4j-CDI — Oracle Dev Week 2026</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
@@ -194,45 +194,21 @@
 <!-- ============================================= -->
 
 <!-- Slide 1: Title with logo -->
-<section>
-    <img src="logodevoxxfr26.png"
-         alt="Devoxx France 2026"
-         style="position: absolute; top: 20px; right: 20px; max-width: 90px; z-index: 10;">
+<section data-background-image="presenter-background-1920x1080-dark-1.png"
+         data-background-size="cover">
     <img src="langchain4j-cdi-logo.png"
          onerror="this.src='https://raw.githubusercontent.com/langchain4j/langchain4j-cdi/main/langchain4j-cdi-logo.png'"
          alt="LangChain4j-CDI" style="max-width: 280px; margin-bottom: 0.3em;">
     <h1>LangChain4j-CDI</h1>
     <h3 style="color: var(--accent-blue);">IA Générative<br>Nativement Injectable dans Jakarta EE</h3>
     <p class="small" style="margin-top: 1em;">
-        <span class="accent">Yann Blazart</span>, <span class="accent">Emmanuel Hugonnet</span> &amp; <span class="accent">Antoine Sabot-Durand</span>
+        <span class="accent">Yann Blazart</span> &amp; <span class="accent">Emmanuel Hugonnet</span>
     </p>
-    <p class="small">Devoxx France 2026</p>
+    <p class="small">Oracle Dev Week 2026</p>
     <aside class="notes">
         Bienvenue à tous ! On espère que vous êtes prêts, parce qu'on va parler de choses sérieuses... enfin, aussi sérieuses que deux types qui ont construit un framework d'IA peuvent l'être.
 
         Aujourd'hui on va vous montrer comment faire ce que l'extension Quarkus fait, mais sur N'IMPORTE QUEL serveur CDI. Oui, même votre bon vieux WildFly qui tourne en production depuis 2015.
-    </aside>
-</section>
-
-<!-- Slide 2: Disclaimer (effet de surprise) -->
-<section data-background-gradient="linear-gradient(135deg, #2a0a0a, #1a0a00)">
-    <p class="emoji-big">⚠️</p>
-    <h2 style="color: var(--accent-orange);">Avertissement</h2>
-    <p class="big" style="margin-top: 0.5em;">
-        Cette présentation a été <span class="accent">honteusement générée</span> avec l'aide d'une IA.
-    </p>
-    <p class="fragment medium" style="margin-top: 1em; color: #ccc;">
-        Rassurez-vous, les speakers sont <em>réels</em>.<br>
-        <span class="fragment">Enfin... on n'a pas encore vérifié avec un CAPTCHA.</span>
-    </p>
-    <p class="fragment small" style="margin-top: 1.5em; color: #999;">
-        Aucun développeur Jakarta EE n'a été maltraité pendant la production de ces slides. Mais on ne parlera pas des raids Viking ⚔️<br>
-        <span class="fragment">Le LLM, par contre, a fait 247 tentatives.</span>
-    </p>
-    <aside class="notes">
-        Slide de disclaimer. On assume pleinement -- l'IA a aidé à construire ces slides. Ça fait rire et ça colle parfaitement avec le sujet de la session.
-
-        Si quelqu'un rigole à la ligne du CAPTCHA, enchaîner avec : "Sérieusement, si vous voulez nous vérifier, demandez-nous d'identifier des feux de circulation dans une grille."
     </aside>
 </section>
 
@@ -296,38 +272,6 @@
         Emmanuel sort de la salle des serveurs après de longues années passées à collectionner bugs et patches.
 
         Il intègre l'IA dans WildFly : WildFly AI Feature Pack (LC4J-CDI, MCP Server, WASM WASI) et A2A Java/JakartaEE SDK.
-    </aside>
-</section>
-
-<!-- Slide 4bis: Antoine Sabot-Durand -->
-<section>
-    <h2>Et le spec lead historique de CDI</h2>
-    <div class="speaker-card antoine" style="border-left-width: 6px;">
-        <div class="avatar"><img src="asd.png" alt="Antoine Sabot-Durand" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;"></div>
-        <div class="info">
-            <h3 style="color: var(--accent-green);">Antoine Sabot-Durand</h3>
-            <p>Java Champion • Ex spec lead <strong>CDI</strong> (Jakarta EE) • Ex-Red Hat</p>
-            <p>Équipe de lancement Quarkus • MicroProfile Fault Tolerance &amp; Health Check</p>
-            <p><span class="badge badge-green">CDI</span> <span class="badge badge-green">Jakarta EE</span> <span class="badge badge-green">Quarkus</span> <span class="badge badge-green">MicroProfile</span></p>
-        </div>
-    </div>
-    <div class="fragment" style="margin-top: 1.2em; text-align: center;">
-        <p class="medium" style="color: #ccc; margin-top: 0.3em;">
-            Directeur Technique @ <strong style="color: var(--accent-orange);">SCIAM</strong> — collègue de Yann
-        </p>
-        <p class="small" style="color: #999;">
-            <a href="https://github.com/antoinesd" style="color: var(--accent-blue);">github.com/antoinesd</a>
-        </p>
-    </div>
-    <p class="fragment small" style="margin-top: 0.8em; color: #777;">
-        À nous trois, bien plus de 75 ans d'expérience Java cumulés. On est vraiment des Technosaures maintenant. 🦕🦕🦕
-    </p>
-    <aside class="notes">
-        Antoine se présente (ou Yann le présente, vu qu'ils sont chez SCIAM tous les deux).
-
-        Spec lead historique de CDI côté Jakarta EE / Red Hat, membre de l'équipe fondatrice de Quarkus, contributeur majeur à MicroProfile Fault Tolerance et Health Check.
-
-        Aujourd'hui Directeur Technique chez SCIAM, il apporte toute la profondeur CDI nécessaire à l'extension langchain4j-cdi.
     </aside>
 </section>
 
@@ -698,6 +642,66 @@ dev.langchain4j.cdi.plugin.my-retriever.config.embeddingStore=\
         Zéro code pour la configuration. On est en 2026, les amis -- pas en 2006.
 
         NOTE : Pour WildFly, il y a aussi le subsystem WildFly AI qui permet de configurer les modèles et MCP directement dans standalone.xml. C'est une intégration native au serveur, très puissante pour les déploiements enterprise. On le verra en démo 3.
+    </aside>
+</section>
+
+<!-- Slide 11bis: Configuration WildFly subsystem AI -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>Configuration : Subsystem AI WildFly</h2>
+    <pre><code class="language-xml" data-trim data-noescape style="font-size: 0.65em;">
+&lt;!-- standalone.xml - Configuration du subsystem AI WildFly --&gt;
+&lt;subsystem xmlns="urn:jboss:domain:ai:1.0"&gt;
+    &lt;!-- Configuration du modèle Ollama --&gt;
+    &lt;chat-language-models&gt;
+        &lt;ollama-chat-model name="ollama"
+            base-url="http://127.0.0.1:11434"
+            model-name="llama3.1:8b"
+            temperature="0.9"
+            connect-timeout="600000"
+            log-requests="true"
+            log-responses="true"/&gt;
+    &lt;/chat-language-models&gt;
+
+    &lt;!-- Configuration du client MCP SSE --&gt;
+    &lt;mcp&gt;
+        &lt;mcp-tool-provider name="mcp" mcp-clients="mcp-sse"/&gt;
+        &lt;mcp-client-sse name="mcp-sse"
+            socket-binding="mcp-sse"
+            sse-path="/sse"
+            connect-timeout="6000000"
+            log-requests="true"
+            log-responses="true"/&gt;
+    &lt;/mcp&gt;
+&lt;/subsystem&gt;
+
+&lt;!-- Socket binding pour le serveur MCP --&gt;
+&lt;outbound-socket-binding name="mcp-sse"&gt;
+    &lt;remote-destination host="localhost" port="8090"/&gt;
+&lt;/outbound-socket-binding&gt;
+    </code></pre>
+    <p class="fragment small accent" style="margin-top: 0.8em;">
+        Configuration WildFly native -- Zéro properties ! 🚀
+    </p>
+    <aside class="notes">
+        Emmanuel explique le subsystem AI WildFly -- la deuxième implémentation du SPI LLMConfig.
+
+        Le WildFly AI Feature Pack ajoute un nouveau subsystem "ai" à WildFly. C'est une extension native qui permet de configurer :
+
+        1. Les modèles de chat (chat-language-models) :
+           - ollama-chat-model : connexion vers Ollama avec base-url, model-name, temperature
+           - Supporte aussi OpenAI et d'autres providers
+
+        2. Les clients MCP :
+           - mcp-tool-provider : expose les tools MCP aux agents CDI
+           - mcp-client-sse : client MCP utilisant Server-Sent Events (HTTP SSE)
+           - socket-binding : pointe vers le serveur MCP distant (localhost:8090)
+
+        Tout est configuré dans standalone.xml. Pas besoin de microprofile-config.properties, pas de code Java pour la config.
+
+        Les agents CDI référencent simplement les noms : chatModelName="ollama" et toolProviderName="mcp".
+
+        C'est une vraie intégration Jakarta EE/WildFly, pas juste un wrapper autour de LangChain4j.
     </aside>
 </section>
 
@@ -1451,66 +1455,6 @@ dev.langchain4j.cdi.plugin.mcp-tools.config.url=\
     </aside>
 </section>
 
-<!-- Slide 25.1: Subsystem AI WildFly -->
-<section>
-    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
-    <h2>Subsystem AI WildFly</h2>
-    <pre><code class="language-xml" data-trim data-noescape style="font-size: 0.65em;">
-&lt;!-- standalone.xml - Configuration du subsystem AI WildFly --&gt;
-&lt;subsystem xmlns="urn:jboss:domain:ai:1.0"&gt;
-    &lt;!-- Configuration du modèle Ollama --&gt;
-    &lt;chat-language-models&gt;
-        &lt;ollama-chat-model name="ollama"
-            base-url="http://127.0.0.1:11434"
-            model-name="llama3.1:8b"
-            temperature="0.9"
-            connect-timeout="600000"
-            log-requests="true"
-            log-responses="true"/&gt;
-    &lt;/chat-language-models&gt;
-
-    &lt;!-- Configuration du client MCP SSE --&gt;
-    &lt;mcp&gt;
-        &lt;mcp-tool-provider name="mcp" mcp-clients="mcp-sse"/&gt;
-        &lt;mcp-client-sse name="mcp-sse"
-            socket-binding="mcp-sse"
-            sse-path="/sse"
-            connect-timeout="6000000"
-            log-requests="true"
-            log-responses="true"/&gt;
-    &lt;/mcp&gt;
-&lt;/subsystem&gt;
-
-&lt;!-- Socket binding pour le serveur MCP --&gt;
-&lt;outbound-socket-binding name="mcp-sse"&gt;
-    &lt;remote-destination host="localhost" port="8090"/&gt;
-&lt;/outbound-socket-binding&gt;
-    </code></pre>
-    <p class="fragment small accent" style="margin-top: 0.8em;">
-        Configuration WildFly native -- Zéro properties ! 🚀
-    </p>
-    <aside class="notes">
-        Emmanuel explique le subsystem AI WildFly.
-
-        Le WildFly AI Feature Pack ajoute un nouveau subsystem "ai" à WildFly. C'est une extension native qui permet de configurer :
-
-        1. Les modèles de chat (chat-language-models) :
-           - ollama-chat-model : connexion vers Ollama avec base-url, model-name, temperature
-           - Supporte aussi OpenAI et d'autres providers
-
-        2. Les clients MCP :
-           - mcp-tool-provider : expose les tools MCP aux agents CDI
-           - mcp-client-sse : client MCP utilisant Server-Sent Events (HTTP SSE)
-           - socket-binding : pointe vers le serveur MCP distant (localhost:8090)
-
-        Tout est configuré dans standalone.xml. Pas besoin de microprofile-config.properties, pas de code Java pour la config.
-
-        Les agents CDI référencent simplement les noms : chatModelName="ollama" et toolProviderName="mcp".
-
-        C'est une vraie intégration Jakarta EE/WildFly, pas juste un wrapper autour de LangChain4j.
-    </aside>
-</section>
-
 <!-- Slide 25.2: Flux Demo 3 avec MCP SSE -->
 <section>
     <span class="speaker-tag speaker-yann">Yann</span>
@@ -2054,7 +1998,7 @@ public AgentExecutor agentExecutor() {
         </a>
     </p>
     <p class="small" style="margin-top: 2em;">
-        Devoxx France 2026<br>
+        Oracle Dev Week 2026<br>
         Slides : Reveal.js | Démos : WildFly + IntelliJ
     </p>
     <aside class="notes">
