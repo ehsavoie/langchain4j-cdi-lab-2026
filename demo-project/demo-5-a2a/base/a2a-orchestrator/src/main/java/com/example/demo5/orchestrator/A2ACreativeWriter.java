@@ -1,23 +1,17 @@
 package com.example.demo5.orchestrator;
 
-// TODO: Importer les annotations nécessaires
-// import dev.langchain4j.cdi.agent.AgentTopologyType;
-// import dev.langchain4j.cdi.spi.RegisterAgent;
+import dev.langchain4j.cdi.spi.RegisterA2AAgent;
 import dev.langchain4j.service.V;
 
-/**
- * Proxy CDI vers l'agent A2A Creative Writer distant.
- *
- * TODO: Annoter l'interface avec @RegisterAgent :
- *   name = "creative-writer"
- *   topology = AgentTopologyType.A2A
- *   a2aServerUrl = "${a2a.creative-writer.url}"   ← lit la config MicroProfile
- *   outputKey = "story"
- *   description = "Generate a Norse saga based on the given topic"
- *
- * Une fois annoté, LangChain4j-CDI crée automatiquement un bean CDI
- * @Named("creative-writer") qui appelle l'agent distant via A2A.
- */
+// TODO - Étape 1 : Annoter cette interface avec @RegisterA2AAgent.
+// LangChain4j-CDI créera automatiquement le proxy CDI qui appelle l'agent A2A distant.
+// La propriété a2aServerUrl est résolue via MicroProfile Config (microprofile-config.properties).
+//
+// @RegisterA2AAgent(
+//         name = "creative-writer",
+//         a2aServerUrl = "${a2a.creative-writer.url}",
+//         outputKey = "story",
+//         description = "Generate a Norse saga based on the given topic")
 public interface A2ACreativeWriter {
 
     String generateStory(@V("topic") String topic);

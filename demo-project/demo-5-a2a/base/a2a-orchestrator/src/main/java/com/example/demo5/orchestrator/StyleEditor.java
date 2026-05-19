@@ -1,21 +1,19 @@
 package com.example.demo5.orchestrator;
 
-// TODO: Importer les annotations nécessaires
-// import dev.langchain4j.cdi.spi.RegisterAgent;
+import dev.langchain4j.cdi.spi.RegisterSimpleAgent;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 
-/**
- * Agent local StyleEditor — réécrit une saga pour mieux correspondre à un style.
- *
- * TODO: Annoter l'interface avec @RegisterAgent :
- *   name = "style-editor"
- *   description = "Reforge a saga to better capture a given style"
- *   outputKey = "story"
- *   chatModelName = "ollama"
- *
- * LangChain4j-CDI crée un bean CDI @Named("style-editor") alimenté par Ollama.
- */
+// TODO - Étape 3 : Annoter cette interface avec @RegisterSimpleAgent.
+// @RegisterSimpleAgent remplace le AgenticServices.agentBuilder() + ChatModel injecté manuellement
+// dans OrchestratorService. chatModelName référence le bean ChatModel nommé "ollama"
+// (configuré via microprofile-config.properties).
+//
+// @RegisterSimpleAgent(
+//         name = "style-editor",
+//         description = "Reforge a saga to better capture a given style",
+//         outputKey = "story",
+//         chatModelName = "ollama")
 public interface StyleEditor {
 
     @UserMessage("""

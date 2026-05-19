@@ -1,10 +1,10 @@
 package com.example.demo5.orchestrator;
 
-import dev.langchain4j.cdi.spi.RegisterAgent;
+import dev.langchain4j.cdi.spi.RegisterSimpleAgent;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 
-@RegisterAgent(name="style-editor", description = "Reforge a saga to better capture a given style", outputKey = "story",chatModelName = "ollama")
+@RegisterSimpleAgent(name = "style-editor", description = "Reforge a saga to better capture a given style", outputKey = "story", chatModelName = "ollama")
 public interface StyleEditor {
 
     @UserMessage("""

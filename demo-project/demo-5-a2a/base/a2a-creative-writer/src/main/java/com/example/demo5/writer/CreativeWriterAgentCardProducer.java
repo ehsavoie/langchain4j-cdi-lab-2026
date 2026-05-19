@@ -13,15 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-/**
- * Producteur CDI de l'AgentCard A2A pour le Creative Writer.
- * L'AgentCard décrit les capacités de l'agent aux autres agents du réseau A2A.
- *
- * TODO: À compléter :
- * 1. Implémenter la méthode agentCard() pour construire et retourner un AgentCard
- * 2. Configurer les capacités (streaming, etc.)
- * 3. Déclarer le skill "creative_writer"
- */
 @ApplicationScoped
 public class CreativeWriterAgentCardProducer {
 
@@ -32,17 +23,29 @@ public class CreativeWriterAgentCardProducer {
     @Produces
     @PublicAgentCard
     public AgentCard agentCard() {
-        // TODO: Construire l'AgentCard avec le Builder :
-        // - name: "Creative Writer"
-        // - description: "Generate a story based on the given topic"
-        // - url: serverUrl
-        // - version: "1.0.0"
-        // - capabilities: streaming=true, pushNotifications=false, stateTransitionHistory=false
-        // - defaultInputModes / defaultOutputModes: "text"
-        // - skills: un AgentSkill avec id="creative_writer", name="Creative Writer"
-        // - protocolVersion: "0.3.0"
-        // - preferredTransport: TransportProtocol.JSONRPC
-        // - additionalInterfaces: AgentInterface JSONRPC sur serverUrl
-        throw new UnsupportedOperationException("TODO: Implémenter la construction de l'AgentCard");
+        return new AgentCard.Builder()
+                .name("Creative Writer")
+                .description("Generate a story based on the given topic")
+                .url(serverUrl)
+                .version("1.0.0")
+                .protocolVersion("1.0.0")
+                .capabilities(new AgentCapabilities.Builder()
+                        .streaming(true)
+                        .pushNotifications(false)
+                        .stateTransitionHistory(false)
+                        .build())
+                .defaultInputModes(Collections.singletonList("text"))
+                .defaultOutputModes(Collections.singletonList("text"))
+                .skills(Collections.singletonList(new AgentSkill.Builder()
+                        .id("creative_writer")
+                        .name("Creative Writer")
+                        .description("Generate a story based on the given topic")
+                        .tags(Collections.singletonList("writing"))
+                        .build()))
+                .protocolVersion("0.3.0")
+                .preferredTransport(TransportProtocol.JSONRPC.asString())
+                .additionalInterfaces(List.of(
+                        new AgentInterface(TransportProtocol.JSONRPC.asString(), serverUrl)))
+                .build();
     }
 }

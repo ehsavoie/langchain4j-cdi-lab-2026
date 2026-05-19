@@ -31,6 +31,18 @@ public class StyledWriterEndpoint {
                     .build();
         }
 
+        // TODO - Étape 8 : Mettre à jour l'appel pour extraire la story ET le score depuis le scope.
+        // Remplacer la ligne ci-dessous par :
+        //
+        //   ResultWithAgenticScope<String> result = orchestratorService.writeStyledStory(topic, style);
+        //   String story = result.result();
+        //   AgenticScope scope = result.agenticScope();
+        //   double score = scope.readState("score", 0.0);
+        //
+        // Ajouter les imports : AgenticScope, ResultWithAgenticScope
+        // Ajouter "score" dans le JSON et dans le .formatted(...) :
+        //   "score": %s,
+        //   .formatted(jsonString(story), score, jsonString(topic), jsonString(style))
         String story = orchestratorService.writeStyledStory(topic, style);
 
         String json = """
