@@ -1790,14 +1790,20 @@ public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
     </aside>
 </section>
 
-<!-- A2A code : AgentCard + Executor -->
+<!-- A2A code : Serveur A2A -->
 <section>
     <span class="speaker-tag speaker-both">Les deux</span>
-    <h2>Serveur A2A = AgentCard + Executor</h2>
-    <pre><code class="language-java" data-trim>
+    <h2>Serveur A2A : Creative Writer</h2>
+    <pre><code class="language-java" data-trim data-line-numbers="1-5|7-13">
 @RegisterAIService(chatModelName = "ollama", scope = ApplicationScoped.class)
 public interface CreativeWriter {
-    @UserMessage("Forge a Norse saga around the topic {{topic}}...")
+    @UserMessage("""
+        You are a Norse skald, a Viking bard who crafts mighty sagas.
+        Forge a short saga no more than 3 sentences around the given topic,
+        in the spirit of the Viking age.
+        Return only the saga in English and nothing else.
+        The topic is {{topic}}.
+        """)
     String generateStory(@V("topic") String topic);
 }
     </code></pre>
@@ -1806,57 +1812,164 @@ public interface CreativeWriter {
 public AgentCard agentCard() {
     return new AgentCard.Builder()
         .name("Creative Writer")
+        .description("Generate a story based on the given topic")
+        .url(serverUrl)
+        .capabilities(new AgentCapabilities.Builder()
+            .streaming(true).build())
         .skills(List.of(new AgentSkill.Builder()
-            .id("creative_writer").build()))
+            .id("creative_writer").name("Creative Writer")
+            .description("Generate a story based on the given topic")
+            .build()))
         .preferredTransport(TransportProtocol.JSONRPC.asString())
         .build();
 }
     </code></pre>
     <p class="fragment small">
-        <span class="accent">@RegisterAIService</span> + <span class="accent-blue">AgentCard CDI producer</span> + <span class="accent-green">AgentExecutor</span> = serveur A2A complet
+        <span class="accent">@RegisterAIService</span> classique + <span class="accent-blue">@PublicAgentCard</span> producteur CDI = agent exposé sur le réseau A2A
     </p>
     <aside class="notes">
-        Côté serveur A2A, on a trois composants : le service IA LangChain4j-CDI classique, un producteur CDI pour l'AgentCard qui décrit l'agent au réseau A2A, et un AgentExecutor qui reçoit les requêtes A2A et délègue au service IA.
+        Côté serveur A2A, le service IA est un @RegisterAIService classique — exactement comme la démo 1.
 
-        Le service IA est identique à ce qu'on fait depuis la démo 1. L'AgentCard est un bean CDI produit avec @Produces et @PublicAgentCard. L'executor est un autre producteur CDI.
+        L'AgentCard est un producteur CDI annoté @PublicAgentCard. Il décrit l'agent pour le réseau A2A : nom, description, capabilities, skills, et le protocole de transport.
+
+        C'est tout ce qu'il faut pour exposer un agent CDI comme serveur A2A.
     </aside>
 </section>
 
-<!-- A2A code : Orchestrateur -->
+<!-- A2A code : AgentExecutor -->
 <section>
     <span class="speaker-tag speaker-both">Les deux</span>
-    <h2>Orchestrateur : séquence + boucle</h2>
-    <pre><code class="language-java" data-trim data-line-numbers="1-4|6-9|11-15|17-20">
-@RegisterA2AAgent(name="creative-writer",
-    a2aServerUrl="${a2a.creative-writer.url}", outputKey="story",
-    description="Generate a Norse saga based on the given topic")
-interface A2ACreativeWriter { String generateStory(@V("topic") String topic); }
+    <h2>AgentExecutor : le pont A2A ↔ CDI</h2>
+    <pre><code class="language-java" data-trim data-line-numbers="1-3|5-7|9-10|12-14">
+@Produces
+public AgentExecutor agentExecutor() {
+    return new AgentExecutor() {
+        @Override
+        public void execute(RequestContext context, EventQueue eventQueue)
+                throws JSONRPCError {
+            TaskUpdater updater = new TaskUpdater(context, eventQueue);
+            updater.startWork();
 
-@RegisterSequenceAgent(
-    subAgentNames={"creative-writer","style-review-loop"}, outputKey="story")
-interface StyledWriter extends AgenticScopeAccess {
-    ResultWithAgenticScope&lt;String&gt; writeStoryWithStyle(@V("topic") String topic, @V("style") String style); }
+            String userMessage = extractTextFromMessage(
+                context.getMessage());
+            String response = creativeWriter.generateStory(userMessage);
 
-@RegisterLoopAgent(name="style-review-loop",
-    subAgentNames={"style-scorer","style-editor"}, maxIterations=5,
-    exitConditionName="scoreExitCondition",
-    exitConditionDescription="Exit when the story score reaches 0.8 or higher")
-interface StyleReviewLoop { String refineStory(@V("story") String s, @V("style") String st); }
+            updater.addArtifact(
+                List.of(new TextPart(response, null)),
+                null, null, null);
+            updater.complete();
+        }
+    };
+}
+    </code></pre>
+    <p class="fragment small">
+        <span class="accent-green">AgentExecutor</span> reçoit la requête A2A → appelle le <span class="accent">@RegisterAIService</span> → renvoie la réponse comme artifact
+    </p>
+    <aside class="notes">
+        L'AgentExecutor est le pont entre le protocole A2A et le bean CDI. C'est un producteur CDI qui délègue au service IA injecté.
 
-@ApplicationScoped @Named("scoreExitCondition")
-class ScoreExitCondition implements Predicate&lt;AgenticScope&gt; {
-    public boolean test(AgenticScope scope) {
-        return ((Number) scope.readState("score")).doubleValue() &gt;= 0.8; } }
+        Le cycle de vie A2A : startWork pour signaler le début, on extrait le texte du message A2A, on appelle le service IA, on ajoute la réponse comme artifact, et on complete.
+
+        Pattern identique pour le Creative Writer et le Style Scorer — seul le service IA injecté change.
+    </aside>
+</section>
+
+<!-- A2A code : Agents de l'orchestrateur -->
+<section>
+    <span class="speaker-tag speaker-both">Les deux</span>
+    <h2>Orchestrateur : déclarer les agents</h2>
+    <pre><code class="language-java" data-trim data-line-numbers="1-5|7-11|13-20">
+@RegisterA2AAgent(name = "creative-writer",
+    a2aServerUrl = "${a2a.creative-writer.url}",
+    outputKey = "story",
+    description = "Generate a Norse saga based on the given topic")
+public interface A2ACreativeWriter {
+    String generateStory(@V("topic") String topic);
+}
+
+@RegisterA2AAgent(name = "style-scorer",
+    a2aServerUrl = "${a2a.style-scorer.url}",
+    outputKey = "score",
+    description = "Score a saga based on how well it captures a given style")
+public interface A2AStyleScorer {
+    double scoreStyle(@V("story") String story, @V("style") String style);
+}
+
+@RegisterSimpleAgent(name = "style-editor",
+    description = "Reforge a saga to better capture a given style",
+    outputKey = "story", chatModelName = "ollama")
+public interface StyleEditor {
+    @UserMessage("""
+        You are a master Norse skald who shapes and tempers sagas
+        like a smith forges steel. Rewrite the following saga to better
+        honor and embody the {{style}} style.
+        Return only the saga and nothing else.
+        The saga is "{{story}}".
+        """)
+    String editStory(@V("story") String story, @V("style") String style);
+}
     </code></pre>
     <p class="fragment small">
         <span class="accent-red">@RegisterA2AAgent</span> → proxy vers agent distant |
-        <span class="accent-green">@RegisterSequenceAgent</span> → pipeline séquentiel |
-        <span class="accent-blue">@RegisterLoopAgent</span> → boucle déclarative avec condition CDI
+        <span class="accent-green">@RegisterSimpleAgent</span> → agent local avec LLM
     </p>
     <aside class="notes">
-        L'orchestrateur utilise quatre annotations dédiées : @RegisterA2AAgent pour les proxies distants, @RegisterSequenceAgent pour le pipeline, @RegisterLoopAgent pour la boucle de révision, et @RegisterSimpleAgent pour l'éditeur local.
+        L'orchestrateur déclare ses agents avec des annotations dédiées.
 
-        La boucle est maintenant entièrement déclarative — plus besoin de builder programmatique. La condition de sortie est un bean CDI @Named qui implémente Predicate — le framework le résout automatiquement via exitConditionName.
+        @RegisterA2AAgent crée un proxy vers un agent A2A distant — l'URL est configurable via MicroProfile Config. Le framework gère la communication A2A de manière transparente.
+
+        @RegisterSimpleAgent crée un agent local qui utilise un LLM directement — ici le Style Editor qui réécrit les sagas. Même pattern que @RegisterAIService mais avec un outputKey pour partager le résultat dans le scope agentique.
+    </aside>
+</section>
+
+<!-- A2A code : Composition de l'orchestrateur -->
+<section>
+    <span class="speaker-tag speaker-both">Les deux</span>
+    <h2>Orchestrateur : séquence + boucle</h2>
+    <pre><code class="language-java" data-trim data-line-numbers="1-5|7-13|15-23">
+@RegisterSequenceAgent(
+    subAgentNames = {"creative-writer", "style-review-loop"},
+    outputKey = "story")
+public interface StyledWriter extends AgenticScopeAccess {
+    ResultWithAgenticScope&lt;String&gt; writeStoryWithStyle(
+        @V("topic") String topic, @V("style") String style);
+}
+
+@RegisterLoopAgent(name = "style-review-loop",
+    subAgentNames = {"style-scorer", "style-editor"},
+    maxIterations = 5,
+    exitConditionName = "scoreExitCondition",
+    exitConditionDescription = "Exit when the story score reaches 0.8 or higher")
+public interface StyleReviewLoop {
+    String refineStory(@V("story") String story, @V("style") String style);
+}
+
+@ApplicationScoped
+@Named("scoreExitCondition")
+public class ScoreExitCondition implements Predicate&lt;AgenticScope&gt; {
+    @Override
+    public boolean test(AgenticScope scope) {
+        Object raw = scope.readState("score");
+        if (raw instanceof Number n) {
+            return n.doubleValue() &gt;= 0.8;
+        }
+        return false;
+    }
+}
+    </code></pre>
+    <p class="fragment small">
+        <span class="accent-green">@RegisterSequenceAgent</span> → pipeline séquentiel |
+        <span class="accent-blue">@RegisterLoopAgent</span> → boucle déclarative |
+        <span class="accent">@Named</span> → condition de sortie CDI
+    </p>
+    <aside class="notes">
+        La composition est entièrement déclarative.
+
+        @RegisterSequenceAgent câble un pipeline : d'abord le creative-writer forge la saga, puis la boucle style-review-loop l'affine. Le résultat circule via le scope agentique grâce aux outputKeys.
+
+        @RegisterLoopAgent crée la boucle de révision : le style-scorer évalue, le style-editor réécrit. La boucle tourne jusqu'à ce que le scoreExitCondition soit satisfait (score &gt;= 0.8) ou que maxIterations (5) soit atteint.
+
+        La condition de sortie est un bean CDI @Named qui implémente Predicate — le framework le résout automatiquement via exitConditionName. C'est du CDI pur.
     </aside>
 </section>
 
@@ -1889,6 +2002,18 @@ class ScoreExitCondition implements Predicate&lt;AgenticScope&gt; {
         6. Observer la boucle de révision dans les logs
 
         SECOURS : Montrer les slides de backup avec le code
+    </aside>
+</section>
+
+<!-- Demo 5 - Vidéo de la démo -->
+<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
+    <h2>Demo 5 — Story Forge en action</h2>
+    <video data-autoplay controls style="max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <source src="demo5.webm" type="video/webm">
+    </video>
+    <aside class="notes">
+        Vidéo de secours pour la démo 5. Montre l'orchestration A2A Story Forge :
+        le Creative Writer forge une saga, le Style Scorer l'évalue, et la boucle de révision s'exécute jusqu'à atteindre un score suffisant.
     </aside>
 </section>
 
