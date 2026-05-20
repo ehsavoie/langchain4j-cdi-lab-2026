@@ -1650,16 +1650,28 @@ public class FrenchInputGuardrail implements InputGuardrail {
         CHECKLIST DEMO :
         1. cd demo-project/demo-4-guardrails/base && mvn clean install && ./target/server/bin/standalone.sh
         2. Ouvrir index.html du navigateur (localhost:8080/demo-4)
-        3. Tester sans guardrails : envoyer "Sing me a Viking song" → ça passe (skald en anglais ?)
+        3. Tester sans guardrails : envoyer "Sing me a heroic Viking song about Odin and his ravens" → ça passe (skald en anglais ?)
         4. Ajouter @Named("french-input") sur FrenchInputGuardrail
         5. Implémenter init() et validate() sur FrenchInputGuardrail
         6. Faire pareil pour les 3 autres guardrails
         7. Ajouter inputGuardrailNames + outputGuardrailNames dans @RegisterAIService de SkaldAssistant
-        8. Hot-reload, tester avec "Sing me a Viking song" → rejeté !
+        8. Hot-reload, tester avec "Sing me a heroic Viking song about Odin and his ravens" → rejeté !
         9. Tester avec "Compose un chant sur les nains vikings" → rejeté !
         10. Tester avec "Compose un chant sur la gloire d'Odin" → accepté !
 
         SECOURS : cd demo-4-guardrails/solution && mvn clean install && ./target/server/bin/standalone.sh
+    </aside>
+</section>
+
+<!-- Demo 4 - Vidéo de la démo -->
+<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
+    <h2>Demo 4 — Guardrails en action</h2>
+    <video data-autoplay controls style="max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <source src="demo4.webm" type="video/webm">
+    </video>
+    <aside class="notes">
+        Vidéo de secours pour la démo 4. Montre les 4 guardrails en action :
+        requête en anglais rejetée, mention de nains rejetée, requête valide en français acceptée.
     </aside>
 </section>
 
