@@ -183,9 +183,36 @@
 
         /* Speaker indicator — hidden, decided on the fly */
         .speaker-tag { display: none; }
+
+        /* Ink stamp effect */
+        .stamp {
+            position: absolute;
+            padding: 0.3em 0.8em;
+            border: 3px solid;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.8;
+            pointer-events: none;
+            filter: url(#ink-texture);
+            text-shadow: 1px 0 0 currentColor;
+        }
+        .stamp-red {
+            color: #c62828;
+            border-color: #c62828;
+        }
     </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute;">
+    <filter id="ink-texture">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+</svg>
 <div class="reveal">
 <div class="slides">
 
@@ -344,11 +371,6 @@
             <strong>🛡️ Prêt pour la production</strong>
             <span class="small"> — Fault Tolerance & Telemetry</span>
             <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
-        </div>
-        <div class="step">
-            <strong>🚀 Démo WildFly en live</strong>
-            <span class="small"> — Le chatbot complet en production</span>
-            <span class="speaker-tag speaker-yann">Yann</span>
         </div>
         <div class="step purple">
             <strong>🛡️ Guardrails</strong>
@@ -1349,12 +1371,20 @@ podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 \
             <p class="small">JWT, RBAC pour agents ?</p>
         </div>
     </div>
+    <div class="fragment stamp stamp-red" style="top: 25%; right: 5%; transform: rotate(-12deg);">
+        + langchain4j-cdi-el<br>
+        <span style="font-size: 0.6em; letter-spacing: 0;">Expression Languages</span>
+    </div>
+    <div class="fragment stamp stamp-red" style="bottom: 25%; left: 5%; transform: rotate(6deg);">
+        + langchain4j-cdi-a2a<br>
+        <span style="font-size: 0.6em; letter-spacing: 0;">Agent-to-Agent Protocol</span>
+    </div>
     <aside class="notes">
         Voici la carte des modules. Le core contient l'API et les annotations. Ensuite vous choisissez votre extension selon votre serveur.
 
         Par-dessus : fault-tolerance et telemetry sont des modules optionnels. Vous ajoutez ce dont vous avez besoin, rien de plus.
 
-        Le dernier en pointillés... c'est une idée pour le futur. Sécurité pour les agents : qui a le droit d'appeler quel tool, quel LLM, etc. On y pense.
+        Et deux nouveaux modules viennent d'arriver ! langchain4j-cdi-el pour le support des Expression Languages dans les paramètres d'annotations, et langchain4j-cdi-a2a pour le support du protocole Agent-to-Agent. C'est ce qu'on utilise dans la démo 5.
     </aside>
 </section>
 
@@ -1787,7 +1817,7 @@ public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
     <div style="font-size: 0.8em; text-align: left; max-width: 750px; margin: 0 auto;">
         <div class="box" style="text-align: center; margin-bottom: 0.5em;">
             <strong style="color: var(--accent-orange);">Orchestrateur</strong> (port 8082)<br>
-            <span class="small">LangChain4j Agentic : séquence + boucle</span>
+            <span class="small">LangChain4j Agentic : séquence + boucle + <strong style="color: var(--accent-green);">Style Editor</strong> (agent local)</span>
         </div>
         <div style="display: flex; gap: 1em;">
             <div class="box box-accent" style="flex: 1; text-align: center;">
@@ -1864,7 +1894,10 @@ public AgentCard agentCard() {
 <section>
     <span class="speaker-tag speaker-both">Les deux</span>
     <h2>AgentExecutor : le pont A2A ↔ CDI</h2>
-    <pre><code class="language-java" data-trim data-line-numbers="1-3|5-7|9-10|12-14">
+    <pre><code class="language-java" data-trim data-line-numbers="1-2|4-6|8-10|12-13|15-17">
+@Inject
+CreativeWriter creativeWriter;
+
 @Produces
 public AgentExecutor agentExecutor() {
     return new AgentExecutor() {
@@ -2038,42 +2071,6 @@ public class ScoreExitCondition implements Predicate&lt;AgenticScope&gt; {
     <aside class="notes">
         Vidéo de secours pour la démo 5. Montre l'orchestration A2A Story Forge :
         le Creative Writer forge une saga, le Style Scorer l'évalue, et la boucle de révision s'exécute jusqu'à atteindre un score suffisant.
-    </aside>
-</section>
-
-<!-- Demo 5 - Backup slide : AgentExecutor -->
-<section data-visibility="uncounted">
-    <h2>AgentExecutor : recevoir les requêtes A2A</h2>
-    <pre><code class="language-java" data-trim>
-@Produces
-public AgentExecutor agentExecutor() {
-    return new AgentExecutor() {
-        @Override
-        public void execute(RequestContext context, EventQueue eventQueue)
-                throws JSONRPCError {
-            TaskUpdater updater = new TaskUpdater(context, eventQueue);
-            updater.startWork();
-
-            String userMessage = extractTextFromMessage(context.getMessage());
-            String response = creativeWriter.generateStory(userMessage);
-
-            updater.addArtifact(List.of(new TextPart(response, null)),
-                null, null, null);
-            updater.complete();
-        }
-    };
-}
-    </code></pre>
-    <p class="fragment small">
-        L'<code>AgentExecutor</code> est un producteur CDI —
-        pattern identique à l'<code>AgentCard</code>
-    </p>
-    <aside class="notes">
-        SECOURS si la démo live ne marche pas.
-
-        L'AgentExecutor reçoit les requêtes A2A. Il crée un TaskUpdater pour gérer le cycle de vie de la tâche A2A : startWork, addArtifact, complete.
-
-        Le message A2A contient des TextParts. On extrait le texte, on appelle le service IA, on renvoie la réponse comme artifact.
     </aside>
 </section>
 
