@@ -1,28 +1,24 @@
 package com.example.demo5.scorer;
 
-// TODO: Importer les annotations LangChain4j nécessaires
-// import dev.langchain4j.cdi.spi.RegisterAIService;
-// import dev.langchain4j.service.UserMessage;
-// import dev.langchain4j.service.V;
 import jakarta.enterprise.context.ApplicationScoped;
 
-/**
- * Agent IA "Style Scorer" qui évalue le style d'une histoire.
- *
- * TODO: À compléter :
- * 1. Annoter l'interface avec @RegisterAIService(chatModelName = "ollama", scope = ApplicationScoped.class)
- * 2. Ajouter @UserMessage avec le prompt d'évaluation de style
- * 3. Utiliser @V("story") et @V("style") pour injecter les paramètres dans le template
- */
+// TODO 1 : Ajouter les imports :
+//   import dev.langchain4j.cdi.spi.RegisterAIService;
+//   import dev.langchain4j.service.UserMessage;
+//   import dev.langchain4j.service.V;
+
+// TODO 2 : Annoter l'interface avec @RegisterAIService pour la rendre injectable via CDI :
+//   @RegisterAIService(chatModelName = "ollama", scope = ApplicationScoped.class)
 public interface StyleScorer {
 
-    // TODO: Ajouter l'annotation @UserMessage avec le prompt suivant :
-    // """
-    // You are a seasoned Norse skald elder who judges sagas by the fire of a longhouse.
-    // Give a score between 0.0 and 1.0 for the following saga based on how well it captures the '{{style}}' style.
-    // Return only the score and nothing else.
+    // TODO 3 : Annoter la méthode avec @UserMessage :
+    //   @UserMessage("""
+    //           You are a seasoned Norse skald elder who judges sagas by the fire of a longhouse.
+    //           Give a score between 0.0 and 1.0 for the following saga based on how well it captures the '{{style}}' style.
+    //           Return only the score and nothing else.
     //
-    // The saga is: "{{story}}"
-    // """
-    double scoreStyle(/* TODO: @V("story") */ String story, /* TODO: @V("style") */ String style);
+    //           The saga is: "{{story}}"
+    //           """)
+    // TODO 4 : Ajouter @V("story") et @V("style") devant les paramètres
+    double scoreStyle(String story, String style);
 }

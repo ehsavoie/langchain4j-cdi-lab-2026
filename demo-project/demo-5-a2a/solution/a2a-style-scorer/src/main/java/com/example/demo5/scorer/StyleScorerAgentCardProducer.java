@@ -17,7 +17,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 public class StyleScorerAgentCardProducer {
 
     @Inject
-    @ConfigProperty(name = "a2a.server.url", defaultValue = "http://localhost:8080")
+    @ConfigProperty(name = "a2a.server.url", defaultValue = "http://localhost:8081")
     String serverUrl;
 
     @Produces

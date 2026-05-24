@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LangChain4j-CDI — Devoxx France 2026</title>
+    <title>LangChain4j-CDI — Oracle Dev Week 2026</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
@@ -183,9 +183,36 @@
 
         /* Speaker indicator — hidden, decided on the fly */
         .speaker-tag { display: none; }
+
+        /* Ink stamp effect */
+        .stamp {
+            position: absolute;
+            padding: 0.3em 0.8em;
+            border: 3px solid;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.8;
+            pointer-events: none;
+            filter: url(#ink-texture);
+            text-shadow: 1px 0 0 currentColor;
+        }
+        .stamp-red {
+            color: #c62828;
+            border-color: #c62828;
+        }
     </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute;">
+    <filter id="ink-texture">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+</svg>
 <div class="reveal">
 <div class="slides">
 
@@ -194,45 +221,21 @@
 <!-- ============================================= -->
 
 <!-- Slide 1: Title with logo -->
-<section>
-    <img src="logodevoxxfr26.png"
-         alt="Devoxx France 2026"
-         style="position: absolute; top: 20px; right: 20px; max-width: 90px; z-index: 10;">
+<section data-background-image="presenter-background-1920x1080-dark-1.png"
+         data-background-size="cover">
     <img src="langchain4j-cdi-logo.png"
          onerror="this.src='https://raw.githubusercontent.com/langchain4j/langchain4j-cdi/main/langchain4j-cdi-logo.png'"
          alt="LangChain4j-CDI" style="max-width: 280px; margin-bottom: 0.3em;">
     <h1>LangChain4j-CDI</h1>
     <h3 style="color: var(--accent-blue);">IA Générative<br>Nativement Injectable dans Jakarta EE</h3>
     <p class="small" style="margin-top: 1em;">
-        <span class="accent">Yann Blazart</span>, <span class="accent">Emmanuel Hugonnet</span> &amp; <span class="accent">Antoine Sabot-Durand</span>
+        <span class="accent">Yann Blazart</span> &amp; <span class="accent">Emmanuel Hugonnet</span>
     </p>
-    <p class="small">Devoxx France 2026</p>
+    <p class="small">Oracle Dev Week 2026</p>
     <aside class="notes">
         Bienvenue à tous ! On espère que vous êtes prêts, parce qu'on va parler de choses sérieuses... enfin, aussi sérieuses que deux types qui ont construit un framework d'IA peuvent l'être.
 
         Aujourd'hui on va vous montrer comment faire ce que l'extension Quarkus fait, mais sur N'IMPORTE QUEL serveur CDI. Oui, même votre bon vieux WildFly qui tourne en production depuis 2015.
-    </aside>
-</section>
-
-<!-- Slide 2: Disclaimer (effet de surprise) -->
-<section data-background-gradient="linear-gradient(135deg, #2a0a0a, #1a0a00)">
-    <p class="emoji-big">⚠️</p>
-    <h2 style="color: var(--accent-orange);">Avertissement</h2>
-    <p class="big" style="margin-top: 0.5em;">
-        Cette présentation a été <span class="accent">honteusement générée</span> avec l'aide d'une IA.
-    </p>
-    <p class="fragment medium" style="margin-top: 1em; color: #ccc;">
-        Rassurez-vous, les speakers sont <em>réels</em>.<br>
-        <span class="fragment">Enfin... on n'a pas encore vérifié avec un CAPTCHA.</span>
-    </p>
-    <p class="fragment small" style="margin-top: 1.5em; color: #999;">
-        Aucun développeur Jakarta EE n'a été maltraité pendant la production de ces slides. Mais on ne parlera pas des raids Viking ⚔️<br>
-        <span class="fragment">Le LLM, par contre, a fait 247 tentatives.</span>
-    </p>
-    <aside class="notes">
-        Slide de disclaimer. On assume pleinement -- l'IA a aidé à construire ces slides. Ça fait rire et ça colle parfaitement avec le sujet de la session.
-
-        Si quelqu'un rigole à la ligne du CAPTCHA, enchaîner avec : "Sérieusement, si vous voulez nous vérifier, demandez-nous d'identifier des feux de circulation dans une grille."
     </aside>
 </section>
 
@@ -296,38 +299,6 @@
         Emmanuel sort de la salle des serveurs après de longues années passées à collectionner bugs et patches.
 
         Il intègre l'IA dans WildFly : WildFly AI Feature Pack (LC4J-CDI, MCP Server, WASM WASI) et A2A Java/JakartaEE SDK.
-    </aside>
-</section>
-
-<!-- Slide 4bis: Antoine Sabot-Durand -->
-<section>
-    <h2>Et le spec lead historique de CDI</h2>
-    <div class="speaker-card antoine" style="border-left-width: 6px;">
-        <div class="avatar"><img src="asd.png" alt="Antoine Sabot-Durand" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;"></div>
-        <div class="info">
-            <h3 style="color: var(--accent-green);">Antoine Sabot-Durand</h3>
-            <p>Java Champion • Ex spec lead <strong>CDI</strong> (Jakarta EE) • Ex-Red Hat</p>
-            <p>Équipe de lancement Quarkus • MicroProfile Fault Tolerance &amp; Health Check</p>
-            <p><span class="badge badge-green">CDI</span> <span class="badge badge-green">Jakarta EE</span> <span class="badge badge-green">Quarkus</span> <span class="badge badge-green">MicroProfile</span></p>
-        </div>
-    </div>
-    <div class="fragment" style="margin-top: 1.2em; text-align: center;">
-        <p class="medium" style="color: #ccc; margin-top: 0.3em;">
-            Directeur Technique @ <strong style="color: var(--accent-orange);">SCIAM</strong> — collègue de Yann
-        </p>
-        <p class="small" style="color: #999;">
-            <a href="https://github.com/antoinesd" style="color: var(--accent-blue);">github.com/antoinesd</a>
-        </p>
-    </div>
-    <p class="fragment small" style="margin-top: 0.8em; color: #777;">
-        À nous trois, bien plus de 75 ans d'expérience Java cumulés. On est vraiment des Technosaures maintenant. 🦕🦕🦕
-    </p>
-    <aside class="notes">
-        Antoine se présente (ou Yann le présente, vu qu'ils sont chez SCIAM tous les deux).
-
-        Spec lead historique de CDI côté Jakarta EE / Red Hat, membre de l'équipe fondatrice de Quarkus, contributeur majeur à MicroProfile Fault Tolerance et Health Check.
-
-        Aujourd'hui Directeur Technique chez SCIAM, il apporte toute la profondeur CDI nécessaire à l'extension langchain4j-cdi.
     </aside>
 </section>
 
@@ -400,11 +371,6 @@
             <strong>🛡️ Prêt pour la production</strong>
             <span class="small"> — Fault Tolerance & Telemetry</span>
             <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
-        </div>
-        <div class="step">
-            <strong>🚀 Démo WildFly en live</strong>
-            <span class="small"> — Le chatbot complet en production</span>
-            <span class="speaker-tag speaker-yann">Yann</span>
         </div>
         <div class="step purple">
             <strong>🛡️ Guardrails</strong>
@@ -701,6 +667,66 @@ dev.langchain4j.cdi.plugin.my-retriever.config.embeddingStore=\
     </aside>
 </section>
 
+<!-- Slide 11bis: Configuration WildFly subsystem AI -->
+<section>
+    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
+    <h2>Configuration : Subsystem AI WildFly</h2>
+    <pre><code class="language-xml" data-trim data-noescape style="font-size: 0.65em;">
+&lt;!-- standalone.xml - Configuration du subsystem AI WildFly --&gt;
+&lt;subsystem xmlns="urn:jboss:domain:ai:1.0"&gt;
+    &lt;!-- Configuration du modèle Ollama --&gt;
+    &lt;chat-language-models&gt;
+        &lt;ollama-chat-model name="ollama"
+            base-url="http://127.0.0.1:11434"
+            model-name="llama3.1:8b"
+            temperature="0.9"
+            connect-timeout="600000"
+            log-requests="true"
+            log-responses="true"/&gt;
+    &lt;/chat-language-models&gt;
+
+    &lt;!-- Configuration du client MCP SSE --&gt;
+    &lt;mcp&gt;
+        &lt;mcp-tool-provider name="mcp" mcp-clients="mcp-sse"/&gt;
+        &lt;mcp-client-sse name="mcp-sse"
+            socket-binding="mcp-sse"
+            sse-path="/sse"
+            connect-timeout="6000000"
+            log-requests="true"
+            log-responses="true"/&gt;
+    &lt;/mcp&gt;
+&lt;/subsystem&gt;
+
+&lt;!-- Socket binding pour le serveur MCP --&gt;
+&lt;outbound-socket-binding name="mcp-sse"&gt;
+    &lt;remote-destination host="localhost" port="8090"/&gt;
+&lt;/outbound-socket-binding&gt;
+    </code></pre>
+    <p class="fragment small accent" style="margin-top: 0.8em;">
+        Configuration WildFly native -- Zéro properties ! 🚀
+    </p>
+    <aside class="notes">
+        Emmanuel explique le subsystem AI WildFly -- la deuxième implémentation du SPI LLMConfig.
+
+        Le WildFly AI Feature Pack ajoute un nouveau subsystem "ai" à WildFly. C'est une extension native qui permet de configurer :
+
+        1. Les modèles de chat (chat-language-models) :
+           - ollama-chat-model : connexion vers Ollama avec base-url, model-name, temperature
+           - Supporte aussi OpenAI et d'autres providers
+
+        2. Les clients MCP :
+           - mcp-tool-provider : expose les tools MCP aux agents CDI
+           - mcp-client-sse : client MCP utilisant Server-Sent Events (HTTP SSE)
+           - socket-binding : pointe vers le serveur MCP distant (localhost:8090)
+
+        Tout est configuré dans standalone.xml. Pas besoin de microprofile-config.properties, pas de code Java pour la config.
+
+        Les agents CDI référencent simplement les noms : chatModelName="ollama" et toolProviderName="mcp".
+
+        C'est une vraie intégration Jakarta EE/WildFly, pas juste un wrapper autour de LangChain4j.
+    </aside>
+</section>
+
 <!-- ============================================= -->
 <!-- SECTION 3: DEMO 1 - Basic injection (Yann)    -->
 <!-- ============================================= -->
@@ -740,6 +766,18 @@ dev.langchain4j.cdi.plugin.my-retriever.config.embeddingStore=\
         10. Tester l'analyse d'image (image.html) avec une photo
 
         Si la démo plante : les slides de secours suivent.
+    </aside>
+</section>
+
+<!-- Demo 1 - Vidéo de la démo -->
+<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
+    <h2>Demo 1 — @RegisterAIService en action</h2>
+    <video data-autoplay controls style="max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <source src="demo1.webm" type="video/webm">
+    </video>
+    <aside class="notes">
+        Vidéo de secours pour la démo 1. Montre le chat basique avec @RegisterAIService,
+        le streaming en temps réel, et l'analyse d'images avec le modèle vision multimodal.
     </aside>
 </section>
 
@@ -1297,6 +1335,18 @@ podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 \
     </aside>
 </section>
 
+<!-- Demo 2 - Vidéo de la démo -->
+<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
+    <h2>Demo 2 — L'assistant d'expédition en action</h2>
+    <video data-autoplay controls style="max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <source src="demo2.webm" type="video/webm">
+    </video>
+    <aside class="notes">
+        Vidéo de secours pour la démo 2. Montre l'assistant d'expédition Viking avec
+        Memory, RAG, Tools, Fault Tolerance et Telemetry en action.
+    </aside>
+</section>
+
 <!-- Slide 23: Récap des modules -->
 <section>
     <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
@@ -1333,12 +1383,20 @@ podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 \
             <p class="small">JWT, RBAC pour agents ?</p>
         </div>
     </div>
+    <div class="fragment stamp stamp-red" style="top: 25%; right: 5%; transform: rotate(-12deg);">
+        + langchain4j-cdi-el<br>
+        <span style="font-size: 0.6em; letter-spacing: 0;">Expression Languages</span>
+    </div>
+    <div class="fragment stamp stamp-red" style="bottom: 25%; left: 5%; transform: rotate(6deg);">
+        + langchain4j-cdi-a2a<br>
+        <span style="font-size: 0.6em; letter-spacing: 0;">Agent-to-Agent Protocol</span>
+    </div>
     <aside class="notes">
         Voici la carte des modules. Le core contient l'API et les annotations. Ensuite vous choisissez votre extension selon votre serveur.
 
         Par-dessus : fault-tolerance et telemetry sont des modules optionnels. Vous ajoutez ce dont vous avez besoin, rien de plus.
 
-        Le dernier en pointillés... c'est une idée pour le futur. Sécurité pour les agents : qui a le droit d'appeler quel tool, quel LLM, etc. On y pense.
+        Et deux nouveaux modules viennent d'arriver ! langchain4j-cdi-el pour le support des Expression Languages dans les paramètres d'annotations, et langchain4j-cdi-a2a pour le support du protocole Agent-to-Agent. C'est ce qu'on utilise dans la démo 5.
     </aside>
 </section>
 
@@ -1451,63 +1509,15 @@ dev.langchain4j.cdi.plugin.mcp-tools.config.url=\
     </aside>
 </section>
 
-<!-- Slide 25.1: Subsystem AI WildFly -->
-<section>
-    <span class="speaker-tag speaker-emmanuel">Emmanuel</span>
-    <h2>Subsystem AI WildFly</h2>
-    <pre><code class="language-xml" data-trim data-noescape style="font-size: 0.65em;">
-&lt;!-- standalone.xml - Configuration du subsystem AI WildFly --&gt;
-&lt;subsystem xmlns="urn:jboss:domain:ai:1.0"&gt;
-    &lt;!-- Configuration du modèle Ollama --&gt;
-    &lt;chat-language-models&gt;
-        &lt;ollama-chat-model name="ollama"
-            base-url="http://127.0.0.1:11434"
-            model-name="llama3.1:8b"
-            temperature="0.9"
-            connect-timeout="600000"
-            log-requests="true"
-            log-responses="true"/&gt;
-    &lt;/chat-language-models&gt;
-
-    &lt;!-- Configuration du client MCP SSE --&gt;
-    &lt;mcp&gt;
-        &lt;mcp-tool-provider name="mcp" mcp-clients="mcp-sse"/&gt;
-        &lt;mcp-client-sse name="mcp-sse"
-            socket-binding="mcp-sse"
-            sse-path="/sse"
-            connect-timeout="6000000"
-            log-requests="true"
-            log-responses="true"/&gt;
-    &lt;/mcp&gt;
-&lt;/subsystem&gt;
-
-&lt;!-- Socket binding pour le serveur MCP --&gt;
-&lt;outbound-socket-binding name="mcp-sse"&gt;
-    &lt;remote-destination host="localhost" port="8090"/&gt;
-&lt;/outbound-socket-binding&gt;
-    </code></pre>
-    <p class="fragment small accent" style="margin-top: 0.8em;">
-        Configuration WildFly native -- Zéro properties ! 🚀
-    </p>
+<!-- Demo 3 - Vidéo de la démo -->
+<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
+    <h2>Demo 3 — Hnefatafl en action</h2>
+    <video data-autoplay controls style="max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <source src="demo3.webm" type="video/webm">
+    </video>
     <aside class="notes">
-        Emmanuel explique le subsystem AI WildFly.
-
-        Le WildFly AI Feature Pack ajoute un nouveau subsystem "ai" à WildFly. C'est une extension native qui permet de configurer :
-
-        1. Les modèles de chat (chat-language-models) :
-           - ollama-chat-model : connexion vers Ollama avec base-url, model-name, temperature
-           - Supporte aussi OpenAI et d'autres providers
-
-        2. Les clients MCP :
-           - mcp-tool-provider : expose les tools MCP aux agents CDI
-           - mcp-client-sse : client MCP utilisant Server-Sent Events (HTTP SSE)
-           - socket-binding : pointe vers le serveur MCP distant (localhost:8090)
-
-        Tout est configuré dans standalone.xml. Pas besoin de microprofile-config.properties, pas de code Java pour la config.
-
-        Les agents CDI référencent simplement les noms : chatModelName="ollama" et toolProviderName="mcp".
-
-        C'est une vraie intégration Jakarta EE/WildFly, pas juste un wrapper autour de LangChain4j.
+        Vidéo de secours pour la démo 3. Montre le jeu de Hnefatafl avec MCP :
+        Ragnar le Skald lance les runes via le serveur MCP externe, le LLM interprète les résultats et annonce le sort du guerrier.
     </aside>
 </section>
 
@@ -1706,16 +1716,28 @@ public class FrenchInputGuardrail implements InputGuardrail {
         CHECKLIST DEMO :
         1. cd demo-project/demo-4-guardrails/base && mvn clean install && ./target/server/bin/standalone.sh
         2. Ouvrir index.html du navigateur (localhost:8080/demo-4)
-        3. Tester sans guardrails : envoyer "Sing me a Viking song" → ça passe (skald en anglais ?)
+        3. Tester sans guardrails : envoyer "Sing me a heroic Viking song about Odin and his ravens" → ça passe (skald en anglais ?)
         4. Ajouter @Named("french-input") sur FrenchInputGuardrail
         5. Implémenter init() et validate() sur FrenchInputGuardrail
         6. Faire pareil pour les 3 autres guardrails
         7. Ajouter inputGuardrailNames + outputGuardrailNames dans @RegisterAIService de SkaldAssistant
-        8. Hot-reload, tester avec "Sing me a Viking song" → rejeté !
+        8. Hot-reload, tester avec "Sing me a heroic Viking song about Odin and his ravens" → rejeté !
         9. Tester avec "Compose un chant sur les nains vikings" → rejeté !
         10. Tester avec "Compose un chant sur la gloire d'Odin" → accepté !
 
         SECOURS : cd demo-4-guardrails/solution && mvn clean install && ./target/server/bin/standalone.sh
+    </aside>
+</section>
+
+<!-- Demo 4 - Vidéo de la démo -->
+<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
+    <h2>Demo 4 — Guardrails en action</h2>
+    <video data-autoplay controls style="max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <source src="demo4.webm" type="video/webm">
+    </video>
+    <aside class="notes">
+        Vidéo de secours pour la démo 4. Montre les 4 guardrails en action :
+        requête en anglais rejetée, mention de nains rejetée, requête valide en français acceptée.
     </aside>
 </section>
 
@@ -1807,7 +1829,7 @@ public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
     <div style="font-size: 0.8em; text-align: left; max-width: 750px; margin: 0 auto;">
         <div class="box" style="text-align: center; margin-bottom: 0.5em;">
             <strong style="color: var(--accent-orange);">Orchestrateur</strong> (port 8082)<br>
-            <span class="small">LangChain4j Agentic : séquence + boucle</span>
+            <span class="small">LangChain4j Agentic : séquence + boucle + <strong style="color: var(--accent-green);">Style Editor</strong> (agent local)</span>
         </div>
         <div style="display: flex; gap: 1em;">
             <div class="box box-accent" style="flex: 1; text-align: center;">
@@ -1834,14 +1856,20 @@ public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
     </aside>
 </section>
 
-<!-- A2A code : AgentCard + Executor -->
+<!-- A2A code : Serveur A2A -->
 <section>
     <span class="speaker-tag speaker-both">Les deux</span>
-    <h2>Serveur A2A = AgentCard + Executor</h2>
-    <pre><code class="language-java" data-trim>
+    <h2>Serveur A2A : Creative Writer</h2>
+    <pre><code class="language-java" data-trim data-line-numbers="1-5|7-13">
 @RegisterAIService(chatModelName = "ollama", scope = ApplicationScoped.class)
 public interface CreativeWriter {
-    @UserMessage("Forge a Norse saga around the topic {{topic}}...")
+    @UserMessage("""
+        You are a Norse skald, a Viking bard who crafts mighty sagas.
+        Forge a short saga no more than 3 sentences around the given topic,
+        in the spirit of the Viking age.
+        Return only the saga in English and nothing else.
+        The topic is {{topic}}.
+        """)
     String generateStory(@V("topic") String topic);
 }
     </code></pre>
@@ -1850,51 +1878,167 @@ public interface CreativeWriter {
 public AgentCard agentCard() {
     return new AgentCard.Builder()
         .name("Creative Writer")
+        .description("Generate a story based on the given topic")
+        .url(serverUrl)
+        .capabilities(new AgentCapabilities.Builder()
+            .streaming(true).build())
         .skills(List.of(new AgentSkill.Builder()
-            .id("creative_writer").build()))
+            .id("creative_writer").name("Creative Writer")
+            .description("Generate a story based on the given topic")
+            .build()))
         .preferredTransport(TransportProtocol.JSONRPC.asString())
         .build();
 }
     </code></pre>
     <p class="fragment small">
-        <span class="accent">@RegisterAIService</span> + <span class="accent-blue">AgentCard CDI producer</span> + <span class="accent-green">AgentExecutor</span> = serveur A2A complet
+        <span class="accent">@RegisterAIService</span> classique + <span class="accent-blue">@PublicAgentCard</span> producteur CDI = agent exposé sur le réseau A2A
     </p>
     <aside class="notes">
-        Côté serveur A2A, on a trois composants : le service IA LangChain4j-CDI classique, un producteur CDI pour l'AgentCard qui décrit l'agent au réseau A2A, et un AgentExecutor qui reçoit les requêtes A2A et délègue au service IA.
+        Côté serveur A2A, le service IA est un @RegisterAIService classique — exactement comme la démo 1.
 
-        Le service IA est identique à ce qu'on fait depuis la démo 1. L'AgentCard est un bean CDI produit avec @Produces et @PublicAgentCard. L'executor est un autre producteur CDI.
+        L'AgentCard est un producteur CDI annoté @PublicAgentCard. Il décrit l'agent pour le réseau A2A : nom, description, capabilities, skills, et le protocole de transport.
+
+        C'est tout ce qu'il faut pour exposer un agent CDI comme serveur A2A.
     </aside>
 </section>
 
-<!-- A2A code : Orchestrateur -->
+<!-- A2A code : AgentExecutor -->
+<section>
+    <span class="speaker-tag speaker-both">Les deux</span>
+    <h2>AgentExecutor : le pont A2A ↔ CDI</h2>
+    <pre><code class="language-java" data-trim data-line-numbers="1-2|4-6|8-10|12-13|15-17">
+@Inject
+CreativeWriter creativeWriter;
+
+@Produces
+public AgentExecutor agentExecutor() {
+    return new AgentExecutor() {
+        @Override
+        public void execute(RequestContext context, EventQueue eventQueue)
+                throws JSONRPCError {
+            TaskUpdater updater = new TaskUpdater(context, eventQueue);
+            updater.startWork();
+
+            String userMessage = extractTextFromMessage(
+                context.getMessage());
+            String response = creativeWriter.generateStory(userMessage);
+
+            updater.addArtifact(
+                List.of(new TextPart(response, null)),
+                null, null, null);
+            updater.complete();
+        }
+    };
+}
+    </code></pre>
+    <p class="fragment small">
+        <span class="accent-green">AgentExecutor</span> reçoit la requête A2A → appelle le <span class="accent">@RegisterAIService</span> → renvoie la réponse comme artifact
+    </p>
+    <aside class="notes">
+        L'AgentExecutor est le pont entre le protocole A2A et le bean CDI. C'est un producteur CDI qui délègue au service IA injecté.
+
+        Le cycle de vie A2A : startWork pour signaler le début, on extrait le texte du message A2A, on appelle le service IA, on ajoute la réponse comme artifact, et on complete.
+
+        Pattern identique pour le Creative Writer et le Style Scorer — seul le service IA injecté change.
+    </aside>
+</section>
+
+<!-- A2A code : Agents de l'orchestrateur -->
+<section>
+    <span class="speaker-tag speaker-both">Les deux</span>
+    <h2>Orchestrateur : déclarer les agents</h2>
+    <pre><code class="language-java" data-trim data-line-numbers="1-5|7-11|13-20">
+@RegisterA2AAgent(name = "creative-writer",
+    a2aServerUrl = "${a2a.creative-writer.url}",
+    outputKey = "story",
+    description = "Generate a Norse saga based on the given topic")
+public interface A2ACreativeWriter {
+    String generateStory(@V("topic") String topic);
+}
+
+@RegisterA2AAgent(name = "style-scorer",
+    a2aServerUrl = "${a2a.style-scorer.url}",
+    outputKey = "score",
+    description = "Score a saga based on how well it captures a given style")
+public interface A2AStyleScorer {
+    double scoreStyle(@V("story") String story, @V("style") String style);
+}
+
+@RegisterSimpleAgent(name = "style-editor",
+    description = "Reforge a saga to better capture a given style",
+    outputKey = "story", chatModelName = "ollama")
+public interface StyleEditor {
+    @UserMessage("""
+        You are a master Norse skald who shapes and tempers sagas
+        like a smith forges steel. Rewrite the following saga to better
+        honor and embody the {{style}} style.
+        Return only the saga and nothing else.
+        The saga is "{{story}}".
+        """)
+    String editStory(@V("story") String story, @V("style") String style);
+}
+    </code></pre>
+    <p class="fragment small">
+        <span class="accent-red">@RegisterA2AAgent</span> → proxy vers agent distant |
+        <span class="accent-green">@RegisterSimpleAgent</span> → agent local avec LLM
+    </p>
+    <aside class="notes">
+        L'orchestrateur déclare ses agents avec des annotations dédiées.
+
+        @RegisterA2AAgent crée un proxy vers un agent A2A distant — l'URL est configurable via MicroProfile Config. Le framework gère la communication A2A de manière transparente.
+
+        @RegisterSimpleAgent crée un agent local qui utilise un LLM directement — ici le Style Editor qui réécrit les sagas. Même pattern que @RegisterAIService mais avec un outputKey pour partager le résultat dans le scope agentique.
+    </aside>
+</section>
+
+<!-- A2A code : Composition de l'orchestrateur -->
 <section>
     <span class="speaker-tag speaker-both">Les deux</span>
     <h2>Orchestrateur : séquence + boucle</h2>
-    <pre><code class="language-java" data-trim data-line-numbers="1-3|5-7|9-12|14-16">
-A2ACreativeWriter writer = AgenticServices
-    .a2aBuilder(writerUrl, A2ACreativeWriter.class)
-    .outputKey("story").build();
+    <pre><code class="language-java" data-trim data-line-numbers="1-5|7-13|15-23">
+@RegisterSequenceAgent(
+    subAgentNames = {"creative-writer", "style-review-loop"},
+    outputKey = "story")
+public interface StyledWriter extends AgenticScopeAccess {
+    ResultWithAgenticScope&lt;String&gt; writeStoryWithStyle(
+        @V("topic") String topic, @V("style") String style);
+}
 
-UntypedAgent reviewLoop = AgenticServices.loopBuilder()
-    .subAgents(styleScorer, styleEditor)
-    .maxIterations(5)
-    .exitCondition(scope -> scope.readState("score", 0.0) >= 0.8)
-    .build();
+@RegisterLoopAgent(name = "style-review-loop",
+    subAgentNames = {"style-scorer", "style-editor"},
+    maxIterations = 5,
+    exitConditionName = "scoreExitCondition",
+    exitConditionDescription = "Exit when the story score reaches 0.8 or higher")
+public interface StyleReviewLoop {
+    String refineStory(@V("story") String story, @V("style") String style);
+}
 
-StyledWriter pipeline = AgenticServices
-    .sequenceBuilder(StyledWriter.class)
-    .subAgents(writer, reviewLoop)
-    .outputKey("story").build();
+@ApplicationScoped
+@Named("scoreExitCondition")
+public class ScoreExitCondition implements Predicate&lt;AgenticScope&gt; {
+    @Override
+    public boolean test(AgenticScope scope) {
+        Object raw = scope.readState("score");
+        if (raw instanceof Number n) {
+            return n.doubleValue() &gt;= 0.8;
+        }
+        return false;
+    }
+}
     </code></pre>
     <p class="fragment small">
-        <span class="accent-red">a2aBuilder</span> → agent distant via A2A |
-        <span class="accent-blue">loopBuilder</span> → boucle avec condition de sortie |
-        <span class="accent-green">sequenceBuilder</span> → pipeline séquentiel
+        <span class="accent-green">@RegisterSequenceAgent</span> → pipeline séquentiel |
+        <span class="accent-blue">@RegisterLoopAgent</span> → boucle déclarative |
+        <span class="accent">@Named</span> → condition de sortie CDI
     </p>
     <aside class="notes">
-        L'orchestrateur câble le pipeline avec LangChain4j Agentic. Trois builders : a2aBuilder pour les agents distants, loopBuilder pour la boucle de révision, et sequenceBuilder pour le pipeline complet.
+        La composition est entièrement déclarative.
 
-        La boucle vérifie le score de style à chaque itération. Si le score dépasse 0.8, on sort. Sinon, le StyleEditor (maître skald) retravaille la saga et on recommence. Maximum 5 itérations pour éviter les boucles infinies.
+        @RegisterSequenceAgent câble un pipeline : d'abord le creative-writer forge la saga, puis la boucle style-review-loop l'affine. Le résultat circule via le scope agentique grâce aux outputKeys.
+
+        @RegisterLoopAgent crée la boucle de révision : le style-scorer évalue, le style-editor réécrit. La boucle tourne jusqu'à ce que le scoreExitCondition soit satisfait (score &gt;= 0.8) ou que maxIterations (5) soit atteint.
+
+        La condition de sortie est un bean CDI @Named qui implémente Predicate — le framework le résout automatiquement via exitConditionName. C'est du CDI pur.
     </aside>
 </section>
 
@@ -1930,40 +2074,15 @@ StyledWriter pipeline = AgenticServices
     </aside>
 </section>
 
-<!-- Demo 5 - Backup slide : AgentExecutor -->
-<section data-visibility="uncounted">
-    <h2>AgentExecutor : recevoir les requêtes A2A</h2>
-    <pre><code class="language-java" data-trim>
-@Produces
-public AgentExecutor agentExecutor() {
-    return new AgentExecutor() {
-        @Override
-        public void execute(RequestContext context, EventQueue eventQueue)
-                throws JSONRPCError {
-            TaskUpdater updater = new TaskUpdater(context, eventQueue);
-            if (context.getTask() == null) { updater.submit(); }
-            updater.startWork();
-
-            String userMessage = extractTextFromMessage(context.getMessage());
-            String response = creativeWriter.generateStory(userMessage);
-
-            updater.addArtifact(List.of(new TextPart(response, null)),
-                null, null, null);
-            updater.complete();
-        }
-    };
-}
-    </code></pre>
-    <p class="fragment small">
-        L'<code>AgentExecutor</code> est un producteur CDI —
-        pattern identique à l'<code>AgentCard</code>
-    </p>
+<!-- Demo 5 - Vidéo de la démo -->
+<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
+    <h2>Demo 5 — Story Forge en action</h2>
+    <video data-autoplay controls style="max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <source src="demo5.webm" type="video/webm">
+    </video>
     <aside class="notes">
-        SECOURS si la démo live ne marche pas.
-
-        L'AgentExecutor reçoit les requêtes A2A. Il crée un TaskUpdater pour gérer le cycle de vie de la tâche A2A : submit, startWork, addArtifact, complete.
-
-        Le message A2A contient des TextParts. On extrait le texte, on appelle le service IA, on renvoie la réponse comme artifact.
+        Vidéo de secours pour la démo 5. Montre l'orchestration A2A Story Forge :
+        le Creative Writer forge une saga, le Style Scorer l'évalue, et la boucle de révision s'exécute jusqu'à atteindre un score suffisant.
     </aside>
 </section>
 
@@ -2051,7 +2170,7 @@ public AgentExecutor agentExecutor() {
         </a>
     </p>
     <p class="small" style="margin-top: 2em;">
-        Devoxx France 2026<br>
+        Oracle Dev Week 2026<br>
         Slides : Reveal.js | Démos : WildFly + IntelliJ
     </p>
     <aside class="notes">
