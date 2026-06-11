@@ -30,7 +30,7 @@
 
         <!-- A2A SDK server -->
         <dependency>
-            <groupId>io.github.a2asdk</groupId>
+            <groupId>org.a2aproject.sdk</groupId>
             <artifactId>a2a-java-sdk-server-common</artifactId>
             <exclusions>
                 <exclusion>
@@ -45,7 +45,7 @@
         </dependency>
         <dependency>
             <groupId>org.wildfly.a2a</groupId>
-            <artifactId>a2a-java-sdk-jakarta-jsonrpc</artifactId>
+            <artifactId>a2a-jakarta-jsonrpc-web</artifactId>
         </dependency>
 
         <!-- LangChain4j CDI integration -->

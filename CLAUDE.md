@@ -13,7 +13,7 @@ Le dépôt contient des **slides Reveal.js** (`slides/`) et un **projet Maven mu
 
 ## Stack
 
-Java 21, Maven 3.8+, Jakarta EE 10, MicroProfile 6.1, WildFly 39 (Galleon), LangChain4j 1.11.0, LangChain4j-CDI 1.0.0, local Ollama.
+Java 21, Maven 3.8+, Jakarta EE 10, MicroProfile 6.1, WildFly 39 (Galleon), LangChain4j 1.16.2, LangChain4j-CDI 1.3.2, local Ollama.
 
 ## Commandes Essentielles
 

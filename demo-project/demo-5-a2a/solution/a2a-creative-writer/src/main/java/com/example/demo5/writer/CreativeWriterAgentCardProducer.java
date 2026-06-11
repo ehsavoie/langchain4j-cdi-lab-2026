@@ -1,11 +1,11 @@
 package com.example.demo5.writer;
 
-import io.a2a.server.PublicAgentCard;
-import io.a2a.spec.AgentCapabilities;
-import io.a2a.spec.AgentCard;
-import io.a2a.spec.AgentInterface;
-import io.a2a.spec.AgentSkill;
-import io.a2a.spec.TransportProtocol;
+import org.a2aproject.sdk.server.PublicAgentCard;
+import org.a2aproject.sdk.spec.AgentCapabilities;
+import org.a2aproject.sdk.spec.AgentCard;
+import org.a2aproject.sdk.spec.AgentInterface;
+import org.a2aproject.sdk.spec.AgentSkill;
+import org.a2aproject.sdk.spec.TransportProtocol;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
@@ -23,28 +23,25 @@ public class CreativeWriterAgentCardProducer {
     @Produces
     @PublicAgentCard
     public AgentCard agentCard() {
-        return new AgentCard.Builder()
+        return AgentCard.builder()
                 .name("Creative Writer")
                 .description("Generate a story based on the given topic")
                 .url(serverUrl)
                 .version("1.0.0")
-                .protocolVersion("1.0.0")
-                .capabilities(new AgentCapabilities.Builder()
+                .capabilities(AgentCapabilities.builder()
                         .streaming(true)
                         .pushNotifications(false)
-                        .stateTransitionHistory(false)
                         .build())
                 .defaultInputModes(Collections.singletonList("text"))
                 .defaultOutputModes(Collections.singletonList("text"))
-                .skills(Collections.singletonList(new AgentSkill.Builder()
+                .skills(Collections.singletonList(AgentSkill.builder()
                         .id("creative_writer")
                         .name("Creative Writer")
                         .description("Generate a story based on the given topic")
                         .tags(Collections.singletonList("writing"))
                         .build()))
-                .protocolVersion("0.3.0")
                 .preferredTransport(TransportProtocol.JSONRPC.asString())
-                .additionalInterfaces(List.of(
+                .supportedInterfaces(List.of(
                         new AgentInterface(TransportProtocol.JSONRPC.asString(), serverUrl)))
                 .build();
     }
