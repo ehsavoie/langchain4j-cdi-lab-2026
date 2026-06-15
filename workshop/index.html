@@ -2511,28 +2511,25 @@ public interface StyleScorer {
     <pre><code>@Produces
 @PublicAgentCard
 public AgentCard agentCard() {
-    return new AgentCard.Builder()
+    return AgentCard.builder()
             .name("Creative Writer")
             .description("Generate a Norse saga based on the given topic")
             .url(serverUrl)
             .version("1.0.0")
-            .protocolVersion("1.0.0")
-            .capabilities(new AgentCapabilities.Builder()
+            .capabilities(AgentCapabilities.builder()
                     .streaming(true)
                     .pushNotifications(false)
-                    .stateTransitionHistory(false)
                     .build())
             .defaultInputModes(Collections.singletonList("text"))
             .defaultOutputModes(Collections.singletonList("text"))
-            .skills(Collections.singletonList(new AgentSkill.Builder()
+            .skills(Collections.singletonList(AgentSkill.builder()
                     .id("creative_writer")
                     .name("Creative Writer")
                     .description("Generate a Norse saga based on the given topic")
                     .tags(Collections.singletonList("writing"))
                     .build()))
-            .protocolVersion("0.3.0")
             .preferredTransport(TransportProtocol.JSONRPC.asString())
-            .additionalInterfaces(List.of(
+            .supportedInterfaces(List.of(
                     new AgentInterface(TransportProtocol.JSONRPC.asString(), serverUrl)))
             .build();
 }</code></pre>
@@ -2541,11 +2538,10 @@ public AgentCard agentCard() {
     <p>Ouvrez <code>CreativeWriterExecutorProducer.java</code> et d&eacute;commentez les &eacute;tapes 1&ndash;4 dans <code>execute()</code> :</p>
 
     <pre><code>@Override
-public void execute(RequestContext context, EventQueue eventQueue) throws JSONRPCError {
-    TaskUpdater updater = new TaskUpdater(context, eventQueue);
+public void execute(RequestContext context, AgentEmitter emitter) throws A2AError {
 
     // &Eacute;TAPE 1 : D&eacute;marrer le traitement
-    updater.startWork();
+    emitter.startWork();
 
     // &Eacute;TAPE 2 : Extraire le texte du message A2A
     String userMessage = extractTextFromMessage(context.getMessage());
@@ -2554,9 +2550,9 @@ public void execute(RequestContext context, EventQueue eventQueue) throws JSONRP
     String response = creativeWriter.generateStory(userMessage);
 
     // &Eacute;TAPE 4 : R&eacute;pondre et compl&eacute;ter
-    TextPart responsePart = new TextPart(response, null);
-    updater.addArtifact(List.of(responsePart), null, null, null);
-    updater.complete();
+    TextPart responsePart = new TextPart(response);
+    emitter.addArtifact(List.of(responsePart), null, null, null);
+    emitter.complete();
 }</code></pre>
 
     <h4>R&eacute;p&eacute;ter pour le Style Scorer</h4>

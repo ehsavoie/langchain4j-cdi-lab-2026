@@ -1876,13 +1876,13 @@ public interface CreativeWriter {
     <pre class="fragment"><code class="language-java" data-trim>
 @Produces @PublicAgentCard
 public AgentCard agentCard() {
-    return new AgentCard.Builder()
+    return AgentCard.builder()
         .name("Creative Writer")
         .description("Generate a story based on the given topic")
         .url(serverUrl)
-        .capabilities(new AgentCapabilities.Builder()
+        .capabilities(AgentCapabilities.builder()
             .streaming(true).build())
-        .skills(List.of(new AgentSkill.Builder()
+        .skills(List.of(AgentSkill.builder()
             .id("creative_writer").name("Creative Writer")
             .description("Generate a story based on the given topic")
             .build()))
@@ -1914,19 +1914,18 @@ CreativeWriter creativeWriter;
 public AgentExecutor agentExecutor() {
     return new AgentExecutor() {
         @Override
-        public void execute(RequestContext context, EventQueue eventQueue)
-                throws JSONRPCError {
-            TaskUpdater updater = new TaskUpdater(context, eventQueue);
-            updater.startWork();
+        public void execute(RequestContext context, AgentEmitter emitter)
+                throws A2AError {
+            emitter.startWork();
 
             String userMessage = extractTextFromMessage(
                 context.getMessage());
             String response = creativeWriter.generateStory(userMessage);
 
-            updater.addArtifact(
-                List.of(new TextPart(response, null)),
+            emitter.addArtifact(
+                List.of(new TextPart(response)),
                 null, null, null);
-            updater.complete();
+            emitter.complete();
         }
     };
 }
