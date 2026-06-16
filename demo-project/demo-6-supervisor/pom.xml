@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.example</groupId>
+        <artifactId>langchain4j-cdi-demo</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>demo-6-supervisor</artifactId>
+    <packaging>pom</packaging>
+    <name>LangChain4j-CDI Demo 6 - Supervisor Agent</name>
+    <description>A2A orchestration demo showing the @RegisterSupervisorAgent pattern: LLM-driven quality loop replacing explicit exit conditions.
+        The supervisor orchestrates style-scorer and style-editor sub-agents until the story reaches a quality score of 0.8.
+        Two outputKey pitfalls to avoid:
+        1. Do not set outputKey on @RegisterSupervisorAgent — with LAST strategy the supervisor would write the last sub-agent's
+           output (the score) to scope["story"], overwriting the actual story.
+        2. Do not set outputKey="story" on @RegisterSequenceAgent — the sequence writes its result (the supervisor's return value,
+           again possibly the score) to scope["story"]. Without outputKey on the sequence, style-editor's scope["story"] is
+           preserved intact. Read the story via scope.readState("story", "") and the score via scope.readState("score", 0.0).</description>
+
+    <modules>
+        <module>base</module>
+        <module>solution</module>
+    </modules>
+</project>

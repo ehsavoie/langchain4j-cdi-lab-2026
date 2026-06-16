@@ -18,6 +18,7 @@
         <module>demo-3-mcp</module>
         <module>demo-4-guardrails</module>
         <module>demo-5-a2a</module>
+        <module>demo-6-supervisor</module>
     </modules>
 
     <properties>

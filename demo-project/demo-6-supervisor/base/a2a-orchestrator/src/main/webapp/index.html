@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Forge &mdash; A2A Orchestrator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&display=swap');
+
+        :root {
+            --bg-dark: #0d0a06;
+            --bg-panel: #1a1510;
+            --bg-panel-hover: #231e16;
+            --gold: #c9a84c;
+            --gold-bright: #e8c84a;
+            --gold-dim: #8a6f2f;
+            --bone: #d4c8a8;
+            --bone-dim: #9e9478;
+            --red: #8b2020;
+            --red-glow: #c43030;
+            --border: #3a3020;
+            --border-light: #5a4a30;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--bone);
+            font-family: 'Cinzel', serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(201, 168, 76, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(139, 32, 32, 0.04) 0%, transparent 60%);
+        }
+
+        /* --- Knotwork border top --- */
+        .knotwork-border {
+            width: 100%;
+            height: 6px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--gold-dim) 0px, var(--gold-dim) 8px,
+                transparent 8px, transparent 12px,
+                var(--gold) 12px, var(--gold) 20px,
+                transparent 20px, transparent 24px
+            );
+            opacity: 0.7;
+        }
+
+        /* --- Header --- */
+        header {
+            text-align: center;
+            padding: 3rem 1rem 1.5rem;
+            position: relative;
+        }
+
+        .rune-decoration {
+            font-size: 1.2rem;
+            letter-spacing: 0.6rem;
+            color: var(--gold-dim);
+            margin-bottom: 0.8rem;
+            opacity: 0.6;
+        }
+
+        h1 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--gold);
+            text-shadow: 0 0 40px rgba(201, 168, 76, 0.3), 0 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 0.15em;
+        }
+
+        .subtitle {
+            font-family: 'MedievalSharp', cursive;
+            font-size: 1.1rem;
+            color: var(--bone-dim);
+            margin-top: 0.5rem;
+            letter-spacing: 0.1em;
+        }
+
+        /* --- Divider --- */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+        }
+
+        .divider-rune {
+            color: var(--gold-dim);
+            font-size: 1.4rem;
+            opacity: 0.6;
+        }
+
+        /* --- Main content --- */
+        main {
+            width: 100%;
+            max-width: 700px;
+            padding: 0 1.5rem 3rem;
+        }
+
+        /* --- Form panel --- */
+        .forge-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(201, 168, 76, 0.05);
+        }
+
+        .forge-panel::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: 20%; right: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+        }
+
+        .panel-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gold-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            color: var(--bone);
+            font-family: 'MedievalSharp', cursive;
+            font-size: 1.1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--gold-dim);
+            box-shadow: 0 0 12px rgba(201, 168, 76, 0.15), inset 0 0 6px rgba(201, 168, 76, 0.05);
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--bone-dim);
+            opacity: 0.4;
+        }
+
+        /* --- Submit button --- */
+        .btn-forge {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            background: linear-gradient(180deg, var(--red) 0%, #6b1818 100%);
+            border: 1px solid #a02828;
+            border-radius: 3px;
+            color: var(--gold-bright);
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(139, 32, 32, 0.3);
+        }
+
+        .btn-forge:hover:not(:disabled) {
+            background: linear-gradient(180deg, var(--red-glow) 0%, var(--red) 100%);
+            box-shadow: 0 4px 24px rgba(196, 48, 48, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-forge:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-forge:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* --- Loading state --- */
+        .loading-container {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading-container.visible {
+            display: block;
+        }
+
+        .loading-runes {
+            font-size: 2rem;
+            letter-spacing: 0.8rem;
+            color: var(--gold);
+            animation: runeGlow 2s ease-in-out infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes runeGlow {
+            0%, 100% { opacity: 0.3; text-shadow: none; }
+            50% { opacity: 1; text-shadow: 0 0 20px rgba(201, 168, 76, 0.5); }
+        }
+
+        .loading-text {
+            font-family: 'MedievalSharp', cursive;
+            color: var(--bone-dim);
+            font-size: 1rem;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* --- Result panel --- */
+        .result-panel {
+            display: none;
+            margin-top: 2rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .result-panel.visible {
+            display: block;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            background: linear-gradient(180deg, rgba(201, 168, 76, 0.1) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-title {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .result-score {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            color: var(--bone-dim);
+            letter-spacing: 0.05em;
+        }
+
+        .result-score .score-value {
+            color: var(--gold-bright);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .result-body {
+            padding: 1.5rem;
+        }
+
+        .result-story {
+            font-family: 'MedievalSharp', cursive;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--bone);
+            white-space: pre-wrap;
+        }
+
+        .result-meta {
+            border-top: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            gap: 2rem;
+            font-size: 0.75rem;
+            color: var(--bone-dim);
+            letter-spacing: 0.05em;
+        }
+
+        .meta-label {
+            color: var(--gold-dim);
+            text-transform: uppercase;
+            margin-right: 0.3rem;
+        }
+
+        /* --- Error --- */
+        .error-panel {
+            display: none;
+            margin-top: 2rem;
+            background: rgba(139, 32, 32, 0.15);
+            border: 1px solid var(--red);
+            border-radius: 4px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .error-panel.visible {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .error-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            color: var(--red-glow);
+            margin-bottom: 0.5rem;
+        }
+
+        .error-message {
+            font-family: 'MedievalSharp', cursive;
+            color: var(--bone-dim);
+            font-size: 0.95rem;
+        }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: auto;
+            padding: 2rem 1rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--bone-dim);
+            opacity: 0.4;
+            letter-spacing: 0.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="knotwork-border"></div>
+
+    <header>
+        <div class="rune-decoration">&loz; &#5765; &#5766; &#5767; &#5768; &#5769; &#5770; &loz;</div>
+        <h1>Story Forge</h1>
+        <p class="subtitle">A2A Agentic Orchestrator</p>
+    </header>
+
+    <div class="divider"><span class="divider-rune">&#9670;</span></div>
+
+    <main>
+        <div class="forge-panel">
+            <div class="panel-title">Forge Your Tale</div>
+
+            <form id="storyForm">
+                <div class="form-group">
+                    <label for="topic">Topic</label>
+                    <input type="text" id="topic" name="topic"
+                           placeholder="e.g. dragons and wizards" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="style">Style</label>
+                    <input type="text" id="style" name="style"
+                           placeholder="e.g. comedy, horror, epic" required>
+                </div>
+
+                <button type="submit" class="btn-forge" id="submitBtn">
+                    Forge the Story
+                </button>
+            </form>
+        </div>
+
+        <div class="loading-container" id="loading">
+            <div class="loading-runes">&#5765; &#5768; &#5770; &#5767; &#5769;</div>
+            <div class="loading-text">The skalds are weaving your tale&hellip;</div>
+        </div>
+
+        <div class="result-panel" id="resultPanel">
+            <div class="result-header">
+                <span class="result-title">&#9670; The Forged Tale &#9670;</span>
+                <span class="result-score">Style Score: <span class="score-value" id="resultScore"></span></span>
+            </div>
+            <div class="result-body">
+                <div class="result-story" id="resultStory"></div>
+            </div>
+            <div class="result-meta">
+                <span><span class="meta-label">Topic:</span> <span id="resultTopic"></span></span>
+                <span><span class="meta-label">Style:</span> <span id="resultStyle"></span></span>
+            </div>
+        </div>
+
+        <div class="error-panel" id="errorPanel">
+            <div class="error-title">The Runes Have Failed</div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+    </main>
+
+    <footer>
+        Powered by A2A Protocol &bull; LangChain4j Agentic &bull; WildFly
+    </footer>
+
+    <script>
+        const form = document.getElementById('storyForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const resultPanel = document.getElementById('resultPanel');
+        const errorPanel = document.getElementById('errorPanel');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const topic = document.getElementById('topic').value.trim();
+            const style = document.getElementById('style').value.trim();
+
+            if (!topic || !style) return;
+
+            // Reset UI
+            resultPanel.classList.remove('visible');
+            errorPanel.classList.remove('visible');
+            loading.classList.add('visible');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Forging\u2026';
+
+            try {
+                const params = new URLSearchParams({ topic, style });
+                const response = await fetch(`/api/styled-story?${params}`);
+
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                document.getElementById('resultStory').textContent = data.story;
+                document.getElementById('resultScore').textContent = data.score.toFixed(2);
+                document.getElementById('resultTopic').textContent = data.topic;
+                document.getElementById('resultStyle').textContent = data.style;
+
+                resultPanel.classList.add('visible');
+            } catch (err) {
+                document.getElementById('errorMessage').textContent = err.message;
+                errorPanel.classList.add('visible');
+            } finally {
+                loading.classList.remove('visible');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Forge the Story';
+            }
+        });
+    </script>
+</body>
+</html>

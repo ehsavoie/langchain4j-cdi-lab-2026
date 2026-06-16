@@ -1,0 +1,74 @@
+package com.example.demo6.orchestrator;
+
+import dev.langchain4j.agentic.scope.AgenticScope;
+import dev.langchain4j.agentic.scope.ResultWithAgenticScope;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+@Path("/styled-story")
+public class StyledWriterEndpoint {
+
+    @Inject
+    OrchestratorService orchestratorService;
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response writeStyledStory(
+            @QueryParam("topic") String topic,
+            @QueryParam("style") String style) {
+
+        if (topic == null || topic.isBlank()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"topic parameter is required\"}")
+                    .build();
+        }
+        if (style == null || style.isBlank()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"style parameter is required\"}")
+                    .build();
+        }
+
+        ResultWithAgenticScope<String> result = orchestratorService.writeStyledStory(topic, style);
+        AgenticScope scope = result.agenticScope();
+        String story = scope.readState("story", "");
+        // TODO - Étape 7 : Extraire également le score depuis le scope partagé.
+        // Ajouter la ligne suivante :
+        //   double score = scope.readState("score", 0.0);  // écrit par style-scorer via outputKey
+        //
+        // Attention : ne pas utiliser result.result() pour la story — le superviseur retourne
+        // le score en dernière réponse. La story vit dans scope["story"].
+        //
+        // Puis ajouter "score" dans le JSON et son argument dans .formatted() :
+        //   "score": %s,
+        //   .formatted(jsonString(story), score, jsonString(topic), jsonString(style))
+
+        String json = """
+                {
+                  "story": %s,
+                  "topic": %s,
+                  "style": %s
+                }
+                """.formatted(
+                jsonString(story),
+                jsonString(topic),
+                jsonString(style));
+
+        return Response.ok(json).build();
+    }
+
+    private static String jsonString(String value) {
+        if (value == null) {
+            return "null";
+        }
+        return "\"" + value.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t") + "\"";
+    }
+}

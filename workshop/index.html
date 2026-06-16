@@ -173,6 +173,7 @@
         .step-num.green { background: var(--accent-green); color: #000; }
         .step-num.purple { background: var(--accent-purple); color: #000; }
         .step-num.red { background: var(--accent-red); color: #fff; }
+        .step-num.yellow { background: var(--accent-yellow); color: #000; }
 
         .sidebar-link .icon { font-size: 1rem; flex-shrink: 0; }
 
@@ -836,6 +837,25 @@
     </div>
 
     <div class="sidebar-section">
+        <div class="sidebar-section-title">Exercice 6 &mdash; Supervisor</div>
+        <a href="#ex6-intro" class="sidebar-link">
+            <span class="step-num yellow">1</span> Introduction Supervisor
+        </a>
+        <a href="#ex6-step1" class="sidebar-link">
+            <span class="step-num yellow">2</span> Agents serveurs (inchangés)
+        </a>
+        <a href="#ex6-step2" class="sidebar-link">
+            <span class="step-num yellow">3</span> @RegisterSupervisorAgent
+        </a>
+        <a href="#ex6-step3" class="sidebar-link">
+            <span class="step-num yellow">4</span> Pipeline &amp; Endpoint
+        </a>
+        <a href="#ex6-test" class="sidebar-link">
+            <span class="step-num yellow">&#10003;</span> Test et validation
+        </a>
+    </div>
+
+    <div class="sidebar-section">
         <div class="sidebar-section-title">Conclusion</div>
         <a href="#whats-next" class="sidebar-link">
             <span class="icon">&#128302;</span> Et après ?
@@ -880,7 +900,7 @@
 
 <h2>Ce que vous allez construire</h2>
 
-<p>Dans cet atelier pratique, vous allez progressivement construire cinq applications alimentées par l'IA en utilisant <strong>LangChain4j-CDI</strong>, transformant des interfaces Jakarta EE en agents IA injectables avec une seule annotation.</p>
+<p>Dans cet atelier pratique, vous allez progressivement construire six applications alimentées par l'IA en utilisant <strong>LangChain4j-CDI</strong>, transformant des interfaces Jakarta EE en agents IA injectables avec une seule annotation.</p>
 
 <div class="card-grid">
     <div class="card">
@@ -906,7 +926,12 @@
     <div class="card">
         <div class="card-icon">&#129309;</div>
         <h4>Exercice 5 : A2A Protocol</h4>
-        <p>Orchestrez plusieurs agents IA via le protocole Agent-to-Agent : un writer, un scorer, et un orchestrateur avec boucle de révision.</p>
+        <p>Orchestrez plusieurs agents IA via le protocole Agent-to-Agent : un writer, un scorer, et un orchestrateur avec boucle de révision déclarative.</p>
+    </div>
+    <div class="card">
+        <div class="card-icon">&#129504;</div>
+        <h4>Exercice 6 : Supervisor Agent</h4>
+        <p>Remplacez la boucle explicite par un superviseur LLM avec <code>@RegisterSupervisorAgent</code> : le modèle décide lui-même quand la qualité est atteinte.</p>
     </div>
 </div>
 
@@ -2747,7 +2772,449 @@ curl "http://localhost:8082/api/styled-story?topic=la+bataille+de+Ragnarok&amp;s
 
     <div class="callout success">
         <div class="callout-title">&#127881; F&eacute;licitations !</div>
-        <p>Vous avez construit cinq applications aliment&eacute;es par l'IA avec LangChain4j-CDI : un skald viking, un guide d'exp&eacute;ditions r&eacute;silient, un jeu de d&eacute;s avec MCP, un skald avec guardrails, et maintenant un pipeline multi-agents via A2A. Tous avec les patterns Jakarta EE que vous connaissez d&eacute;j&agrave;.</p>
+        <p>Vous avez construit cinq applications aliment&eacute;es par l'IA avec LangChain4j-CDI : un skald viking, un guide d'exp&eacute;ditions r&eacute;silient, un jeu de d&eacute;s avec MCP, un skald avec guardrails, et maintenant un pipeline multi-agents via A2A. Passez &agrave; l'exercice 6 pour remplacer la boucle explicite par un superviseur LLM avec <code>@RegisterSupervisorAgent</code> !</p>
+    </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- EXERCISE 6: SUPERVISOR AGENT                                  -->
+<!-- ============================================================ -->
+<section id="ex6-intro" class="section-anchor">
+<h2>Exercice 6 : Supervisor Agent &mdash; orchestration pilot&eacute;e par le LLM</h2>
+
+<p><strong>Message cl&eacute;</strong> : &laquo; Avec <code>@RegisterLoopAgent</code>, <em>vous</em> &eacute;crivez la condition de sortie. Avec <code>@RegisterSupervisorAgent</code>, le <em>mod&egrave;le</em> d&eacute;cide quand la qualit&eacute; est atteinte. &raquo;</p>
+
+<div class="callout info">
+    <div class="callout-title">&#128204; Objectif</div>
+    <p>Reprenez l'architecture Story Forge de l'exercice 5 et remplacez uniquement l'orchestrateur. La boucle <code>@RegisterLoopAgent</code> + <code>ScoreExitCondition</code> disparaissent au profit d'un unique <code>@RegisterSupervisorAgent</code> : le LLM lit la story, appelle le scorer et l'&eacute;diteur, et d&eacute;cide lui-m&ecirc;me quand le score est suffisant.</p>
+</div>
+
+<pre><code>cd demo-project/demo-6-supervisor/base
+# Ouvrir ce r&eacute;pertoire dans votre IDE</code></pre>
+
+<h3>Diff&eacute;rence cl&eacute; : Loop vs Supervisor</h3>
+
+<div class="compare-grid">
+    <div class="compare-box">
+        <h4 style="color: var(--accent-red);">Demo 5 &mdash; <code>@RegisterLoopAgent</code></h4>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">Condition de sortie cod&eacute;e en dur dans un bean CDI. Le code d&eacute;cide quand s'arr&ecirc;ter.</p>
+        <pre><code>@RegisterLoopAgent(exitConditionName = "scoreExitCondition")
+// + ScoreExitCondition implements Predicate&lt;AgenticScope&gt;</code></pre>
+    </div>
+    <div class="compare-box">
+        <h4 style="color: var(--accent-yellow);">Demo 6 &mdash; <code>@RegisterSupervisorAgent</code></h4>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">Le LLM lit le <code>supervisorContext</code> et d&eacute;cide lui-m&ecirc;me quand s'arr&ecirc;ter. Plus de Predicate.</p>
+        <pre><code>@RegisterSupervisorAgent(supervisorContext = "...")
+// Pas de ScoreExitCondition !</code></pre>
+    </div>
+</div>
+
+<h3>AgenticScope &mdash; &eacute;volution au fil du pipeline</h3>
+
+<p>Tous les agents partagent un unique <code>AgenticScope</code> &mdash; un espace cl&eacute;/valeur mutable qui relie chaque agent du pipeline. Trois m&eacute;canismes r&eacute;gissent les &eacute;changes :</p>
+
+<div class="compare-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 1.5rem;">
+    <div class="compare-box">
+        <h4 style="color: var(--accent-yellow);">&#9312; &Eacute;criture par <code>@V</code></h4>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">Quand vous appelez une m&eacute;thode d&apos;agent avec des param&egrave;tres <code>@V("key")</code>, le framework &eacute;crit chaque valeur dans le scope <em>avant</em> d&apos;invoquer l&apos;agent. Les sous-agents du superviseur lisent ensuite leurs entr&eacute;es depuis ce m&ecirc;me scope.</p>
+        <pre><code>// supervisor.refineStory(story, style)
+// &rarr; scope["story"] = story
+// &rarr; scope["style"] = style
+// Les sous-agents liront ces cl&eacute;s
+// automatiquement via le scope.</code></pre>
+    </div>
+    <div class="compare-box">
+        <h4 style="color: var(--accent-orange);">&#9313; &Eacute;criture par <code>outputKey</code></h4>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">Quand un agent d&eacute;clare un <code>outputKey</code>, son r&eacute;sultat est automatiquement persist&eacute; dans le scope apr&egrave;s ex&eacute;cution. Les agents suivants peuvent ainsi r&eacute;utiliser ce r&eacute;sultat sans param&egrave;tre explicite.</p>
+        <pre><code>// style-scorer (outputKey="score")
+// &rarr; scope["score"] = 0.35
+
+// style-editor (outputKey="story")
+// &rarr; scope["story"] = "saga v2..."
+
+// L'endpoint lit ensuite :
+// scope.readState("story", "")</code></pre>
+    </div>
+    <div class="compare-box">
+        <h4 style="color: var(--accent-blue);">&#9314; Lecture par <code>@SupervisorRequest</code></h4>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">Le planificateur LLM du superviseur construit son message utilisateur depuis le scope gr&acirc;ce &agrave; une m&eacute;thode statique <code>@SupervisorRequest</code>. Sans elle, le planificateur re&ccedil;oit une requ&ecirc;te vide <code>''</code> et ne peut pas prendre de d&eacute;cision &eacute;clair&eacute;e.</p>
+        <pre><code>@SupervisorRequest
+static String buildRequest(
+    @V("story") String story,
+    @V("style") String style) {
+  return "Refine for style '"
+       + style + "':\n" + story;
+}
+// Le LLM voit :
+// "The user request is: 'Refine...'"</code></pre>
+    </div>
+</div>
+
+<p>Le diagramme ci-dessous montre l&apos;&eacute;volution du scope &eacute;tape par &eacute;tape :</p>
+
+<img src="demo6-agentic-scope.svg"
+     alt="Diagramme AgenticScope — évolution du pipeline demo-6"
+     style="width:100%;max-width:860px;display:block;margin:1rem auto;border-radius:8px;border:1px solid var(--border)">
+
+<p style="font-size:0.85rem; color:var(--text-secondary); text-align:center; margin-top:0.25rem;">
+    Orange = &eacute;crit <code>scope["story"]</code> &nbsp;&bull;&nbsp;
+    Bleu = &eacute;crit <code>scope["score"]</code> &nbsp;&bull;&nbsp;
+    Vert = score &ge; 0.8 (arr&ecirc;t) &nbsp;&bull;&nbsp;
+    Jaune = endpoint lit le scope
+</p>
+
+<details>
+    <summary style="cursor:pointer; color:var(--text-secondary); font-size:0.9rem; margin:0.75rem 0;">&#9654; Voir &eacute;galement le tableau d&eacute;taill&eacute;</summary>
+<table>
+    <thead>
+        <tr>
+            <th>Niveau</th>
+            <th>Agent</th>
+            <th><code>scope["story"]</code></th>
+            <th><code>scope["score"]</code></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="color: var(--text-muted);">D&eacute;part</td>
+            <td style="color: var(--text-muted);">—</td>
+            <td style="color: var(--text-muted); font-style: italic;">&#8709;</td>
+            <td style="color: var(--text-muted); font-style: italic;">&#8709;</td>
+        </tr>
+        <tr>
+            <td>S&eacute;quence &rarr; &eacute;tape&nbsp;1</td>
+            <td><code>A2ACreativeWriter</code><br><small style="color: var(--text-muted);">outputKey = "story"</small></td>
+            <td style="background: rgba(255,107,53,0.15); color: var(--accent-orange);">"Sigurd navigua vers l'horizon..."</td>
+            <td style="color: var(--text-muted); font-style: italic;">&#8709;</td>
+        </tr>
+        <tr>
+            <td style="padding-left: 1.5rem; color: var(--text-muted);">Superviseur<br>tour&nbsp;1</td>
+            <td><code>style-scorer</code><br><small style="color: var(--text-muted);">outputKey = "score"</small></td>
+            <td style="color: var(--text-secondary);">"Sigurd navigua..."</td>
+            <td style="background: rgba(88,166,255,0.15); color: var(--accent-blue);">0.35</td>
+        </tr>
+        <tr>
+            <td style="padding-left: 1.5rem; color: var(--text-muted);"></td>
+            <td><code>style-editor</code><br><small style="color: var(--text-muted);">outputKey = "story"</small></td>
+            <td style="background: rgba(255,107,53,0.15); color: var(--accent-orange);">"Sigurd, fils du tonnerre, navigua..."</td>
+            <td style="color: var(--text-secondary);">0.35</td>
+        </tr>
+        <tr>
+            <td style="padding-left: 1.5rem; color: var(--text-muted);">Superviseur<br>tour&nbsp;2</td>
+            <td><code>style-scorer</code><br><small style="color: var(--text-muted);">outputKey = "score"</small></td>
+            <td style="color: var(--text-secondary);">"Sigurd, fils du tonnerre..."</td>
+            <td style="background: rgba(88,166,255,0.15); color: var(--accent-blue);">0.72</td>
+        </tr>
+        <tr>
+            <td style="padding-left: 1.5rem; color: var(--text-muted);"></td>
+            <td><code>style-editor</code><br><small style="color: var(--text-muted);">outputKey = "story"</small></td>
+            <td style="background: rgba(255,107,53,0.15); color: var(--accent-orange);">"Sous la fureur d'Odin, Sigurd..."</td>
+            <td style="color: var(--text-secondary);">0.72</td>
+        </tr>
+        <tr>
+            <td style="padding-left: 1.5rem; color: var(--text-muted);">Superviseur<br>tour&nbsp;3</td>
+            <td><code>style-scorer</code><br><small style="color: var(--text-muted);">outputKey = "score"</small></td>
+            <td style="color: var(--text-secondary);">"Sous la fureur d'Odin..."</td>
+            <td style="background: rgba(63,185,80,0.2); color: var(--accent-green);">0.85 &#10003; (&ge;&nbsp;0.8)</td>
+        </tr>
+        <tr>
+            <td style="padding-left: 1.5rem; color: var(--text-muted);">Superviseur<br>s'arr&ecirc;te (LAST)</td>
+            <td style="color: var(--text-muted); font-style: italic;">retourne "0.85"<br>pas d'<code>outputKey</code> &rarr;<br>scope inchang&eacute;</td>
+            <td style="color: var(--text-secondary);">"Sous la fureur d'Odin..."</td>
+            <td style="color: var(--text-secondary);">0.85</td>
+        </tr>
+        <tr>
+            <td>S&eacute;quence termine</td>
+            <td style="color: var(--text-muted); font-style: italic;">pas d'<code>outputKey</code> &rarr;<br>scope inchang&eacute;</td>
+            <td style="color: var(--text-secondary);">"Sous la fureur d'Odin..."</td>
+            <td style="color: var(--text-secondary);">0.85</td>
+        </tr>
+        <tr style="background: rgba(210,153,34,0.1); font-weight: 600;">
+            <td>Endpoint lit le scope</td>
+            <td><code>scope.readState(...)</code></td>
+            <td style="color: var(--accent-orange);">&#8592; story (derni&egrave;re &eacute;dition)</td>
+            <td style="color: var(--accent-green);">&#8592; 0.85</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="callout tip">
+    <div class="callout-title">&#128161; Pourquoi le scope pr&eacute;serve la story</div>
+    <p>Ni le superviseur ni la s&eacute;quence n'ont <code>outputKey</code> : aucun des deux n'&eacute;crase le scope. Seuls <code>style-editor</code> (<code>outputKey = "story"</code>) et <code>style-scorer</code> (<code>outputKey = "score"</code>) &eacute;crivent dans le scope. Apr&egrave;s la derni&egrave;re it&eacute;ration, <code>scope["story"]</code> contient toujours la derni&egrave;re saga r&eacute;&eacute;crite, m&ecirc;me si le superviseur a termin&eacute; en appelant le scorer.</p>
+</div>
+</details>
+
+<h3>Fichiers cl&eacute;s &mdash; a2a-orchestrator</h3>
+
+<table>
+    <thead><tr><th>Fichier</th><th>R&ocirc;le</th><th>TODO</th></tr></thead>
+    <tbody>
+        <tr><td><code>A2ACreativeWriter.java</code></td><td>Proxy CDI vers le Creative Writer distant</td><td>&Eacute;tape 1 : <code>@RegisterA2AAgent</code></td></tr>
+        <tr><td><code>A2AStyleScorer.java</code></td><td>Proxy CDI vers le Style Scorer distant</td><td>&Eacute;tape 2 : <code>@RegisterA2AAgent</code></td></tr>
+        <tr><td><code>StyleEditor.java</code></td><td>Agent local de r&eacute;&eacute;criture (Ollama)</td><td>&Eacute;tape 3 : <code>@RegisterSimpleAgent</code></td></tr>
+        <tr><td><code>StyleReviewSupervisor.java</code></td><td>Superviseur LLM (remplace loop + condition)</td><td>&Eacute;tape 4 : <code>@RegisterSupervisorAgent</code> + <code>@SupervisorRequest</code> &larr; nouveaut&eacute; !</td></tr>
+        <tr><td><code>StyledWriter.java</code></td><td>Pipeline SEQUENCE complet</td><td>&Eacute;tape 5 : <code>@RegisterSequenceAgent</code></td></tr>
+        <tr><td><code>OrchestratorService.java</code></td><td>C&acirc;blage imperatif &rarr; <code>@Inject</code></td><td>&Eacute;tape 6 : remplacer par <code>@Inject StyledWriter</code></td></tr>
+        <tr><td><code>StyledWriterEndpoint.java</code></td><td>Point d'acc&egrave;s REST</td><td>&Eacute;tape 7 : extraire story ET score depuis le scope</td></tr>
+    </tbody>
+</table>
+
+<div class="callout warning">
+    <div class="callout-title">&#9888; Pr&eacute;requis</div>
+    <p>Cet exercice r&eacute;utilise le <strong>Creative Writer</strong> (port 8080) et le <strong>Style Scorer</strong> (port 8081) de l'exercice 5 &mdash; m&ecirc;me code, m&ecirc;mes ports. Seul l'orchestrateur (port 8082) change. Assurez-vous qu'Ollama tourne avec <code>qwen2.5:7b</code>.</p>
+</div>
+</section>
+
+<!-- Step 1: Agents serveurs -->
+<section id="ex6-step1" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-yellow); color: #000;">1</span>
+        <span class="step-title">D&eacute;marrer les agents serveurs (identiques &agrave; l'exercice 5)</span>
+    </div>
+
+    <p>Les services <strong>Creative Writer</strong> et <strong>Style Scorer</strong> sont inchang&eacute;s par rapport &agrave; l'exercice 5. Utilisez les m&ecirc;mes binaires :</p>
+
+    <pre><code># Terminal 1 : Creative Writer (port 8080) — identique &agrave; l'exercice 5
+cd demo-project/demo-5-a2a/solution/a2a-creative-writer   # ou base si d&eacute;j&agrave; construit
+mvn clean install
+./target/server/bin/standalone.sh                                           # Linux / macOS
+target\server\bin\standalone.bat                                            # Windows
+
+# Terminal 2 : Style Scorer (port 8081) — identique &agrave; l'exercice 5
+cd demo-project/demo-5-a2a/solution/a2a-style-scorer
+mvn clean install
+./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=1     # Linux / macOS
+target\server\bin\standalone.bat -Djboss.socket.binding.port-offset=1      # Windows</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">&#128161; R&eacute;utilisez les serveurs de l'exercice 5</div>
+        <p>Si vous avez d&eacute;j&agrave; les serveurs de l'exercice 5 en cours d'ex&eacute;cution sur les ports 8080 et 8081, laissez-les tourner. Seul l'orchestrateur (port 8082) utilisera le module <code>demo-6-supervisor</code>.</p>
+    </div>
+</div>
+</section>
+
+<!-- Step 2: @RegisterSupervisorAgent -->
+<section id="ex6-step2" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-yellow); color: #000;">2</span>
+        <span class="step-title">C&acirc;bler les proxies A2A et annoter le superviseur</span>
+    </div>
+
+    <h4>&Eacute;tapes 1 &amp; 2 &mdash; Proxies A2A (<code>A2ACreativeWriter.java</code>, <code>A2AStyleScorer.java</code>)</h4>
+    <p>Identiques &agrave; l'exercice 5 &mdash; ajoutez simplement <code>@RegisterA2AAgent</code> sur chaque interface :</p>
+
+    <pre><code>@RegisterA2AAgent(
+        name = "creative-writer",
+        a2aServerUrl = "${a2a.creative-writer.url}",
+        outputKey = "story",
+        description = "Generate a Norse saga based on the given topic")
+public interface A2ACreativeWriter {
+    String generateStory(@V("topic") String topic);
+}
+
+@RegisterA2AAgent(
+        name = "style-scorer",
+        a2aServerUrl = "${a2a.style-scorer.url}",
+        outputKey = "score",
+        description = "Score a saga based on how well it captures a given style")
+public interface A2AStyleScorer {
+    double scoreStyle(@V("story") String story, @V("style") String style);
+}</code></pre>
+
+    <h4>&Eacute;tape 3 &mdash; &Eacute;diteur local (<code>StyleEditor.java</code>)</h4>
+    <pre><code>@RegisterSimpleAgent(
+        name = "style-editor",
+        description = "Reforge a saga to better capture a given style",
+        outputKey = "story",
+        chatModelName = "ollama")
+public interface StyleEditor {
+    @UserMessage("""
+            You are a master Norse skald who shapes and tempers sagas like a smith forges steel.
+            Rewrite the following saga to better honor and embody the {{style}} style.
+            Return only the saga and nothing else.
+            The saga is "{{story}}".
+            """)
+    String editStory(@V("story") String story, @V("style") String style);
+}</code></pre>
+
+    <h4>&Eacute;tape 4 &mdash; Le superviseur LLM (<code>StyleReviewSupervisor.java</code>) &larr; <strong>nouveaut&eacute; !</strong></h4>
+    <p>Ouvrez <code>StyleReviewSupervisor.java</code> et ajoutez l'annotation <code>@RegisterSupervisorAgent</code>. Le superviseur remplace &agrave; lui seul la boucle <em>et</em> la condition de sortie de l'exercice 5. Notez les trois &eacute;l&eacute;ments cl&eacute;s : <code>extends AgenticScopeAccess</code>, <code>@SupervisorRequest</code>, et le type de retour <code>ResultWithAgenticScope&lt;String&gt;</code> :</p>
+
+    <pre><code>import dev.langchain4j.agentic.declarative.SupervisorRequest;
+import dev.langchain4j.agentic.scope.AgenticScopeAccess;
+import dev.langchain4j.agentic.scope.ResultWithAgenticScope;
+import dev.langchain4j.agentic.supervisor.SupervisorResponseStrategy;
+import dev.langchain4j.cdi.spi.RegisterSupervisorAgent;
+import dev.langchain4j.service.V;
+
+@RegisterSupervisorAgent(
+        name = "style-review-supervisor",
+        subAgentNames = {"style-scorer", "style-editor"},
+        chatModelName = "ollama",
+        maxAgentsInvocations = 10,
+        supervisorContext = """
+                You are a Viking saga quality judge overseeing a story refinement process.
+                Use the style-scorer to evaluate how well the story matches the requested style (score 0.0–1.0).
+                Use the style-editor to rewrite the story if the score is below 0.8.
+                Repeat score → edit cycles until the score reaches 0.8 or you have made 5 refinements.
+                """,
+        supervisorResponseStrategy = SupervisorResponseStrategy.LAST)
+public interface StyleReviewSupervisor extends AgenticScopeAccess {         // (1)
+
+    @SupervisorRequest                                                       // (2)
+    static String buildRequest(@V("story") String story,
+                               @V("style") String style) {
+        return "Evaluate and if necessary refine the following story"
+             + " to better match the '" + style + "' style:\n\n" + story;
+    }
+
+    ResultWithAgenticScope&lt;String&gt; refineStory(                             // (3)
+            @V("story") String story, @V("style") String style);
+}</code></pre>
+
+    <div class="callout danger">
+        <div class="callout-title">&#9888; Pi&egrave;ge critique : sans <code>@SupervisorRequest</code>, le planificateur voit une requ&ecirc;te vide</div>
+        <p>Sans m&eacute;thode statique <code>@SupervisorRequest</code> <strong>(2)</strong>, le planificateur LLM re&ccedil;oit <code>"The user request is: ''"</code>. Il voit les scores arriver dans le scope mais ne sait pas quelle story &eacute;valuer ni quel style cibler. Il peut alors d&eacute;clarer le travail termin&eacute; d&egrave;s le premier score, retournant une story vide.<br><br>
+        <code>@SupervisorRequest</code> lit les cl&eacute;s du scope (via les param&egrave;tres <code>@V</code>) et retourne la cha&icirc;ne que le LLM recevra comme requ&ecirc;te utilisateur. C&apos;est l&apos;&eacute;quivalent d&eacute;claratif de <code>.requestGenerator(scope -&gt; ...)</code> de l&apos;API imp&eacute;rative.</p>
+    </div>
+
+    <div class="callout danger">
+        <div class="callout-title">&#9888; Pi&egrave;ge : n'ajoutez <strong>pas</strong> <code>outputKey</code> sur le superviseur !</div>
+        <p>Avec <code>supervisorResponseStrategy = LAST</code>, le superviseur retourne la r&eacute;ponse du <em>dernier sous-agent appel&eacute;</em>. Si le superviseur termine par <code>style-scorer</code> (pour v&eacute;rifier la qualit&eacute;), <code>LAST</code> retourne le <strong>score</strong> &mdash; pas la story. Si vous ajoutiez <code>outputKey = "story"</code>, ce score &eacute;craserait le vrai contenu dans <code>scope["story"]</code>.<br><br>
+        Solution : <strong>omettre <code>outputKey</code></strong> sur le superviseur. C'est <code>style-editor</code> qui &eacute;crit dans <code>scope["story"]</code> via son propre <code>outputKey = "story"</code>. Le score reste accessible via <code>scope.readState("score")</code>.</p>
+    </div>
+
+    <div class="callout info">
+        <div class="callout-title">&#128161; <code>supervisorContext</code> vs <code>exitConditionName</code></div>
+        <p>Dans l'exercice 5, la condition de sortie &eacute;tait un bean CDI Java (<code>Predicate&lt;AgenticScope&gt;</code>) qui testait <code>score &ge; 0.8</code>. Dans cet exercice, <code>supervisorContext</code> est un prompt texte qui <em>explique</em> au LLM quand s'arr&ecirc;ter. Le LLM interpr&egrave;te les r&eacute;sultats et d&eacute;cide dynamiquement &mdash; plus flexible, mais moins d&eacute;terministe.</p>
+    </div>
+</div>
+</section>
+
+<!-- Step 3: Pipeline & Endpoint -->
+<section id="ex6-step3" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-yellow); color: #000;">3</span>
+        <span class="step-title">Pipeline, service et endpoint</span>
+    </div>
+
+    <h4>&Eacute;tape 5 &mdash; D&eacute;clarer le pipeline (<code>StyledWriter.java</code>)</h4>
+    <p>Similaire &agrave; l'exercice 5, mais avec <code>style-review-supervisor</code> &agrave; la place de <code>style-review-loop</code> et <strong>sans <code>outputKey</code></strong> sur la s&eacute;quence (voir encart ci-dessous) :</p>
+
+    <pre><code>import dev.langchain4j.agentic.scope.AgenticScopeAccess;
+import dev.langchain4j.agentic.scope.ResultWithAgenticScope;
+import dev.langchain4j.cdi.spi.RegisterSequenceAgent;
+import dev.langchain4j.service.V;
+
+@RegisterSequenceAgent(
+        name = "styled-writer",
+        subAgentNames = {"creative-writer", "style-review-supervisor"})
+public interface StyledWriter extends AgenticScopeAccess {
+    ResultWithAgenticScope&lt;String&gt; writeStoryWithStyle(
+            @V("topic") String topic, @V("style") String style);
+}</code></pre>
+
+    <div class="callout warning">
+        <div class="callout-title">&#9888; Pas d'<code>outputKey</code> sur la s&eacute;quence</div>
+        <p>Dans l'exercice 5, <code>@RegisterSequenceAgent(outputKey = "story")</code> fonctionnait parce que la boucle retournait toujours la story. Ici, le superviseur avec <code>LAST</code> peut retourner le <em>score</em> (si son dernier appel &eacute;tait <code>style-scorer</code>). Sans <code>outputKey</code> sur la s&eacute;quence, <code>scope["story"]</code> conserve la dernière story &eacute;crite par <code>style-editor</code> via son propre <code>outputKey</code>. On lit ensuite la story directement depuis le scope (&eacute;tape 7).</p>
+    </div>
+
+    <h4>&Eacute;tape 6 &mdash; Simplifier <code>OrchestratorService.java</code></h4>
+    <p>Remplacez tout le c&acirc;blage imp&eacute;ratif <code>@PostConstruct</code> par un simple <code>@Inject</code> et mettez &agrave; jour la m&eacute;thode pour retourner le <code>ResultWithAgenticScope</code> :</p>
+
+    <pre><code>import dev.langchain4j.agentic.scope.ResultWithAgenticScope;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+@ApplicationScoped
+public class OrchestratorService {
+
+    @Inject
+    StyledWriter styledWriter;
+
+    public ResultWithAgenticScope&lt;String&gt; writeStyledStory(String topic, String style) {
+        return styledWriter.writeStoryWithStyle(topic, style);
+    }
+}</code></pre>
+
+    <h4>&Eacute;tape 7 &mdash; Exposer story et score (<code>StyledWriterEndpoint.java</code>)</h4>
+    <p>Mettez &agrave; jour l'endpoint pour lire story et score directement depuis le scope &mdash; les deux viennent des sous-agents qui y ont &eacute;crit via leur propre <code>outputKey</code> :</p>
+
+    <pre><code>import dev.langchain4j.agentic.scope.AgenticScope;
+import dev.langchain4j.agentic.scope.ResultWithAgenticScope;
+
+// Dans writeStyledStory() :
+ResultWithAgenticScope&lt;String&gt; result = orchestratorService.writeStyledStory(topic, style);
+AgenticScope scope = result.agenticScope();
+String story = scope.readState("story", "");   // &eacute;crit par style-editor (outputKey="story")
+double score = scope.readState("score", 0.0);  // &eacute;crit par style-scorer (outputKey="score")
+
+String json = """
+        {
+          "story": %s,
+          "score": %s,
+          "topic": %s,
+          "style": %s
+        }
+        """.formatted(jsonString(story), score, jsonString(topic), jsonString(style));</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">&#128161; Pourquoi pas <code>result.result()</code> ?</div>
+        <p>Sans <code>outputKey</code> sur la s&eacute;quence, <code>result.result()</code> renvoie la valeur brute du dernier sous-agent (le superviseur). Avec <code>LAST</code>, c'est souvent le score du dernier appel au <code>style-scorer</code>. Lire depuis le scope est fiable car <code>style-editor</code> y &eacute;crit toujours la story via son <code>outputKey = "story"</code>.</p>
+    </div>
+
+    <h4>D&eacute;marrer l'orchestrateur</h4>
+    <pre><code># Terminal 3 : Orchestrateur Supervisor (port 8082)
+cd demo-project/demo-6-supervisor/base/a2a-orchestrator
+mvn clean install
+./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=2     # Linux / macOS
+target\server\bin\standalone.bat -Djboss.socket.binding.port-offset=2      # Windows</code></pre>
+
+    <div class="callout warning">
+        <div class="callout-title">&#9888; Ordre de d&eacute;marrage</div>
+        <p>D&eacute;marrez le Creative Writer (8080) et le Style Scorer (8081) <strong>avant</strong> l'Orchestrateur Supervisor (8082).</p>
+    </div>
+</div>
+</section>
+
+<!-- Test Ex6 -->
+<section id="ex6-test" class="section-anchor">
+<div class="step-box">
+    <div class="step-header">
+        <span class="step-number" style="background: var(--accent-green);">&#10003;</span>
+        <span class="step-title">Tester et valider l'exercice 6</span>
+    </div>
+
+    <h4>Via curl</h4>
+    <pre><code># Forger une saga avec un superviseur LLM
+curl "http://localhost:8082/api/styled-story?topic=Erik+le+Rouge+traverse+les+mers&amp;style=epique"
+
+# La r&eacute;ponse inclut la story ET le score final
+# { "story": "...", "score": 0.85, "topic": "...", "style": "..." }</code></pre>
+
+    <h4>Via l'interface web</h4>
+    <p>Ouvrez <a href="http://localhost:8082" target="_blank">http://localhost:8082</a> pour acc&eacute;der &agrave; l'interface Story Forge. Comparez les logs avec l'exercice 5 : la boucle est pilot&eacute;e par le LLM, pas par un Predicate Java.</p>
+
+    <ul class="checklist">
+        <li>Les trois services WildFly d&eacute;marrent sans erreur (ports 8080, 8081, 8082)</li>
+        <li>La r&eacute;ponse JSON contient &agrave; la fois <code>story</code> et <code>score</code></li>
+        <li>La <code>story</code> est bien une saga, pas un score num&eacute;rique</li>
+        <li>Les logs montrent le superviseur appelant scorer et &eacute;diteur alternativement</li>
+        <li>Le score final affich&eacute; est &ge; 0.8 (ou le superviseur a atteint la limite d'invocations)</li>
+    </ul>
+
+    <div class="callout tip">
+        <div class="callout-title">&#128161; Bloqu&eacute; ?</div>
+        <p>Passez &agrave; la solution : utilisez les modules sous <code>demo-6-supervisor/solution/</code> au lieu de <code>base/</code>.</p>
+    </div>
+
+    <div class="callout success">
+        <div class="callout-title">&#127881; F&eacute;licitations &mdash; Atelier termin&eacute; !</div>
+        <p>Vous avez construit six applications aliment&eacute;es par l'IA avec LangChain4j-CDI : un skald viking injectable, un guide r&eacute;silient avec observabilit&eacute;, un jeu de d&eacute;s MCP, un skald avec guardrails, un pipeline A2A avec boucle d&eacute;clarative, et maintenant un orchestrateur pilot&eacute; par le LLM. Tout &ccedil;a avec les patterns Jakarta EE que vous connaissiez d&eacute;j&agrave;.</p>
     </div>
 </div>
 </section>
@@ -2866,6 +3333,21 @@ curl "http://localhost:8082/api/styled-story?topic=la+bataille+de+Ragnarok&amp;s
             <td><code>@PublicAgentCard</code> manquant</td>
             <td>V&eacute;rifier que le producteur CDI est annot&eacute; <code>@Produces @PublicAgentCard</code></td>
         </tr>
+        <tr>
+            <td>La r&eacute;ponse JSON contient un score au lieu d'une story</td>
+            <td><code>outputKey = "story"</code> sur <code>@RegisterSupervisorAgent</code> ou sur <code>@RegisterSequenceAgent</code> avec strat&eacute;gie <code>LAST</code></td>
+            <td>Supprimer <code>outputKey</code> du superviseur ET de la s&eacute;quence. Lire la story via <code>scope.readState("story", "")</code> dans l'endpoint.</td>
+        </tr>
+        <tr>
+            <td>Le superviseur ne s'arr&ecirc;te pas ou d&eacute;passe <code>maxAgentsInvocations</code></td>
+            <td><code>supervisorContext</code> ambigu ou mod&egrave;le trop petit</td>
+            <td>Formuler le crit&egrave;re d'arr&ecirc;t clairement (seuil num&eacute;rique explicite). Essayez <code>qwen2.5:7b</code> ou un mod&egrave;le plus grand.</td>
+        </tr>
+        <tr>
+            <td><code>style-review-supervisor</code> non trouv&eacute; au d&eacute;marrage</td>
+            <td><code>@RegisterSupervisorAgent</code> manquant ou <code>name</code> incorrect</td>
+            <td>V&eacute;rifier que <code>name = "style-review-supervisor"</code> correspond exactement &agrave; <code>subAgentNames</code> dans <code>@RegisterSequenceAgent</code></td>
+        </tr>
     </tbody>
 </table>
 
@@ -2885,6 +3367,10 @@ cd demo-5-a2a/solution/a2a-style-scorer && mvn clean install
 ./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=1    # port 8081
 
 cd demo-5-a2a/solution/a2a-orchestrator && mvn clean install
+./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=2    # port 8082
+
+# Exemple pour l'exercice 6 (orchestrateur seulement — r&eacute;utiliser les serveurs de l'ex5) :
+cd demo-6-supervisor/solution/a2a-orchestrator && mvn clean install
 ./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=2    # port 8082</code></pre>
 </div>
 </section>
