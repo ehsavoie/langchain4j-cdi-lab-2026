@@ -13,7 +13,7 @@
 
     <artifactId>demo-6-supervisor-base</artifactId>
     <packaging>pom</packaging>
-    <name>LangChain4j-CDI Demo 5 Base (Live Coding)</name>
+    <name>LangChain4j-CDI Demo 6 Base (Live Coding)</name>
 
     <modules>
         <module>a2a-creative-writer</module>

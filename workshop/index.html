@@ -1908,7 +1908,8 @@ npx @modelcontextprotocol/inspector</code></pre>
     <p>Ouvrez <code>HnefataflJarlAI.java</code> dans <code>demo-3-mcp/base/</code> :</p>
 
     <pre><code>@RegisterAIService(chatModelName = "mistral",
-                   toolProviderName = "mcp")
+                   toolProviderName = "mcp",
+                   chatMemoryProviderName = "my-memory")
 public interface HnefataflJarlAI {
 
     @SystemMessage("""
@@ -2275,7 +2276,7 @@ public OutputGuardrailResult validate(AiMessage responseFromLLM) {
     </div>
     <p>Ouvrez <code>SkaldAssistant.java</code> et décommentez / remplacez le TODO par l'annotation complète :</p>
 
-    <pre><code>import dev.langchain4j.cdi.RegisterAIService;
+    <pre><code>import dev.langchain4j.cdi.spi.RegisterAIService;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 

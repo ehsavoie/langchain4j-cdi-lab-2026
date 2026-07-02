@@ -13,7 +13,7 @@ import java.util.Set;
  * Garantit que le LLM n'a pas glissé des nains ou des elfes dans le chant viking.
  */
 @ApplicationScoped
-@Named(("fantasy-output"))
+@Named("fantasy-output")
 public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
 
     private static final Set<String> FORBIDDEN_WORDS = Set.of(
