@@ -789,7 +789,7 @@ package com.example.demo1;
 
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
-import dev.langchain4j.cdi.RegisterAIService;
+import dev.langchain4j.cdi.spi.RegisterAIService;
 
 @RegisterAIService(chatModelName = "my-model")
 public interface ChatAssistant {
