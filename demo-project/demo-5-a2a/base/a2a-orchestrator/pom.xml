@@ -79,6 +79,10 @@
         </dependency>
         <dependency>
             <groupId>dev.langchain4j.cdi</groupId>
+            <artifactId>langchain4j-cdi-a2a</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j.cdi</groupId>
             <artifactId>langchain4j-cdi-portable-ext</artifactId>
         </dependency>
         <dependency>

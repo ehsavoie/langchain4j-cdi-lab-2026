@@ -34,8 +34,8 @@ public class OrchestratorService {
 
     private StyledWriter styledWriter;
 
-    // TODO - Étape 7 : Remplacer tout le câblage impératif ci-dessous par un simple @Inject.
-    // Grâce aux annotations des étapes 1–6, LangChain4j-CDI produit automatiquement tous les beans.
+    // TODO - Étape 4d : Remplacer tout le câblage impératif ci-dessous par un simple @Inject.
+    // Grâce aux annotations des étapes 4a–4c, LangChain4j-CDI produit automatiquement tous les beans.
     // Supprimer : creativeWriterUrl, styleScorerUrl, chatModel, styledWriter, et la méthode @PostConstruct.
     // Les remplacer par :
     //

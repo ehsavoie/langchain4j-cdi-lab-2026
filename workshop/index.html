@@ -2410,8 +2410,8 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
     <thead><tr><th>Fichier</th><th>R&ocirc;le</th><th>TODO</th></tr></thead>
     <tbody>
         <tr><td><code>CreativeWriter.java</code></td><td>Service IA LangChain4j</td><td>Ajouter <code>@RegisterAIService</code> et <code>@UserMessage</code></td></tr>
-        <tr><td><code>CreativeWriterAgentCardProducer.java</code></td><td>D&eacute;crit l'agent au r&eacute;seau A2A</td><td>Construire l'<code>AgentCard</code></td></tr>
-        <tr><td><code>CreativeWriterExecutorProducer.java</code></td><td>Re&ccedil;oit et traite les requ&ecirc;tes A2A</td><td>Impl&eacute;menter <code>execute()</code></td></tr>
+        <tr><td><code>CreativeWriterAgentCardProducer.java</code></td><td>D&eacute;crit l'agent au r&eacute;seau A2A</td><td>D&eacute;j&agrave; impl&eacute;ment&eacute; &mdash; observer</td></tr>
+        <tr><td><code>CreativeWriterExecutorProducer.java</code></td><td>Re&ccedil;oit et traite les requ&ecirc;tes A2A</td><td>D&eacute;j&agrave; impl&eacute;ment&eacute; &mdash; observer</td></tr>
     </tbody>
 </table>
 
@@ -2420,8 +2420,8 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
     <thead><tr><th>Fichier</th><th>R&ocirc;le</th><th>TODO</th></tr></thead>
     <tbody>
         <tr><td><code>StyleScorer.java</code></td><td>Service IA LangChain4j</td><td>Ajouter <code>@RegisterAIService</code> et <code>@UserMessage</code></td></tr>
-        <tr><td><code>StyleScorerAgentCardProducer.java</code></td><td>D&eacute;crit l'agent au r&eacute;seau A2A</td><td>Construire l'<code>AgentCard</code></td></tr>
-        <tr><td><code>StyleScorerExecutorProducer.java</code></td><td>Re&ccedil;oit et traite les requ&ecirc;tes A2A</td><td>Impl&eacute;menter <code>execute()</code></td></tr>
+        <tr><td><code>StyleScorerAgentCardProducer.java</code></td><td>D&eacute;crit l'agent au r&eacute;seau A2A</td><td>D&eacute;j&agrave; impl&eacute;ment&eacute; &mdash; observer</td></tr>
+        <tr><td><code>StyleScorerExecutorProducer.java</code></td><td>Re&ccedil;oit et traite les requ&ecirc;tes A2A</td><td>D&eacute;j&agrave; impl&eacute;ment&eacute; &mdash; observer</td></tr>
     </tbody>
 </table>
 
@@ -2436,7 +2436,7 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
         <tr><td><code>ScoreExitCondition.java</code></td><td>Condition de sortie CDI (<code>Predicate&lt;AgenticScope&gt;</code>)</td><td>Impl&eacute;menter le test <code>score &ge; 0.8</code></td></tr>
         <tr><td><code>StyledWriter.java</code></td><td>Pipeline SEQUENCE complet</td><td>Ajouter <code>@RegisterSequenceAgent(subAgentNames=...)</code></td></tr>
         <tr><td><code>OrchestratorService.java</code></td><td>Injecte et appelle le pipeline</td><td>Injecter <code>StyledWriter</code> et appeler <code>writeStoryWithStyle()</code></td></tr>
-        <tr><td><code>StyledWriterEndpoint.java</code></td><td>Point d'acc&egrave;s REST (d&eacute;j&agrave; c&acirc;bl&eacute;)</td><td>Rien &mdash; d&eacute;j&agrave; impl&eacute;ment&eacute;</td></tr>
+        <tr><td><code>StyledWriterEndpoint.java</code></td><td>Point d'acc&egrave;s REST</td><td>Extraire le score depuis le <code>AgenticScope</code></td></tr>
     </tbody>
 </table>
 
@@ -2469,7 +2469,7 @@ public interface CreativeWriter {
     @UserMessage("""
                 You are a Norse skald, a Viking bard who crafts mighty sagas of glory, battle, and adventure.
                 Forge a short saga no more than 3 sentences around the given topic, in the spirit of the Viking age.
-                Return only the saga and nothing else.
+                Return only the saga in English and nothing else.
                 The topic is {{topic}}.
                 """)
     String generateStory(@V("topic") String topic);
@@ -2525,13 +2525,13 @@ public interface StyleScorer {
 <div class="step-box">
     <div class="step-header">
         <span class="step-number" style="background: var(--accent-red);">3</span>
-        <span class="step-title">Cr&eacute;er l'AgentCard et l'AgentExecutor</span>
+        <span class="step-title">Observer l'AgentCard et l'AgentExecutor (d&eacute;j&agrave; impl&eacute;ment&eacute;s)</span>
     </div>
 
-    <p>Chaque agent A2A a besoin de deux composants CDI : une <strong>AgentCard</strong> (qui d&eacute;crit l'agent au r&eacute;seau) et un <strong>AgentExecutor</strong> (qui traite les requ&ecirc;tes).</p>
+    <p>Chaque agent A2A a besoin de deux composants CDI : une <strong>AgentCard</strong> (qui d&eacute;crit l'agent au r&eacute;seau) et un <strong>AgentExecutor</strong> (qui traite les requ&ecirc;tes). Ces fichiers sont <strong>d&eacute;j&agrave; impl&eacute;ment&eacute;s</strong> dans le module <code>base/</code> &mdash; prenez un moment pour comprendre leur structure.</p>
 
     <h4>AgentCard &mdash; Creative Writer</h4>
-    <p>Ouvrez <code>CreativeWriterAgentCardProducer.java</code> et impl&eacute;mentez <code>agentCard()</code> :</p>
+    <p>Ouvrez <code>CreativeWriterAgentCardProducer.java</code> et observez la m&eacute;thode <code>agentCard()</code> :</p>
 
     <pre><code>@Produces
 @PublicAgentCard
@@ -2560,7 +2560,7 @@ public AgentCard agentCard() {
 }</code></pre>
 
     <h4>AgentExecutor &mdash; Creative Writer</h4>
-    <p>Ouvrez <code>CreativeWriterExecutorProducer.java</code> et d&eacute;commentez les &eacute;tapes 1&ndash;4 dans <code>execute()</code> :</p>
+    <p>Ouvrez <code>CreativeWriterExecutorProducer.java</code> et observez la m&eacute;thode <code>execute()</code> :</p>
 
     <pre><code>@Override
 public void execute(RequestContext context, AgentEmitter emitter) throws A2AError {
@@ -2580,8 +2580,8 @@ public void execute(RequestContext context, AgentEmitter emitter) throws A2AErro
     emitter.complete();
 }</code></pre>
 
-    <h4>R&eacute;p&eacute;ter pour le Style Scorer</h4>
-    <p>Appliquez le m&ecirc;me pattern dans <code>StyleScorerAgentCardProducer.java</code> (skill id : <code>"style_scorer"</code>) et <code>StyleScorerExecutorProducer.java</code> (extraire deux arguments : story et style).</p>
+    <h4>Style Scorer &mdash; m&ecirc;me pattern</h4>
+    <p>Observez &eacute;galement <code>StyleScorerAgentCardProducer.java</code> (skill id : <code>"style_scorer"</code>) et <code>StyleScorerExecutorProducer.java</code> (extrait deux arguments : story et style) &mdash; d&eacute;j&agrave; impl&eacute;ment&eacute;s.</p>
 
     <div class="callout info">
         <div class="callout-title">&#128161; Pattern serveur A2A</div>
@@ -2677,7 +2677,7 @@ public class ScoreExitCondition implements Predicate&lt;AgenticScope&gt; {
     }
 }</code></pre>
 
-    <h4>&Eacute;tape 4d &mdash; Annoter le pipeline (<code>StyledWriter.java</code>) et simplifier <code>OrchestratorService.java</code></h4>
+    <h4>&Eacute;tape 4d &mdash; Annoter le pipeline (<code>StyledWriter.java</code>), simplifier <code>OrchestratorService.java</code> et mettre &agrave; jour <code>StyledWriterEndpoint.java</code></h4>
     <pre><code>import dev.langchain4j.agentic.scope.AgenticScopeAccess;
 import dev.langchain4j.agentic.scope.ResultWithAgenticScope;
 import dev.langchain4j.cdi.spi.RegisterSequenceAgent;
@@ -2705,6 +2705,29 @@ public class OrchestratorService {
         return styledWriter.writeStoryWithStyle(topic, style);
     }
 }</code></pre>
+
+    <p>Enfin, mettez &agrave; jour <code>StyledWriterEndpoint.java</code> pour extraire le score depuis le <code>AgenticScope</code> :</p>
+
+    <pre><code>import dev.langchain4j.agentic.scope.AgenticScope;
+import dev.langchain4j.agentic.scope.ResultWithAgenticScope;
+
+// Dans la m&eacute;thode writeStyledStory(), remplacez :
+//   String story = orchestratorService.writeStyledStory(topic, style);
+// par :
+ResultWithAgenticScope&lt;String&gt; result = orchestratorService.writeStyledStory(topic, style);
+String story = result.result();
+AgenticScope scope = result.agenticScope();
+double score = scope.readState("score", 0.0);
+
+// Ajoutez "score" dans le JSON :
+String json = """
+        {
+          "story": %s,
+          "score": %s,
+          "topic": %s,
+          "style": %s
+        }
+        """.formatted(jsonString(story), score, jsonString(topic), jsonString(style));</code></pre>
 
     <div class="callout info">
         <div class="callout-title">&#128161; Annotations d&eacute;di&eacute;es vs builders manuels</div>

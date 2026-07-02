@@ -31,7 +31,7 @@ public class StyledWriterEndpoint {
                     .build();
         }
 
-        // TODO - Étape 8 : Mettre à jour l'appel pour extraire la story ET le score depuis le scope.
+        // TODO - Étape 4d : Mettre à jour l'appel pour extraire la story ET le score depuis le scope.
         // Remplacer la ligne ci-dessous par :
         //
         //   ResultWithAgenticScope<String> result = orchestratorService.writeStyledStory(topic, style);

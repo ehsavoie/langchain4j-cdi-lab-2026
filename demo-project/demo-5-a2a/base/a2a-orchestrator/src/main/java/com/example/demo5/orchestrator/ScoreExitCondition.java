@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Predicate;
 
-// TODO - Étape 4 : Ajouter @ApplicationScoped et @Named("scoreExitCondition") à cette classe.
+// TODO - Étape 4c : Ajouter @ApplicationScoped et @Named("scoreExitCondition") à cette classe.
 // Ces deux annotations remplacent la lambda anonyme de la méthode @PostConstruct dans OrchestratorService.
-// Le @Named référencé dans @RegisterLoopAgent.exitConditionName (Étape 5) doit correspondre exactement.
+// Le @Named référencé dans @RegisterLoopAgent.exitConditionName (Étape 4c) doit correspondre exactement.
 //
 // @ApplicationScoped
 // @Named("scoreExitCondition")
