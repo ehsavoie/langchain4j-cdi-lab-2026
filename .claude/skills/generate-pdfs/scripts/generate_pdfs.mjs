@@ -269,14 +269,49 @@ async function generateRevealDeck(puppeteer, { htmlFile, outputFile }) {
       });
     });
 
+    // Inject CSS to force full-bleed slides (remove Reveal.js print margins)
+    await page.evaluateOnNewDocument(() => {
+      const style = document.createElement('style');
+      style.textContent = `
+        .reveal .slides { left: 0 !important; right: 0 !important; }
+        .pdf-page { margin: 0 !important; box-shadow: none !important; }
+        .reveal .slides section { padding: 0 !important; }
+        .reveal .slide-background { inset: 0 !important; }
+      `;
+      document.addEventListener('DOMContentLoaded', () => {
+        document.head.appendChild(style);
+      });
+    });
+
     // ?print-pdf activates Reveal.js print layout with full-bleed backgrounds
     await page.goto(`file://${src}?print-pdf`, {
       waitUntil: 'networkidle0',
       timeout: 60000,
     });
 
+    // Also inject after load in case DOMContentLoaded already fired
+    await page.addStyleTag({
+      content: `
+        .reveal .slides { left: 0 !important; right: 0 !important; }
+        .pdf-page { margin: 0 !important; box-shadow: none !important; }
+        .reveal .slides section { padding: 0 !important; }
+        .reveal .slide-background { inset: 0 !important; }
+      `,
+    });
+
     // Extra wait for Reveal to finish laying out all slides
     await new Promise((r) => setTimeout(r, 3000));
+
+    // Query actual slide dimensions from Reveal.js to match PDF page size
+    const slideDims = await page.evaluate(() => {
+      if (window.Reveal) {
+        const config = window.Reveal.getConfig();
+        return { width: config.width || 960, height: config.height || 700 };
+      }
+      return { width: 960, height: 700 };
+    });
+    const pdfWidth = 297; // mm
+    const pdfHeight = pdfWidth * slideDims.height / slideDims.width;
 
     // Identify which PDF pages contain videos and replace <video> with poster images + play button
     if (videoFiles.length > 0) {
@@ -361,8 +396,8 @@ async function generateRevealDeck(puppeteer, { htmlFile, outputFile }) {
 
     await page.pdf({
       path: out,
-      width: '297mm',
-      height: '167.0625mm',
+      width: `${pdfWidth}mm`,
+      height: `${pdfHeight}mm`,
       printBackground: true,
       displayHeaderFooter: false,
       margin: { top: '0', bottom: '0', left: '0', right: '0' },

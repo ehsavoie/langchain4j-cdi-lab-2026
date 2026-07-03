@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atelier LangChain4j-CDI — Introduction — Oracle Dev Week 2026</title>
+    <title>Atelier LangChain4j-CDI — Introduction — RivieraDev 2026</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
@@ -136,31 +136,27 @@
 <div class="reveal">
 <div class="slides">
 
-<!-- ============================================= -->
-<!-- SLIDE 0: En route pour Oracle Dev Week         -->
-<!-- ============================================= -->
-<section data-background-image="../slides/rh03v3-devo-set-c-slate-150.png"
-         data-background-size="contain"
-         data-background-color="#0a0a1a">
-    <aside class="notes">
-        Slide d'ouverture — laisser l'image parler. On est à Oracle Dev Week !
-    </aside>
-</section>
 
 <!-- ============================================= -->
 <!-- SLIDE 1: Title                                -->
 <!-- ============================================= -->
-<section data-background-image="../slides/presenter-background-1920x1080-dark-1.png"
+<section data-background-image="../slides/logorivieradev2026.png"
          data-background-size="cover">
+</section>
+
+<!-- ============================================= -->
+<!-- SLIDE 2: Title with logo                      -->
+<!-- ============================================= -->
+<section>
     <img src="../slides/langchain4j-cdi-logo.png"
          onerror="this.src='https://raw.githubusercontent.com/langchain4j/langchain4j-cdi/main/langchain4j-cdi-logo.png'"
          alt="LangChain4j-CDI" style="max-width: 280px; margin-bottom: 0.3em;">
     <h1>LangChain4j-CDI</h1>
     <h3 style="color: var(--accent-blue);">IA générative<br>Nativement injectable dans Jakarta EE</h3>
     <p class="small" style="margin-top: 1em;">
-        <span class="accent">Yann Blazart</span> &amp; <span class="accent">Emmanuel Hugonnet</span>
+        <span class="accent">Yann Blazart</span>, <span class="accent">Emmanuel Hugonnet</span> &amp; <span class="accent">Antoine Sabot-Durand</span>
     </p>
-    <p class="small">Oracle Dev Week 2026 — Atelier pratique</p>
+    <p class="small">RivieraDev 2026 — Atelier pratique</p>
     <aside class="notes">
         Bienvenue à tous dans cet atelier pratique ! Aujourd'hui, vous ne regarderez pas seulement des diapositives — vous construirez de vrais agents IA fonctionnant sur WildFly.
 
@@ -234,7 +230,38 @@
 </section>
 
 <!-- ============================================= -->
-<!-- SLIDE 5: The context                          -->
+<!-- SLIDE 5: Antoine                              -->
+<!-- ============================================= -->
+<section>
+    <h2>Et le spec lead historique de CDI</h2>
+    <div class="speaker-card antoine" style="border-left-width: 6px;">
+        <div class="avatar"><img src="../slides/asd.png" alt="Antoine Sabot-Durand" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;"></div>
+        <div class="info">
+            <h3 style="color: var(--accent-green);">Antoine Sabot-Durand</h3>
+            <p>Java Champion &bull; Ex spec lead <strong>CDI</strong> (Jakarta EE) &bull; Ex-Red Hat</p>
+            <p>Équipe de lancement Quarkus &bull; MicroProfile Fault Tolerance &amp; Health Check</p>
+            <p><span class="badge badge-green">CDI</span> <span class="badge badge-green">Jakarta EE</span> <span class="badge badge-green">Quarkus</span> <span class="badge badge-green">MicroProfile</span></p>
+        </div>
+    </div>
+    <div class="fragment" style="margin-top: 1.2em; text-align: center;">
+        <p class="medium" style="color: #ccc; margin-top: 0.3em;">
+            Directeur Technique @ <strong style="color: var(--accent-green);">SCIAM</strong> — collègue de Yann
+        </p>
+        <p class="small" style="color: #999;">
+            <a href="https://github.com/antoinesd" style="color: var(--accent-blue);">github.com/antoinesd</a>
+        </p>
+    </div>
+    <aside class="notes">
+        Antoine se présente (ou Yann le présente, vu qu'ils sont chez SCIAM tous les deux).
+
+        Spec lead historique de CDI côté Jakarta EE / Red Hat, membre de l'équipe fondatrice de Quarkus, contributeur majeur à MicroProfile Fault Tolerance et Health Check.
+
+        Aujourd'hui Directeur Technique chez SCIAM, il apporte toute la profondeur CDI nécessaire à l'extension langchain4j-cdi.
+    </aside>
+</section>
+
+<!-- ============================================= -->
+<!-- SLIDE 6: The context                          -->
 <!-- ============================================= -->
 <section>
     <h2>Le contexte aujourd'hui</h2>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LangChain4j-CDI — Oracle Dev Week 2026</title>
+    <title>LangChain4j-CDI — RivieraDev 2026</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
@@ -221,17 +221,21 @@
 <!-- ============================================= -->
 
 <!-- Slide 1: Title with logo -->
-<section data-background-image="presenter-background-1920x1080-dark-1.png"
+<section data-background-image="logorivieradev2026.png"
          data-background-size="cover">
+</section>
+
+<!-- Slide 2: Title with logo -->
+<section>
     <img src="langchain4j-cdi-logo.png"
          onerror="this.src='https://raw.githubusercontent.com/langchain4j/langchain4j-cdi/main/langchain4j-cdi-logo.png'"
          alt="LangChain4j-CDI" style="max-width: 280px; margin-bottom: 0.3em;">
     <h1>LangChain4j-CDI</h1>
     <h3 style="color: var(--accent-blue);">IA Générative<br>Nativement Injectable dans Jakarta EE</h3>
     <p class="small" style="margin-top: 1em;">
-        <span class="accent">Yann Blazart</span> &amp; <span class="accent">Emmanuel Hugonnet</span>
+        <span class="accent">Yann Blazart</span>, <span class="accent">Emmanuel Hugonnet</span> &amp; <span class="accent">Antoine Sabot-Durand</span>
     </p>
-    <p class="small">Oracle Dev Week 2026</p>
+    <p class="small">RivieraDev 2026</p>
     <aside class="notes">
         Bienvenue à tous ! On espère que vous êtes prêts, parce qu'on va parler de choses sérieuses... enfin, aussi sérieuses que deux types qui ont construit un framework d'IA peuvent l'être.
 
@@ -769,17 +773,6 @@ dev.langchain4j.cdi.plugin.my-retriever.config.embeddingStore=\
     </aside>
 </section>
 
-<!-- Demo 1 - Vidéo de la démo -->
-<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
-    <h2>Demo 1 — @RegisterAIService en action</h2>
-    <video data-autoplay controls style="max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
-        <source src="demo1.webm" type="video/webm">
-    </video>
-    <aside class="notes">
-        Vidéo de secours pour la démo 1. Montre le chat basique avec @RegisterAIService,
-        le streaming en temps réel, et l'analyse d'images avec le modèle vision multimodal.
-    </aside>
-</section>
 
 <!-- Slide 13: Demo 1 - Slide de secours : Interface -->
 <section data-visibility="uncounted">
@@ -1335,17 +1328,6 @@ podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 \
     </aside>
 </section>
 
-<!-- Demo 2 - Vidéo de la démo -->
-<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
-    <h2>Demo 2 — L'assistant d'expédition en action</h2>
-    <video data-autoplay controls style="max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
-        <source src="demo2.webm" type="video/webm">
-    </video>
-    <aside class="notes">
-        Vidéo de secours pour la démo 2. Montre l'assistant d'expédition Viking avec
-        Memory, RAG, Tools, Fault Tolerance et Telemetry en action.
-    </aside>
-</section>
 
 <!-- Slide 23: Récap des modules -->
 <section>
@@ -1509,17 +1491,6 @@ dev.langchain4j.cdi.plugin.mcp-tools.config.url=\
     </aside>
 </section>
 
-<!-- Demo 3 - Vidéo de la démo -->
-<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
-    <h2>Demo 3 — Hnefatafl en action</h2>
-    <video data-autoplay controls style="max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
-        <source src="demo3.webm" type="video/webm">
-    </video>
-    <aside class="notes">
-        Vidéo de secours pour la démo 3. Montre le jeu de Hnefatafl avec MCP :
-        Ragnar le Skald lance les runes via le serveur MCP externe, le LLM interprète les résultats et annonce le sort du guerrier.
-    </aside>
-</section>
 
 <!-- Slide 25.2: Flux Demo 3 avec MCP SSE -->
 <section>
@@ -1729,17 +1700,6 @@ public class FrenchInputGuardrail implements InputGuardrail {
     </aside>
 </section>
 
-<!-- Demo 4 - Vidéo de la démo -->
-<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
-    <h2>Demo 4 — Guardrails en action</h2>
-    <video data-autoplay controls style="max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
-        <source src="demo4.webm" type="video/webm">
-    </video>
-    <aside class="notes">
-        Vidéo de secours pour la démo 4. Montre les 4 guardrails en action :
-        requête en anglais rejetée, mention de nains rejetée, requête valide en français acceptée.
-    </aside>
-</section>
 
 <!-- Demo 4 - Backup slide : Guardrail de sortie -->
 <section data-visibility="uncounted">
@@ -2073,17 +2033,6 @@ public class ScoreExitCondition implements Predicate&lt;AgenticScope&gt; {
     </aside>
 </section>
 
-<!-- Demo 5 - Vidéo de la démo -->
-<section data-background-gradient="linear-gradient(135deg, #1a0a00, #2a1500)">
-    <h2>Demo 5 — Story Forge en action</h2>
-    <video data-autoplay controls style="max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
-        <source src="demo5.webm" type="video/webm">
-    </video>
-    <aside class="notes">
-        Vidéo de secours pour la démo 5. Montre l'orchestration A2A Story Forge :
-        le Creative Writer forge une saga, le Style Scorer l'évalue, et la boucle de révision s'exécute jusqu'à atteindre un score suffisant.
-    </aside>
-</section>
 
 <!-- Slide 27: Récap -->
 <section>
@@ -2169,7 +2118,7 @@ public class ScoreExitCondition implements Predicate&lt;AgenticScope&gt; {
         </a>
     </p>
     <p class="small" style="margin-top: 2em;">
-        Oracle Dev Week 2026<br>
+        RivieraDev 2026<br>
         Slides : Reveal.js | Démos : WildFly + IntelliJ
     </p>
     <aside class="notes">
