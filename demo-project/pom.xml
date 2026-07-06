@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>LangChain4j-CDI Demo — Devoxx France 2026</name>
+    <name>LangChain4j-CDI Demo — Riviera Dev 2026</name>
     <description>Progressive demos: Injectable AI Agent, Fault Tolerance, MCP</description>
 
     <modules>

@@ -1,4 +1,4 @@
-# LangChain4j-CDI — Devoxx France 2026
+# LangChain4j-CDI — Riviera Dev 2026
 
 ## Prérequis
 
@@ -44,6 +44,7 @@ ollama pull qwen2.5:7b       # démo 2 (tool calling + embeddings), démo 5 (A2A
 
 ```bash
 git clone https://github.com/ehsavoie/langchain4j-cdi-lab-2026.git
+git checkout rivieradev
 cd langchain4j-cdi-lab-2026/demo-project
 
 # Télécharger toutes les dépendances Maven
