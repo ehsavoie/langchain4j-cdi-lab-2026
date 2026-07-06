@@ -1470,6 +1470,12 @@ assistant.chat("yann", "Bonjour !");</code></pre>
     <p>Créez un chatbot IA simple en utilisant <code>@RegisterAIService</code>, injectez-le dans un point d'accès JAX-RS et testez-le. Ensuite, ajoutez des capacités de streaming et de vision multimodale.</p>
 </div>
 
+<div class="callout warning">
+    <div class="callout-title">&#9888;&#65039; Attention &mdash; Code de d&eacute;part cod&eacute; en dur pour Mistral AI</div>
+    <p>Le fichier <code>ChatResource.java</code> du module <code>base/</code> instancie <strong>directement</strong> <code>MistralAiChatModel</code> dans sa m&eacute;thode <code>@PostConstruct</code>. Il <strong>ignore</strong> le fichier <code>microprofile-config.properties</code> et n&eacute;cessite la variable d'environnement <code>MISTRAL_API_KEY</code> pour fonctionner.</p>
+    <p>Si vous utilisez <strong>Ollama</strong>, le projet de base <strong>ne fonctionnera pas</strong> tant que vous n'aurez pas termin&eacute; les &eacute;tapes 1 &agrave; 3 de cet exercice, qui remplacent ce code en dur par l'injection CDI + la configuration MicroProfile.</p>
+</div>
+
 <pre><code>cd demo-project/demo-1-ai-agent/base
 # Ouvrez ce répertoire dans votre IDE</code></pre>
 
