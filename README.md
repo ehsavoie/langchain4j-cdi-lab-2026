@@ -166,7 +166,7 @@ mvn clean install
 target\server\bin\standalone.bat    # Windows
 
 curl -X POST -H "Content-Type: text/plain" \
-  -d "Chante-moi une chanson viking" \
+  -d "Chante-moi une chanson viking à" \
   http://localhost:8080/demo-4/api/chat
 ```
 

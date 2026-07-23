@@ -21,15 +21,10 @@ public class FrenchOutputGuardrail implements OutputGuardrail {
 
     @PostConstruct
     void init() {
-        // TODO: Initialize the detector: new OptimaizeLangDetector().loadModels()
     }
 
     @Override
     public OutputGuardrailResult validate(AiMessage responseFromLLM) {
-        // TODO: Get the AI response text with responseFromLLM.text()
-        // TODO: Detect the language with detector.detect(text) (synchronized on detector)
-        // TODO: Return failure("...") if NOT result.isReasonablyCertain() OR language is not "fr"
-        // TODO: Return success() otherwise
         return success();
     }
 }

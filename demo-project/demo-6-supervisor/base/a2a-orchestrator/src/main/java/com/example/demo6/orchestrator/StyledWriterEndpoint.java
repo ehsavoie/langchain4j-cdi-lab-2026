@@ -36,17 +36,6 @@ public class StyledWriterEndpoint {
         ResultWithAgenticScope<String> result = orchestratorService.writeStyledStory(topic, style);
         AgenticScope scope = result.agenticScope();
         String story = scope.readState("story", "");
-        // TODO - Étape 7 : Extraire également le score depuis le scope partagé.
-        // Ajouter la ligne suivante :
-        //   double score = scope.readState("score", 0.0);  // écrit par style-scorer via outputKey
-        //
-        // Attention : ne pas utiliser result.result() pour la story — le superviseur retourne
-        // le score en dernière réponse. La story vit dans scope["story"].
-        //
-        // Puis ajouter "score" dans le JSON et son argument dans .formatted() :
-        //   "score": %s,
-        //   .formatted(jsonString(story), score, jsonString(topic), jsonString(style))
-
         String json = """
                 {
                   "story": %s,

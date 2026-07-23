@@ -44,7 +44,7 @@
         <a2a-jakarta.version>1.0.0.CR1</a2a-jakarta.version>
 
         <!-- Apache Tika language detection -->
-        <tika.version>2.9.2</tika.version>
+        <tika.version>3.3.2</tika.version>
     </properties>
 
     <dependencyManagement>

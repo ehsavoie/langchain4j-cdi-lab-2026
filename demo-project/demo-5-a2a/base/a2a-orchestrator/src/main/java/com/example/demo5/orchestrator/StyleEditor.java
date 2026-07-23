@@ -4,16 +4,6 @@ import dev.langchain4j.cdi.spi.RegisterSimpleAgent;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 
-// TODO - Étape 4b : Annoter cette interface avec @RegisterSimpleAgent.
-// @RegisterSimpleAgent remplace le AgenticServices.agentBuilder() + ChatModel injecté manuellement
-// dans OrchestratorService. chatModelName référence le bean ChatModel nommé "ollama"
-// (configuré via microprofile-config.properties).
-//
-// @RegisterSimpleAgent(
-//         name = "style-editor",
-//         description = "Reforge a saga to better capture a given style",
-//         outputKey = "story",
-//         chatModelName = "ollama")
 public interface StyleEditor {
 
     @UserMessage("""

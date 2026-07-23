@@ -3,9 +3,6 @@ package com.example.demo4;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 
-// TODO: Add @RegisterAIService(chatModelName = "my-model",
-//         inputGuardrailNames  = {"french-input",  "fantasy-input"},
-//         outputGuardrailNames = {"french-output", "fantasy-output"})
 public interface SkaldAssistant {
 
     @SystemMessage("""

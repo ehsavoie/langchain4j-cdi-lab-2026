@@ -6,28 +6,20 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 /**
- * TODO: Point d'entrée REST pour jouer au Hnefatafl au Grand Thing des vikings.
- *
- * À compléter :
- * 1. Injecter le HnefataflJarlAI
- * 2. Implémenter la méthode play() qui appelle l'agent
+ * Point d'entrée REST pour jouer au Hnefatafl au Grand Thing des vikings.
  */
 @Path("/game")
 @ApplicationScoped
 public class GameResource {
 
-    // TODO: Injecter le HnefataflJarlAI avec @Inject
-    // HnefataflJarlAI gameMaster;
-
     /**
-     * TODO: Jouer une action dans la partie de Hnefatafl.
+     * Jouer une action dans la partie de Hnefatafl.
      */
     @POST
     @Path("/play")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
     public String play(String playerAction) {
-        // TODO: Appeler gameMaster.play(playerAction)
         throw new UnsupportedOperationException("TODO: À implémenter pendant le live coding");
     }
 
@@ -38,7 +30,6 @@ public class GameResource {
     @Path("/start")
     @Produces(MediaType.TEXT_PLAIN)
     public String start() {
-        // TODO: Retourner gameMaster.play("Salve ! Je suis prêt à jouer au Hnefatafl.")
         throw new UnsupportedOperationException("TODO: À implémenter pendant le live coding");
     }
 

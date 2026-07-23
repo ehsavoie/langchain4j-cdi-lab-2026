@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atelier LangChain4j-CDI — RivieraDev 2026</title>
+    <title>Atelier LangChain4j-CDI — Volcamp 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -614,6 +614,54 @@
         .file-tree .file { color: var(--text-secondary); }
         .file-tree .highlight { color: var(--accent-orange); font-weight: 600; }
         .file-tree .comment { color: var(--text-muted); font-style: italic; }
+
+        /* Collapsible solution blocks */
+        details.solution {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        details.solution > summary {
+            padding: 0.7rem 1.1rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--accent-blue);
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            user-select: none;
+            transition: background 0.15s;
+        }
+
+        details.solution > summary:hover {
+            background: rgba(88, 166, 255, 0.08);
+        }
+
+        details.solution > summary::before {
+            content: '\25b6';
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+        }
+
+        details.solution[open] > summary::before {
+            transform: rotate(90deg);
+        }
+
+        details.solution > summary::-webkit-details-marker { display: none; }
+
+        details.solution > .solution-body {
+            padding: 0 1.1rem 1rem;
+        }
+
+        details.solution > .solution-body > pre:first-child,
+        details.solution > .solution-body > h4:first-child {
+            margin-top: 0;
+        }
         /* Slides modal */
         .slides-modal-overlay {
             display: none;
@@ -818,6 +866,14 @@
                 max-width: 100% !important;
                 break-inside: avoid;
             }
+
+            /* Force collapsible sections open for print */
+            details.solution {
+                border: 1px solid #d1d9e0;
+                background: #f6f8fa !important;
+            }
+            details.solution > summary { display: none; }
+            details.solution > .solution-body { display: block !important; padding: 0.5rem; }
         }
     </style>
 </head>
@@ -1018,7 +1074,7 @@
 <!-- ============================================================ -->
 <section id="overview" class="section-anchor">
 <div class="hero">
-    <div class="hero-badge">Atelier RivieraDev 2026</div>
+    <div class="hero-badge">Atelier Volcamp 2026</div>
     <h1>LangChain4j-<span class="highlight">CDI</span></h1>
     <p class="subtitle">
         IA générative nativement injectable dans Jakarta&nbsp;EE &mdash; Construisez des agents IA prêts pour la production avec CDI, MicroProfile et LangChain4j sur WildFly.
@@ -1500,12 +1556,12 @@ assistant.chat("yann", "Bonjour !");</code></pre>
         <span class="step-number">1</span>
         <span class="step-title">Créer l'interface du service IA</span>
     </div>
-    <p>Ouvrez <code>ChatAssistant.java</code>. C'est une interface Java simple avec deux TODOs. Votre tâche : la transformer en agent IA injectable.</p>
+    <p>Ouvrez <code>ChatAssistant.java</code>. Votre tâche : la transformer en agent IA injectable en ajoutant <code>@RegisterAIService</code> sur l'interface.</p>
 
-    <h4>TODO 1 — Décommenter l'import</h4>
-    <pre><code>import dev.langchain4j.cdi.spi.RegisterAIService;</code></pre>
-
-    <h4>TODO 2 — Ajouter @RegisterAIService sur l'interface</h4>
+    <h4>Ajouter @RegisterAIService sur l'interface</h4>
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>@SuppressWarnings("CdiManagedBeanInconsistencyInspection")
 @RegisterAIService(chatModelName = "my-model")
 public interface ChatAssistant {
@@ -1519,6 +1575,8 @@ public interface ChatAssistant {
         """)
     String chat(@UserMessage String userMessage);
 }</code></pre>
+    </div>
+    </details>
 
     <div class="callout tip">
         <div class="callout-title">&#128161; Ce qui se passe</div>
@@ -1541,14 +1599,10 @@ public interface ChatAssistant {
     </div>
     <p>Ouvrez <code>ChatResource.java</code>. Il contient une méthode <code>@PostConstruct init()</code> qui instancie manuellement les modèles et les services IA — c'est exactement ce que CDI remplace. Votre tâche : supprimer ce boilerplate et le remplacer par de l'injection.</p>
 
-    <h4>TODO 1 — Supprimer les 4 imports inutiles en haut du fichier</h4>
-    <pre><code>// Supprimer ces 4 imports :
-import dev.langchain4j.model.mistralai.MistralAiChatModel;
-import dev.langchain4j.model.mistralai.MistralAiStreamingChatModel;
-import dev.langchain4j.service.AiServices;
-import jakarta.annotation.PostConstruct;</code></pre>
-
-    <h4>TODO 2 — Décommenter l'import CDI et remplacer les champs + @PostConstruct</h4>
+    <h4>Remplacer les champs et @PostConstruct par l'injection CDI</h4>
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>import jakarta.inject.Inject;
 
 @Path("/chat")
@@ -1572,6 +1626,8 @@ public class ChatResource {
 
     // Le point d'accès /stream est déjà implémenté, rien à modifier ici.
 }</code></pre>
+    </div>
+    </details>
 
     <div class="callout success">
         <div class="callout-title">&#10003; Point clé</div>
@@ -1590,6 +1646,9 @@ public class ChatResource {
     <p>Ouvrez <code>src/main/resources/META-INF/microprofile-config.properties</code>. La configuration est déjà prête &mdash; vérifiez simplement que le bon fournisseur est actif.</p>
 
     <p>Par défaut, <strong>l'Option A (Mistral AI) est déjà décommentée</strong> :</p>
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code># ---- Option A : Mistral AI (distant) ---- [ACTIVE PAR DÉFAUT]
 dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.mistralai.MistralAiChatModel
 dev.langchain4j.cdi.plugin.my-model.config.api-key=${MISTRAL_API_KEY}
@@ -1602,6 +1661,8 @@ dev.langchain4j.cdi.plugin.my-model.config.model-name=mistral-small-latest
 
 dev.langchain4j.cdi.plugin.my-model.config.temperature=0.9
 dev.langchain4j.cdi.plugin.my-model.config.log-requests=true</code></pre>
+    </div>
+    </details>
 
     <div class="callout tip">
         <div class="callout-title">🏠 Ollama local</div>
@@ -1631,12 +1692,12 @@ curl -X POST -H "Content-Type: text/plain" \
         <span class="step-number">4</span>
         <span class="step-title">Ajouter les réponses en streaming</span>
     </div>
-    <p>Ouvrez <code>ChatAssistantStreaming.java</code>. Comme pour <code>ChatAssistant</code>, elle a deux TODOs :</p>
+    <p>Ouvrez <code>ChatAssistantStreaming.java</code>. Ajoutez <code>@RegisterAIService</code> sur l'interface :</p>
 
-    <h4>TODO 1 — Décommenter l'import</h4>
-    <pre><code>import dev.langchain4j.cdi.spi.RegisterAIService;</code></pre>
-
-    <h4>TODO 2 — Ajouter @RegisterAIService sur l'interface</h4>
+    <h4>Ajouter @RegisterAIService sur l'interface</h4>
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>@SuppressWarnings("CdiManagedBeanInconsistencyInspection")
 @RegisterAIService(streamingChatModelName = "my-streaming-model")
 public interface ChatAssistantStreaming {
@@ -1649,6 +1710,8 @@ public interface ChatAssistantStreaming {
         """)
     TokenStream chatStream(@UserMessage String userMessage);
 }</code></pre>
+    </div>
+    </details>
 
     <div class="callout info">
         <div class="callout-title">&#128161; Le point d'accès SSE est déjà là</div>
@@ -1657,6 +1720,9 @@ public interface ChatAssistantStreaming {
 
     <p>La configuration du modèle streaming est également déjà présente dans <code>microprofile-config.properties</code> &mdash; vérifiez que le bon fournisseur est actif (Option A ou B) :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code># ---- Option A : Mistral AI (distant) ---- [ACTIVE PAR DÉFAUT]
 dev.langchain4j.cdi.plugin.my-streaming-model.class=dev.langchain4j.model.mistralai.MistralAiStreamingChatModel
 dev.langchain4j.cdi.plugin.my-streaming-model.config.api-key=${MISTRAL_API_KEY}
@@ -1666,6 +1732,8 @@ dev.langchain4j.cdi.plugin.my-streaming-model.config.model-name=mistral-small-la
 #dev.langchain4j.cdi.plugin.my-streaming-model.class=dev.langchain4j.model.ollama.OllamaStreamingChatModel
 #dev.langchain4j.cdi.plugin.my-streaming-model.config.base-url=http://localhost:11434
 #dev.langchain4j.cdi.plugin.my-streaming-model.config.model-name=ministral-3:3b</code></pre>
+    </div>
+    </details>
 
     <div class="callout tip">
         <div class="callout-title">🏠 Ollama local</div>
@@ -1683,6 +1751,9 @@ dev.langchain4j.cdi.plugin.my-streaming-model.config.model-name=mistral-small-la
     </div>
     <p>Ouvrez <code>ImageAnalyzerServlet.java</code> et injectez un modèle de vision :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>@WebServlet("/uploadServlet")
 @MultipartConfig
 public class ImageAnalyzerServlet extends HttpServlet {
@@ -1713,6 +1784,8 @@ public class ImageAnalyzerServlet extends HttpServlet {
     dev.langchain4j.model.mistralai.MistralAiChatModel
 dev.langchain4j.cdi.plugin.vision-model.config.api-key=${MISTRAL_API_KEY}
 dev.langchain4j.cdi.plugin.vision-model.config.model-name=pixtral-large-latest</code></pre>
+    </div>
+    </details>
 
     <div class="callout tip">
         <div class="callout-title">🏠 Ollama local</div>
@@ -1826,6 +1899,9 @@ target\server\bin\standalone.bat           # Windows</code></pre>
     </div>
     <p>Ouvrez <code>ChatAssistant.java</code>. L'interface du service IA possède déjà <code>@RegisterAIService</code> avec la mémoire, le RAG et les outils. Ajoutez l'annotation <code>@Retry</code> :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>import org.eclipse.microprofile.faulttolerance.Retry;
 
 @RegisterAIService(chatModelName = "my-model",
@@ -1838,6 +1914,8 @@ public interface ChatAssistant {
     String chat(@MemoryId String sessionId,
                 @UserMessage String message);
 }</code></pre>
+    </div>
+    </details>
 
     <div class="callout info">
         <div class="callout-title">&#128161; Pourquoi ça fonctionne</div>
@@ -1855,6 +1933,9 @@ public interface ChatAssistant {
     </div>
     <p>Empilez les annotations Fault Tolerance :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>import org.eclipse.microprofile.faulttolerance.*;
 import java.time.temporal.ChronoUnit;
 
@@ -1876,6 +1957,8 @@ public interface ChatAssistant {
              + "Our team has been notified.";
     }
 }</code></pre>
+    </div>
+    </details>
 </div>
 </section>
 
@@ -1888,12 +1971,17 @@ public interface ChatAssistant {
     </div>
     <p>Ajoutez la dernière pièce &mdash; le circuit breaker empêche de surcharger un service défaillant :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>@Retry(maxRetries = 3, delay = 1000)
 @Timeout(value = 30, unit = ChronoUnit.SECONDS)
 @Fallback(fallbackMethod = "chatFallback")
 @CircuitBreaker(requestVolumeThreshold = 5, failureRatio = 0.5)
 String chat(@MemoryId String sessionId,
             @UserMessage String message);</code></pre>
+    </div>
+    </details>
 
     <p>Rechargement à chaud : sauvegardez et exécutez <code>mvn package</code> (ou laissez votre IDE compiler automatiquement).</p>
 
@@ -1922,6 +2010,9 @@ String chat(@MemoryId String sessionId,
     </div>
     <p>La stack Grafana LGTM est déjà lancée depuis le début de l'exercice. La configuration de télémétrie est déjà dans <code>microprofile-config.properties</code> :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code># OpenTelemetry
 otel.exporter.otlp.endpoint=http://localhost:4318
 otel.service.name=demo-2-langchain4j-cdi
@@ -1932,6 +2023,8 @@ otel.metrics.exporter=otlp
 dev.langchain4j.cdi.plugin.my-model.config.listeners=\
     dev.langchain4j.cdi.telemetry.SpanChatModelListener,\
     dev.langchain4j.cdi.telemetry.MetricsChatModelListener</code></pre>
+    </div>
+    </details>
 
     <p>Envoyez quelques requêtes de chat, puis ouvrez <a href="http://localhost:3000" target="_blank">http://localhost:3000</a> (Grafana). Naviguez vers <strong>Explore &rarr; Tempo</strong> et recherchez le service <code>demo-2-langchain4j-cdi</code>.</p>
 
@@ -2056,6 +2149,9 @@ npx @modelcontextprotocol/inspector</code></pre>
     </div>
     <p>Ouvrez <code>HnefataflJarlAI.java</code> dans <code>demo-3-mcp/base/</code> :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>@RegisterAIService(chatModelName = "mistral",
                    toolProviderName = "mcp",
                    chatMemoryProviderName = "my-memory")
@@ -2081,6 +2177,8 @@ public interface HnefataflJarlAI {
         """)
     String play(@UserMessage String playerAction);
 }</code></pre>
+    </div>
+    </details>
 
     <div class="callout tip">
         <div class="callout-title">&#128161; toolProviderName</div>
@@ -2098,6 +2196,9 @@ public interface HnefataflJarlAI {
     </div>
     <p>Ouvrez <code>microprofile-config.properties</code> et décommentez la configuration MCP :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code># Chat Model
 # ---- Option A : Mistral AI (distant) ----
 dev.langchain4j.cdi.plugin.mistral.class=dev.langchain4j.model.mistralai.MistralAiChatModel
@@ -2118,6 +2219,8 @@ dev.langchain4j.cdi.plugin.mcpclient.config.transport=lookup:@ssetransport
 # MCP Tool Provider (nommé "mcp" pour @RegisterAIService)
 dev.langchain4j.cdi.plugin.mcp.class=dev.langchain4j.mcp.McpToolProvider
 dev.langchain4j.cdi.plugin.mcp.config.mcpClients=lookup:@mcpclient</code></pre>
+    </div>
+    </details>
 
     <div class="callout tip">
         <div class="callout-title">🏠 Ollama local</div>
@@ -2140,6 +2243,9 @@ dev.langchain4j.cdi.plugin.mcp.config.mcpClients=lookup:@mcpclient</code></pre>
     </div>
     <p>Ouvrez <code>GameResource.java</code> :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>@Path("/game")
 @ApplicationScoped
 public class GameResource {
@@ -2163,6 +2269,8 @@ public class GameResource {
             "Salut ! Je suis prêt pour une partie de Hnefatafl !");
     }
 }</code></pre>
+    </div>
+    </details>
 </div>
 </section>
 
@@ -2269,6 +2377,9 @@ curl -X POST -H "Content-Type: text/plain" \
     </div>
     <p>Les guardrails sont des beans CDI référencés par leur nom dans <code>@RegisterAIService</code>. Ajoutez <code>@Named</code> sur chaque classe de guardrail.</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <h4>FrenchInputGuardrail.java</h4>
     <pre><code>import jakarta.inject.Named;
 
@@ -2298,6 +2409,8 @@ public class NoFantasyRacesInputGuardrail implements InputGuardrail {
 public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
     // ...
 }</code></pre>
+    </div>
+    </details>
 
     <div class="callout tip">
         <div class="callout-title">&#128161; Pourquoi @Named ?</div>
@@ -2315,6 +2428,9 @@ public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
     </div>
     <p>Les guardrails de langue (<code>FrenchInputGuardrail</code> et <code>FrenchOutputGuardrail</code>) utilisent Apache Tika pour détecter automatiquement la langue d'un texte. Initialisez le détecteur dans <code>@PostConstruct</code> :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>import org.apache.tika.langdetect.optimaize.OptimaizeLangDetector;
 import org.apache.tika.language.detect.LanguageDetector;
 
@@ -2334,6 +2450,8 @@ public class FrenchInputGuardrail implements InputGuardrail {
 }</code></pre>
 
     <p>Faites de même dans <code>FrenchOutputGuardrail</code>.</p>
+    </div>
+    </details>
 
     <div class="callout info">
         <div class="callout-title">&#128161; Thread-safety</div>
@@ -2350,6 +2468,9 @@ public class FrenchInputGuardrail implements InputGuardrail {
         <span class="step-title">Implémenter la méthode <code>validate()</code></span>
     </div>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <h4>FrenchInputGuardrail — accepter uniquement le français</h4>
     <pre><code>@Override
 public InputGuardrailResult validate(UserMessage userMessage) {
@@ -2413,6 +2534,8 @@ public OutputGuardrailResult validate(AiMessage responseFromLLM) {
     }
     return success();
 }</code></pre>
+    </div>
+    </details>
 </div>
 </section>
 
@@ -2425,6 +2548,9 @@ public OutputGuardrailResult validate(AiMessage responseFromLLM) {
     </div>
     <p>Ouvrez <code>SkaldAssistant.java</code> et décommentez / remplacez le TODO par l'annotation complète :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>import dev.langchain4j.cdi.spi.RegisterAIService;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
@@ -2444,6 +2570,8 @@ public interface SkaldAssistant {
         """)
     String composeSong(@UserMessage String request);
 }</code></pre>
+    </div>
+    </details>
 
     <div class="callout info">
         <div class="callout-title">&#128161; Ordre d'exécution</div>
@@ -2606,6 +2734,9 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
 
     <p>Ouvrez <code>a2a-creative-writer/src/main/java/com/example/demo5/writer/CreativeWriter.java</code> et compl&eacute;tez l'interface :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>package com.example.demo5.writer;
 
 import dev.langchain4j.cdi.spi.RegisterAIService;
@@ -2624,6 +2755,8 @@ public interface CreativeWriter {
                 """)
     String generateStory(@V("topic") String topic);
 }</code></pre>
+    </div>
+    </details>
 
     <div class="callout info">
         <div class="callout-title">&#128161; @RegisterAIService</div>
@@ -2642,6 +2775,9 @@ public interface CreativeWriter {
 
     <p>Ouvrez <code>a2a-style-scorer/src/main/java/com/example/demo5/scorer/StyleScorer.java</code> et compl&eacute;tez l'interface :</p>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <pre><code>package com.example.demo5.scorer;
 
 import dev.langchain4j.cdi.spi.RegisterAIService;
@@ -2662,6 +2798,8 @@ public interface StyleScorer {
             """)
     double scoreStyle(@V("story") String story, @V("style") String style);
 }</code></pre>
+    </div>
+    </details>
 
     <div class="callout tip">
         <div class="callout-title">&#128161; Type de retour <code>double</code></div>
@@ -2748,6 +2886,9 @@ public void execute(RequestContext context, AgentEmitter emitter) throws A2AErro
         <span class="step-title">C&acirc;bler l'orchestrateur agentic</span>
     </div>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <h4>&Eacute;tape 4a &mdash; Annoter les proxies A2A (<code>A2ACreativeWriter.java</code>, <code>A2AStyleScorer.java</code>)</h4>
     <p>Chaque interface devient un bean CDI gr&acirc;ce &agrave; <code>@RegisterA2AAgent</code>. L'URL de l'agent est lue depuis la configuration MicroProfile :</p>
 
@@ -2878,6 +3019,8 @@ String json = """
           "style": %s
         }
         """.formatted(jsonString(story), score, jsonString(topic), jsonString(style));</code></pre>
+    </div>
+    </details>
 
     <div class="callout info">
         <div class="callout-title">&#128161; Annotations d&eacute;di&eacute;es vs builders manuels</div>
@@ -3176,6 +3319,9 @@ target\server\bin\standalone.bat -Djboss.socket.binding.port-offset=1      # Win
         <span class="step-title">C&acirc;bler les proxies A2A et annoter le superviseur</span>
     </div>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <h4>&Eacute;tapes 1 &amp; 2 &mdash; Proxies A2A (<code>A2ACreativeWriter.java</code>, <code>A2AStyleScorer.java</code>)</h4>
     <p>Identiques &agrave; l'exercice 5 &mdash; ajoutez simplement <code>@RegisterA2AAgent</code> sur chaque interface :</p>
 
@@ -3247,6 +3393,8 @@ public interface StyleReviewSupervisor extends AgenticScopeAccess {         // (
     ResultWithAgenticScope&lt;String&gt; refineStory(                             // (3)
             @V("story") String story, @V("style") String style);
 }</code></pre>
+    </div>
+    </details>
 
     <div class="callout danger">
         <div class="callout-title">&#9888; Pi&egrave;ge critique : sans <code>@SupervisorRequest</code>, le planificateur voit une requ&ecirc;te vide</div>
@@ -3275,6 +3423,9 @@ public interface StyleReviewSupervisor extends AgenticScopeAccess {         // (
         <span class="step-title">Pipeline, service et endpoint</span>
     </div>
 
+    <details class="solution">
+    <summary>Voir la solution</summary>
+    <div class="solution-body">
     <h4>&Eacute;tape 5 &mdash; D&eacute;clarer le pipeline (<code>StyledWriter.java</code>)</h4>
     <p>Similaire &agrave; l'exercice 5, mais avec <code>style-review-supervisor</code> &agrave; la place de <code>style-review-loop</code> et <strong>sans <code>outputKey</code></strong> sur la s&eacute;quence (voir encart ci-dessous) :</p>
 
@@ -3339,6 +3490,8 @@ String json = """
         <div class="callout-title">&#128161; Pourquoi pas <code>result.result()</code> ?</div>
         <p>Sans <code>outputKey</code> sur la s&eacute;quence, <code>result.result()</code> renvoie la valeur brute du dernier sous-agent (le superviseur). Avec <code>LAST</code>, c'est souvent le score du dernier appel au <code>style-scorer</code>. Lire depuis le scope est fiable car <code>style-editor</code> y &eacute;crit toujours la story via son <code>outputKey = "story"</code>.</p>
     </div>
+    </div>
+    </details>
 
     <h4>D&eacute;marrer l'orchestrateur</h4>
     <pre><code># Terminal 3 : Orchestrateur Supervisor (port 8082)
@@ -3552,7 +3705,7 @@ cd demo-6-supervisor/solution/a2a-orchestrator && mvn clean install
 
 <footer class="footer">
     <p>
-        Atelier LangChain4j-CDI &mdash; RivieraDev 2026 &mdash;
+        Atelier LangChain4j-CDI &mdash; Volcamp 2026 &mdash;
         <a href="https://github.com/langchain4j/langchain4j-cdi">GitHub</a> &mdash;
         Licence : Apache 2.0
     </p>

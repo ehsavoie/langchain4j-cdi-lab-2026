@@ -34,19 +34,6 @@ public class OrchestratorService {
 
     private StyledWriter styledWriter;
 
-    // TODO - Étape 4d : Remplacer tout le câblage impératif ci-dessous par un simple @Inject.
-    // Grâce aux annotations des étapes 4a–4c, LangChain4j-CDI produit automatiquement tous les beans.
-    // Supprimer : creativeWriterUrl, styleScorerUrl, chatModel, styledWriter, et la méthode @PostConstruct.
-    // Les remplacer par :
-    //
-    //   @Inject
-    //   StyledWriter styledWriter;
-    //
-    // Mettre à jour writeStyledStory pour retourner ResultWithAgenticScope<String> directement :
-    //
-    //   public ResultWithAgenticScope<String> writeStyledStory(String topic, String style) {
-    //       return styledWriter.writeStoryWithStyle(topic, style);
-    //   }
     @PostConstruct
     void init() {
 

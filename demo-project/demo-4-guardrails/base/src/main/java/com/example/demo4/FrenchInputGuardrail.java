@@ -21,15 +21,10 @@ public class FrenchInputGuardrail implements InputGuardrail {
 
     @PostConstruct
     void init() {
-        // TODO: Initialize the detector: new OptimaizeLangDetector().loadModels()
     }
 
     @Override
     public InputGuardrailResult validate(UserMessage userMessage) {
-        // TODO: Get the user message text with userMessage.singleText()
-        // TODO: Detect the language with detector.detect(text) (synchronized on detector)
-        // TODO: Return failure("...") if result.isReasonablyCertain() AND language is not "fr"
-        // TODO: Return success() otherwise (French or too short to detect)
         return success();
     }
 }

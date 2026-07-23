@@ -20,10 +20,6 @@ public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
 
     @Override
     public OutputGuardrailResult validate(AiMessage responseFromLLM) {
-        // TODO: Get the AI response text with responseFromLLM.text()
-        // TODO: Check if it contains any FORBIDDEN_WORDS (case-insensitive)
-        // TODO: Return failure("Le chant du skald ne doit pas évoquer les nains ni les elfes ! C'est une saga viking pure.") if a forbidden word is found
-        // TODO: Return success() otherwise
         return success();
     }
 }

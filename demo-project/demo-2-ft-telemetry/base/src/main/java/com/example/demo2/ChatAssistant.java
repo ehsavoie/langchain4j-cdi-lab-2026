@@ -16,10 +16,6 @@ import dev.langchain4j.service.UserMessage;
                    tools = ExpeditionTools.class)
 public interface ChatAssistant {
 
-    // TODO ÉTAPE 1 : Ajouter @Retry(maxRetries = 3, delay = 1000)
-    // TODO ÉTAPE 2 : Ajouter @Timeout(value = 30, unit = ChronoUnit.SECONDS)
-    // TODO ÉTAPE 3 : Ajouter @Fallback(fallbackMethod = "chatFallback")
-    // TODO ÉTAPE 4 : Ajouter @CircuitBreaker(requestVolumeThreshold = 5, failureRatio = 0.5)
     @SystemMessage("""
         Tu es l'assistant des expéditions vikings.
         Tu as accès à une base de connaissances sur les expéditions, les chefs et les destinations.
@@ -43,8 +39,4 @@ public interface ChatAssistant {
         """)
     String chat(@MemoryId String sessionId, @UserMessage String message);
 
-    // TODO ÉTAPE 5 : Implémenter le fallback
-    // default String chatFallback(String sessionId, String message) {
-    //     return "Oups ! Le LLM fait une sieste. Veuillez réessayer dans un moment.";
-    // }
 }
