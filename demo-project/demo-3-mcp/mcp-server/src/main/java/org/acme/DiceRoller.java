@@ -14,13 +14,13 @@ public class DiceRoller {
 
     private static final Logger logger = Logger.getLogger(DiceRoller.class.getName());
 
-    @Tool(description = "Lance un nombre de dés et retourne les résultats")
-    public String roll(@ToolArg(description = "Le nombre de dés") int numberOfDice) {
-        logger.info("Lancer de dés : " + numberOfDice + " dés");
+    @Tool(description = "Rolls a number of dice and returns the results")
+    public String roll(@ToolArg(description = "The number of dice") int numberOfDice) {
+        logger.info("Dice roll: " + numberOfDice + " dice");
         int[] result = new int[numberOfDice];
         for (int i = 0; i < numberOfDice; i++) {
             result[i] = new Random().nextInt(1, 7);
-            logger.info("Dé " + i + " : " + result[i]);
+            logger.info("Die " + i + ": " + result[i]);
         }
         return Arrays.toString(result);
     }

@@ -40,7 +40,7 @@ public class ImageAnalyzerServlet extends HttpServlet {
         Part file = request.getPart("file");
 
         UserMessage userMessage = UserMessage.from(
-            TextContent.from("Décris cette image en détails."),
+            TextContent.from("Describe this image in detail."),
             ImageContent.from(encodeBase64(file.getInputStream()), file.getContentType())
         );
 

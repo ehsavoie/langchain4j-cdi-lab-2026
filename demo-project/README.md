@@ -144,7 +144,7 @@ cd demo-1-ai-agent/base
 ```bash
 curl -X POST http://localhost:8080/demo-1/api/chat \
   -H "Content-Type: text/plain" \
-  -d "Raconte-moi une blague viking !"
+  -d "Tell me a Viking joke!"
 ```
 8. Add streaming with `ChatAssistantStreaming` + `TokenStream`
 9. Add vision with `ImageAnalyzerServlet` + `@Named("vision-model")`
@@ -205,9 +205,9 @@ cd demo-4-guardrails/base
 **Live steps:**
 1. Add `@Named` on each guardrail bean
 2. Implement `init()` with `OptimaizeLangDetector().loadModels()`
-3. Implement `validate()` for each guardrail (french-input, fantasy-input, french-output, fantasy-output)
+3. Implement `validate()` for each guardrail (english-input, fantasy-input, english-output, fantasy-output)
 4. Wire `inputGuardrailNames` + `outputGuardrailNames` in `@RegisterAIService`
-5. Test: English request → rejected, French with elves → rejected, valid French → accepted
+5. Test: French request → rejected, English with elves → rejected, valid English → accepted
 
 ---
 

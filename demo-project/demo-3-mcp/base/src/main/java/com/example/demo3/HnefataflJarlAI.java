@@ -1,7 +1,7 @@
 package com.example.demo3;
 
 /**
- * Agent IA qui anime un jeu de Hnefatafl au Grand Thing des guerriers du Nord.
+ * AI agent that hosts a Hnefatafl game at the Grand Thing of the Northern warriors.
  */
 @SuppressWarnings("CdiManagedBeanInconsistencyInspection")
 public interface HnefataflJarlAI {

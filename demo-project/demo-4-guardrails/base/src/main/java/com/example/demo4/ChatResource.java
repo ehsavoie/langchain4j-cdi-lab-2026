@@ -28,7 +28,7 @@ public class ChatResource {
 
     private static String extractGuardrailMessage(Exception e) {
         String msg = e.getMessage();
-        if (msg == null) return "Erreur inconnue";
+        if (msg == null) return "Unknown error";
         String marker = "failed with this message: ";
         int idx = msg.indexOf(marker);
         return idx >= 0 ? msg.substring(idx + marker.length()) : msg;

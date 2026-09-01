@@ -1,26 +1,26 @@
-# Démo 3 - Guide de Démarrage Rapide
+# Demo 3 - Quick Start Guide
 
-## Démarrage Rapide (3 minutes)
+## Quick Start (3 minutes)
 
-### 1. Démarrer Ollama
+### 1. Start Ollama
 
 ```bash
 ollama pull ministral-3:3b
 ollama serve
 ```
 
-> **Note** : Laisser ce terminal ouvert. Ollama doit tourner sur `localhost:11434`.
+> **Note**: Leave this terminal open. Ollama must be running on `localhost:11434`.
 
-### 2. Compiler le serveur MCP de dés
+### 2. Build the MCP dice server
 
 ```bash
 cd demo-3-mcp/mcp-server
 mvn clean package
 ```
 
-Produit `target/demo-3-mcp-dice-server.jar`.
+Produces `target/demo-3-mcp-dice-server.jar`.
 
-### 3. Démarrer l'application
+### 3. Start the application
 
 ```bash
 cd ../solution/
@@ -29,62 +29,62 @@ mvn clean install
 target\server\bin\standalone.bat    # Windows
 ```
 
-WildFly est provisionné via Galleon lors de `mvn clean install` (première exécution ~2 minutes).
+WildFly is provisioned via Galleon during `mvn clean install` (first run ~2 minutes).
 
-### 4. Jouer au Hnefatafl !
+### 4. Play Hnefatafl!
 
-Ouvrir http://localhost:8080/demo-3/ — l'interface viking se charge automatiquement.
+Open http://localhost:8080/demo-3/ — the Viking interface loads automatically.
 
-Essayez ces commandes :
+Try these commands:
 
-- `Lance les runes` — Ragnar lance 2 pierres runiques pour déterminer votre destin
-- `Relance` — Continuer pendant la phase de la rune
-- `Nouvelle partie` — Recommencer une nouvelle manche
+- `Roll the runes` — Ragnar rolls 2 rune stones to determine your fate
+- `Roll again` — Continue during the rune phase
+- `New game` — Start a new round
 
-Ou via curl :
+Or via curl:
 
 ```bash
 curl -X POST -H "Content-Type: text/plain" \
-  -d "Lance les runes" \
+  -d "Roll the runes" \
   http://localhost:8080/demo-3/api/game/play
 ```
 
-## Ce Que Vous Verrez
+## What You Will See
 
-- **Ragnar le Skald** : Un agent IA Jarl du Grand Thing animant le Hnefatafl
-- **Appels d'outils MCP** : Le LLM appelle `roll(numberOfDice=2)` via le protocole MCP
-- **Règles du Hnefatafl** : 7/11 = Faveur d'Odin, 2/3/12 = Malédiction, autre = Rune Marquée
+- **Ragnar the Skald**: An AI Jarl agent hosting Hnefatafl at the Grand Thing
+- **MCP tool calls**: The LLM calls `roll(numberOfDice=2)` via the MCP protocol
+- **Hnefatafl rules**: 7/11 = Odin's Favor, 2/3/12 = Norns' Curse, other = Marked Rune
 
-## Comment Ça Fonctionne
+## How It Works
 
 ```
-Guerrier -> JAX-RS -> CasinoDealerAI (@RegisterAIService)
-  -> Le LLM décide d'appeler l'outil roll
-  -> McpToolProvider -> JSON-RPC -> Serveur MCP de dés (stdio)
-  -> Le serveur lance 2d6 -> retourne le résultat
-  -> Le LLM applique les règles -> répond en personnage
+Warrior -> JAX-RS -> CasinoDealerAI (@RegisterAIService)
+  -> LLM decides to call the roll tool
+  -> McpToolProvider -> JSON-RPC -> MCP dice server (stdio)
+  -> Server rolls 2d6 -> returns the result
+  -> LLM applies the rules -> responds in character
 ```
 
-## Arrêter Tout
+## Stopping Everything
 
 ```bash
-# Dans le terminal WildFly : Ctrl+C
+# In the WildFly terminal: Ctrl+C
 ```
 
-## Problèmes Courants
+## Common Issues
 
-**"Serveur MCP introuvable"** :
-- Vérifier que le JAR a été compilé : `ls mcp-server/target/demo-3-mcp-dice-server.jar`
-- Recompiler si nécessaire : `cd mcp-server && mvn clean package`
+**"MCP server not found"**:
+- Check that the JAR was built: `ls mcp-server/target/demo-3-mcp-dice-server.jar`
+- Rebuild if necessary: `cd mcp-server && mvn clean package`
 
-**"Connection refused" sur le chat** :
-- Vérifier qu'Ollama tourne : `curl http://localhost:11434/api/tags`
-- Vérifier que le modèle est téléchargé : `ollama list`
+**"Connection refused" on chat**:
+- Check that Ollama is running: `curl http://localhost:11434/api/tags`
+- Check that the model is downloaded: `ollama list`
 
-**Port 8080 déjà utilisé** :
-- Vérifier ce qui l'utilise : `lsof -i :8080`
-- Ou utiliser le serveur provisionné avec décalage de port : `./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=10`
+**Port 8080 already in use**:
+- Check what's using it: `lsof -i :8080`
+- Or use the provisioned server with port offset: `./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=10`
 
-**Les runes ne sont pas lancées (le LLM invente les résultats)** :
-- Vérifier les logs WildFly pour les traces d'appels d'outils MCP
-- Essayer un modèle plus grand (`qwen2.5:7b`) pour une meilleure précision des appels d'outils
+**Runes are not rolled (LLM invents results)**:
+- Check WildFly logs for MCP tool call traces
+- Try a larger model (`qwen2.5:7b`) for better tool calling accuracy

@@ -20,58 +20,58 @@ class NoFantasyRacesInputGuardrailTest {
     }
 
     @Test
-    void requeteNordiqueNormaleEstAcceptee() {
+    void normalNorseRequestIsAccepted() {
         InputGuardrailResult result = guardrail.validate(
-                UserMessage.from("Chante les exploits d'Erik le Rouge et ses guerriers vikings"));
+                UserMessage.from("Sing the exploits of Erik the Red and his Viking warriors"));
 
         assertEquals(GuardrailResult.Result.SUCCESS, result.result());
         assertTrue(result.failures().isEmpty());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"nain", "nains"})
-    void requeteMentionnantDesNainsEstBloquee(String motInterdit) {
+    @ValueSource(strings = {"dwarf", "dwarves", "halfling", "halflings", "dragon", "dragons"})
+    void requestMentioningFantasyCreaturesIsBlocked(String forbiddenWord) {
         InputGuardrailResult result = guardrail.validate(
-                UserMessage.from("Un chant avec des " + motInterdit + " forgeurs"));
+                UserMessage.from("A song with " + forbiddenWord + " smiths"));
 
         assertEquals(GuardrailResult.Result.FAILURE, result.result());
         assertFalse(result.failures().isEmpty());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"elfe", "elfes"})
-    void requeteMentionnantDesElfesEstBloquee(String motInterdit) {
+    @ValueSource(strings = {"elf", "elves"})
+    void requestMentioningElvesIsBlocked(String forbiddenWord) {
         InputGuardrailResult result = guardrail.validate(
-                UserMessage.from("Un chant sur les " + motInterdit + " des forêts"));
+                UserMessage.from("A song about the " + forbiddenWord + " of the forests"));
 
         assertEquals(GuardrailResult.Result.FAILURE, result.result());
         assertFalse(result.failures().isEmpty());
     }
 
     @Test
-    void verificationInsensibleALaCasse() {
+    void checkIsCaseInsensitive() {
         InputGuardrailResult result = guardrail.validate(
-                UserMessage.from("Chante les NAINS et les ELFES"));
+                UserMessage.from("Sing about DWARVES and DRAGONS"));
 
         assertEquals(GuardrailResult.Result.FAILURE, result.result());
     }
 
     @Test
-    void motInterditDansUnePhraseEstBloque() {
+    void forbiddenWordInSentenceIsBlocked() {
         InputGuardrailResult result = guardrail.validate(
-                UserMessage.from("Je veux un chant sur les nains !"));
+                UserMessage.from("I want a song about dwarves!"));
 
         assertEquals(GuardrailResult.Result.FAILURE, result.result());
     }
 
     @Test
-    void messageDerreurEstEnFrancais() {
+    void errorMessageMentionsFantasyRaces() {
         InputGuardrailResult result = guardrail.validate(
-                UserMessage.from("Un chant sur les elfes"));
+                UserMessage.from("A song about elves"));
 
         assertFalse(result.failures().isEmpty());
         String message = result.failures().get(0).message();
-        assertTrue(message.contains("nains") || message.contains("elfes"),
-                "Le message d'erreur doit mentionner les races fantastiques : " + message);
+        assertTrue(message.contains("dwarves") || message.contains("elves") || message.contains("halflings") || message.contains("dragons"),
+                "Error message should mention fantasy races: " + message);
     }
 }

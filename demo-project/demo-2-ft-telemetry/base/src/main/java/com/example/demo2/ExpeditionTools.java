@@ -17,7 +17,7 @@ public class ExpeditionTools {
     @Inject
     ExpeditionRepository repository;
 
-    @Tool("Liste toutes les expéditions vikings disponibles avec leurs places de guerrier restantes")
+    @Tool("Lists all available Viking expeditions with their remaining warrior slots")
     public String listExpeditions() {
         List<Expedition> all = repository.listAll();
         return all.stream()
@@ -25,72 +25,72 @@ public class ExpeditionTools {
                 .collect(Collectors.joining("\n"));
     }
 
-    @Tool("Inscrit un guerrier à une expédition viking. Utilise l'identifiant retourné par listExpeditions.")
+    @Tool("Enrolls a warrior in a Viking expedition. Use the identifier returned by listExpeditions.")
     public String enrollWarrior(
-            @P("Identifiant (ex: raid-angleterre) ou destination partielle de l'expédition") String expeditionId,
-            @P("Prénom du guerrier") String firstName,
-            @P("Nom de famille du guerrier") String lastName) {
+            @P("Identifier (e.g. raid-angleterre) or partial destination of the expedition") String expeditionId,
+            @P("Warrior's first name") String firstName,
+            @P("Warrior's last name") String lastName) {
         Expedition expedition = repository.findById(expeditionId);
         if (expedition == null) {
             expedition = repository.findByDestination(expeditionId);
         }
         if (expedition == null) {
-            return "Expédition '" + expeditionId + "' introuvable. Utilisez listExpeditions pour voir les expéditions disponibles.";
+            return "Expedition '" + expeditionId + "' not found. Use listExpeditions to see available expeditions.";
         }
         String fullName = firstName + " " + lastName;
         if (expedition.isEnrolled(fullName)) {
-            return fullName + " est déjà inscrit pour " + expedition.getDestination();
+            return fullName + " is already enrolled for " + expedition.getDestination();
         }
         if (expedition.getRemainingSlots() <= 0) {
-            return "Désolé, l'expédition " + expedition.getDestination() + " est complète!";
+            return "Sorry, the expedition " + expedition.getDestination() + " is full!";
         }
         expedition.enroll(fullName);
-        return "Inscription confirmée: " + fullName + " pour '" + expedition.getDestination()
-                + "'. Places restantes: " + expedition.getRemainingSlots() + "/" + expedition.getWarriorSlots();
+        return "Enrollment confirmed: " + fullName + " for '" + expedition.getDestination()
+                + "'. Remaining slots: " + expedition.getRemainingSlots() + "/" + expedition.getWarriorSlots();
     }
 
-    @Tool("Annule l'inscription d'un guerrier à une expédition. Utilise l'identifiant retourné par listExpeditions.")
+    @Tool("Cancels a warrior's enrollment in an expedition. Use the identifier returned by listExpeditions.")
     public String cancelEnrollment(
-            @P("Identifiant (ex: raid-angleterre) ou destination partielle de l'expédition") String expeditionId,
-            @P("Prénom du guerrier") String firstName,
-            @P("Nom de famille du guerrier") String lastName) {
+            @P("Identifier (e.g. raid-angleterre) or partial destination of the expedition") String expeditionId,
+            @P("Warrior's first name") String firstName,
+            @P("Warrior's last name") String lastName) {
         Expedition expedition = repository.findById(expeditionId);
         if (expedition == null) {
             expedition = repository.findByDestination(expeditionId);
         }
         if (expedition == null) {
-            return "Expédition '" + expeditionId + "' introuvable.";
+            return "Expedition '" + expeditionId + "' not found.";
         }
         String fullName = firstName + " " + lastName;
         if (expedition.cancelEnrollment(fullName)) {
-            return "Inscription annulée pour " + fullName + " de '" + expedition.getDestination()
-                    + "'. Places restantes: " + expedition.getRemainingSlots() + "/" + expedition.getWarriorSlots();
+            return "Enrollment cancelled for " + fullName + " from '" + expedition.getDestination()
+                    + "'. Remaining slots: " + expedition.getRemainingSlots() + "/" + expedition.getWarriorSlots();
         }
-        return fullName + " n'est pas inscrit pour " + expedition.getDestination();
+        return fullName + " is not enrolled for " + expedition.getDestination();
     }
 
-    @Tool("Retourne le nombre de places de guerrier restantes pour une expédition. Utilise l'identifiant retourné par listExpeditions.")
-    public String remainingSlots(@P("Identifiant (ex: raid-angleterre) ou destination partielle de l'expédition") String expeditionId) {
+    @Tool("Returns the number of remaining warrior slots for an expedition. Use the identifier returned by listExpeditions.")
+    public String remainingSlots(@P("Identifier (e.g. raid-angleterre) or partial destination of the expedition") String expeditionId) {
         Expedition expedition = repository.findById(expeditionId);
         if (expedition == null) {
             expedition = repository.findByDestination(expeditionId);
         }
         if (expedition == null) {
-            return "Expédition '" + expeditionId + "' introuvable.";
+            return "Expedition '" + expeditionId + "' not found.";
         }
-        return expedition.getDestination() + ": " + expedition.getRemainingSlots() + " places de guerrier restantes sur " + expedition.getWarriorSlots();
+        return expedition.getDestination() + ": " + expedition.getRemainingSlots() + " warrior slots remaining out of " + expedition.getWarriorSlots();
     }
 
-    @Tool("Liste toutes les inscriptions d'un guerrier aux expéditions")
+    @Tool("Lists all expedition enrollments for a warrior")
     public String myEnrollments(
-            @P("Prénom du guerrier") String firstName,
-            @P("Nom de famille du guerrier") String lastName) {
+            @P("Warrior's first name") String firstName,
+            @P("Warrior's last name") String lastName) {
         String fullName = firstName + " " + lastName;
         List<Expedition> enrollments = repository.findEnrollments(fullName);
         if (enrollments.isEmpty()) {
-            return fullName + " n'est inscrit à aucune expédition.";
+            return fullName + " is not enrolled in any expedition.";
         }
-        return fullName + " est inscrit pour:\n" + enrollments.stream()
+        return fullName + " is enrolled for:\n" + enrollments.stream()
                 .map(e -> "- " + e.toString())
                 .collect(Collectors.joining("\n"));
     }

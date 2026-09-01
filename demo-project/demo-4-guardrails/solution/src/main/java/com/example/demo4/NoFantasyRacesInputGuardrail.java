@@ -9,15 +9,15 @@ import jakarta.inject.Named;
 import java.util.Set;
 
 /**
- * Guardrail d'entrée qui rejette les requêtes mentionnant des races fantastiques (nains ou elfes).
- * Les Vikings ne connaissent ni les nains ni les elfes !
+ * Input guardrail that rejects requests mentioning fantasy races (dwarves, elves, halflings, or dragons).
+ * Vikings know neither dwarves, elves, halflings, nor dragons!
  */
 @ApplicationScoped
 @Named("fantasy-input")
 public class NoFantasyRacesInputGuardrail implements InputGuardrail {
 
     private static final Set<String> FORBIDDEN_WORDS = Set.of(
-            "nain", "nains", "elfe", "elf", "elfes"
+            "dwarf", "dwarves", "elf", "elves", "halfling", "halflings", "dragon", "dragons"
     );
 
     @Override
@@ -26,7 +26,7 @@ public class NoFantasyRacesInputGuardrail implements InputGuardrail {
 
         for (String word : FORBIDDEN_WORDS) {
             if (text.contains(word)) {
-                return failure("Les Vikings ne connaissent ni les nains ni les elfes ! Gardez votre requête purement nordique.");
+                return failure("Vikings know neither dwarves, elves, halflings, nor dragons! Keep your request purely Norse.");
             }
         }
         return success();

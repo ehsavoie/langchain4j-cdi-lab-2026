@@ -20,63 +20,63 @@ class NoFantasyRacesOutputGuardrailTest {
     }
 
     @Test
-    void chantVikingNormalEstAccepte() {
-        String chant = """
-                Ô guerriers du Nord, levez vos haches vers le ciel !
-                Thor vous guide, Odin vous protège dans la bataille.
-                Refrain : Valhalla vous attend, fils des mers glacées !
+    void normalVikingSongIsAccepted() {
+        String song = """
+                O warriors of the North, raise your axes to the sky!
+                Thor guides you, Odin protects you in battle.
+                Chorus: Valhalla awaits you, sons of the frozen seas!
                 """;
 
-        OutputGuardrailResult result = guardrail.validate(AiMessage.from(chant));
+        OutputGuardrailResult result = guardrail.validate(AiMessage.from(song));
 
         assertEquals(GuardrailResult.Result.SUCCESS, result.result());
         assertTrue(result.failures().isEmpty());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"nain", "nains"})
-    void chantMentionnantDesNainsEstBloque(String motInterdit) {
+    @ValueSource(strings = {"dwarf", "dwarves", "halfling", "halflings", "dragon", "dragons"})
+    void songMentioningFantasyCreaturesIsBlocked(String forbiddenWord) {
         OutputGuardrailResult result = guardrail.validate(
-                AiMessage.from("Les " + motInterdit + " forgèrent les épées des guerriers vikings"));
+                AiMessage.from("The " + forbiddenWord + " forged the swords of the Viking warriors"));
 
         assertEquals(GuardrailResult.Result.FAILURE, result.result());
         assertFalse(result.failures().isEmpty());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"elfe", "elfes"})
-    void chantMentionnantDesElfesEstBloque(String motInterdit) {
+    @ValueSource(strings = {"elf", "elves"})
+    void songMentioningElvesIsBlocked(String forbiddenWord) {
         OutputGuardrailResult result = guardrail.validate(
-                AiMessage.from("Les guerriers combattirent les " + motInterdit + " de la forêt"));
+                AiMessage.from("The warriors fought the " + forbiddenWord + " of the forest"));
 
         assertEquals(GuardrailResult.Result.FAILURE, result.result());
         assertFalse(result.failures().isEmpty());
     }
 
     @Test
-    void verificationInsensibleALaCasse() {
+    void checkIsCaseInsensitive() {
         OutputGuardrailResult result = guardrail.validate(
-                AiMessage.from("Les ELFES et les NAINS s'allièrent contre les Vikings"));
+                AiMessage.from("The DRAGONS and the HALFLINGS allied against the Vikings"));
 
         assertEquals(GuardrailResult.Result.FAILURE, result.result());
     }
 
     @Test
-    void motInterditDansUnePhraseEstBloque() {
+    void forbiddenWordInSentenceIsBlocked() {
         OutputGuardrailResult result = guardrail.validate(
-                AiMessage.from("Un nain surgit de la montagne sombre"));
+                AiMessage.from("A dwarf emerged from the dark mountain"));
 
         assertEquals(GuardrailResult.Result.FAILURE, result.result());
     }
 
     @Test
-    void messageDerreurEstEnFrancais() {
+    void errorMessageMentionsFantasyRaces() {
         OutputGuardrailResult result = guardrail.validate(
-                AiMessage.from("Les elfes chantaient avec les guerriers"));
+                AiMessage.from("The elves sang with the warriors"));
 
         assertFalse(result.failures().isEmpty());
         String message = result.failures().get(0).message();
-        assertTrue(message.contains("nains") || message.contains("elfes"),
-                "Le message d'erreur doit mentionner les races fantastiques : " + message);
+        assertTrue(message.contains("dwarves") || message.contains("elves") || message.contains("halflings") || message.contains("dragons"),
+                "Error message should mention fantasy races: " + message);
     }
 }

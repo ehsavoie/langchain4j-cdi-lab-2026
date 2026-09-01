@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🖼️ Runique Vision — Analyse Viking</title>
+    <title>🖼️ Runic Vision — Viking Analysis</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -218,7 +218,7 @@
         function upload(file) {
             var statusDiv = document.getElementById("status");
             statusDiv.className = "visible loading";
-            statusDiv.innerHTML = "🔥 Le skalde analyse: " + file.name;
+            statusDiv.innerHTML = "🔥 The skald is analyzing: " + file.name;
 
             var formData = new FormData();
             formData.append("file", file);
@@ -235,47 +235,47 @@
             var progress = Math.round(event.loaded / event.total * 100);
             var statusDiv = document.getElementById("status");
             statusDiv.className = "visible loading";
-            statusDiv.innerHTML = "⚔️ Analyse runique en cours... " + progress + "%";
+            statusDiv.innerHTML = "⚔️ Runic analysis in progress... " + progress + "%";
         }
 
         function uploadComplete(event) {
             var statusDiv = document.getElementById("status");
             statusDiv.className = "visible";
-            statusDiv.innerHTML = "🛡️ Révélation du skalde:\n\n" + event.target.responseText;
+            statusDiv.innerHTML = "🛡️ The skald's revelation:\n\n" + event.target.responseText;
         }
 
         function uploadError(event) {
             var statusDiv = document.getElementById("status");
             statusDiv.className = "visible";
-            statusDiv.innerHTML = "⚠️ Difficulté technique: " + event.target.statusText;
+            statusDiv.innerHTML = "⚠️ Technical difficulty: " + event.target.statusText;
         }
     </script>
 </head>
 <body>
     <header>
-        <h1>🖼️ Runique Vision</h1>
-        <span class="badge">👁️ Vision IA</span>
-        <span class="subtitle">L'œil du skalde</span>
-        <a href="index.html" style="margin-left: auto;">🎲 Chat Simple</a>
+        <h1>🖼️ Runic Vision</h1>
+        <span class="badge">👁️ AI Vision</span>
+        <span class="subtitle">The skald's eye</span>
+        <a href="index.html" style="margin-left: auto;">🎲 Simple Chat</a>
         <a href="stream.html">⚡ Streaming SSE</a>
     </header>
 
     <div class="container">
         <div class="info-box">
-            <h2>⚔️ Bienvenue dans Runique Vision!</h2>
+            <h2>⚔️ Welcome to Runic Vision!</h2>
             <p>
-                Le skalde déchiffre les runes et artefacts que vos yeux ne peuvent voir!
-                Déposez une image et il révèlera les secrets des symboles vikings, armes, boucliers et objets anciens.
+                The skald deciphers runes and artifacts that your eyes cannot see!
+                Drop an image and he will reveal the secrets of Viking symbols, weapons, shields, and ancient objects.
             </p>
             <p style="margin-top: 1rem;">
-                <strong>📋 Configuration (dans microprofile-config.properties):</strong>
+                <strong>📋 Configuration (in microprofile-config.properties):</strong>
             </p>
 
             <div class="config-section">
                 <strong>🔸 Ollama (local):</strong>
                 <code>vision-model.class=...OllamaChatModel</code>
                 <code>vision-model.config.model-name=llama3.2-vision:11b</code>
-                <p style="margin-top: 0.5rem; font-size: 0.9rem;">Puis exécuter : <code style="display: inline;">ollama pull llama3.2-vision:11b</code></p>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem;">Then run: <code style="display: inline;">ollama pull llama3.2-vision:11b</code></p>
             </div>
 
             <div class="config-section">
@@ -283,7 +283,7 @@
                 <code>vision-model.class=...OpenAiChatModel</code>
                 <code>vision-model.config.model-name=gpt-4o</code>
                 <code>vision-model.config.api-key=${OPENAI_API_KEY}</code>
-                <p style="margin-top: 0.5rem; font-size: 0.9rem;">Variable d'environnement : <code style="display: inline;">export OPENAI_API_KEY=sk-...</code></p>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem;">Environment variable: <code style="display: inline;">export OPENAI_API_KEY=sk-...</code></p>
             </div>
 
             <div class="config-section">
@@ -292,17 +292,17 @@
                 <code>vision-model.config.base-url=https://api.groq.com/openai/v1</code>
                 <code>vision-model.config.model-name=meta-llama/llama-4-scout-17b-16e-instruct</code>
                 <code>vision-model.config.api-key=${GROQ_API_KEY}</code>
-                <p style="margin-top: 0.5rem; font-size: 0.9rem;">Variable d'environnement : <code style="display: inline;">export GROQ_API_KEY=gsk_...</code></p>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem;">Environment variable: <code style="display: inline;">export GROQ_API_KEY=gsk_...</code></p>
             </div>
             <p style="margin-top: 1rem; font-size: 0.85rem; color: #8b6914;">
-                <em>"Les anciens Vikings voyaient ce que les autres ne pouvaient percevoir..."</em>
+                <em>"The ancient Vikings saw what others could not perceive..."</em>
             </p>
         </div>
 
         <div id="dropbox">
             <div class="icon">🖼️</div>
-            <div class="text">Déposez une image ici</div>
-            <div class="hint">JPG, PNG, GIF... Le skalde accepte tous les formats!</div>
+            <div class="text">Drop an image here</div>
+            <div class="hint">JPG, PNG, GIF... The skald accepts all formats!</div>
         </div>
 
         <div id="status"></div>

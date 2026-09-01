@@ -116,7 +116,7 @@ Test that everything works before adding Fault Tolerance:
 ```bash
 curl -X POST -H "Content-Type: text/plain" \
   -H "X-Session-Id: test-123" \
-  -d "Quelles expéditions sont disponibles ?" \
+  -d "What expeditions are available?" \
   http://localhost:8080/demo-2/api/chat
 ```
 
@@ -150,7 +150,7 @@ import java.time.temporal.ChronoUnit;
 String chat(@MemoryId String sessionId, @UserMessage String message);
 
 default String chatFallback(String sessionId, String message) {
-    return "Oups ! Le LLM fait une sieste. Veuillez réessayer dans un moment.";
+    return "Oops! The LLM is taking a nap. Please try again in a moment.";
 }
 ```
 
@@ -192,7 +192,7 @@ pkill -f ollama
 # Send requests — should get fallback after retries
 curl -X POST -H "Content-Type: text/plain" \
   -H "X-Session-Id: test-resilience" \
-  -d "Quelles expéditions sont disponibles ?" \
+  -d "What expeditions are available?" \
   http://localhost:8080/demo-2/api/chat
 ```
 

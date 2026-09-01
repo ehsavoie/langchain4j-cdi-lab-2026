@@ -68,17 +68,17 @@ public class Expedition {
 
     public String toRagDocument() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Expédition: ").append(destination).append("\n");
-        sb.append("Départ: ").append(departureDate).append("\n");
-        sb.append("Places de guerrier: ").append(warriorSlots).append("\n");
-        if (chief != null) sb.append("Chef: ").append(chief).append("\n");
+        sb.append("Expedition: ").append(destination).append("\n");
+        sb.append("Departure: ").append(departureDate).append("\n");
+        sb.append("Warrior slots: ").append(warriorSlots).append("\n");
+        if (chief != null) sb.append("Chief: ").append(chief).append("\n");
         if (description != null) sb.append("Description: ").append(description).append("\n");
-        if (requirements != null) sb.append("Exigences: ").append(requirements).append("\n");
+        if (requirements != null) sb.append("Requirements: ").append(requirements).append("\n");
         return sb.toString();
     }
 
     @Override
     public String toString() {
-        return departureDate + " -- " + destination + " (" + getRemainingSlots() + "/" + warriorSlots + " places)";
+        return departureDate + " -- " + destination + " (" + getRemainingSlots() + "/" + warriorSlots + " slots)";
     }
 }

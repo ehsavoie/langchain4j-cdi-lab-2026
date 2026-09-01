@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -96,35 +96,35 @@
 
     <div id="content">
         <div class="welcome">
-            <p>🛡️ <code>@InputGuardrails</code> + <code>@OutputGuardrails</code> sur <code>SkaldAssistant</code></p>
-            <p>Demandez un chant viking en français — les guardrails feront respecter les règles.</p>
+            <p>🛡️ <code>@InputGuardrails</code> + <code>@OutputGuardrails</code> on <code>SkaldAssistant</code></p>
+            <p>Request a Viking song in English — the guardrails will enforce the rules.</p>
         </div>
 
         <div class="guardrail-info">
-            <h3>Guardrails à implémenter</h3>
+            <h3>Guardrails to implement</h3>
             <p>
                 <span class="tag input">INPUT</span>
-                <strong>FrenchInputGuardrail</strong> — accepte uniquement les requêtes en français
+                <strong>EnglishInputGuardrail</strong> — only accepts English requests
             </p>
             <p>
                 <span class="tag input">INPUT</span>
-                <strong>NoFantasyRacesInputGuardrail</strong> — bloque les requêtes mentionnant des nains ou des elfes
+                <strong>NoFantasyRacesInputGuardrail</strong> — blocks requests mentioning dwarves, elves, halflings, or dragons
             </p>
             <p>
                 <span class="tag output">OUTPUT</span>
-                <strong>FrenchOutputGuardrail</strong> — rejette les chants non écrits en français
+                <strong>EnglishOutputGuardrail</strong> — rejects songs not written in English
             </p>
             <p>
                 <span class="tag output">OUTPUT</span>
-                <strong>NoFantasyRacesOutputGuardrail</strong> — rejette les chants mentionnant des nains ou des elfes
+                <strong>NoFantasyRacesOutputGuardrail</strong> — rejects songs mentioning dwarves, elves, halflings, or dragons
             </p>
             <div class="examples">
-                <span style="color:#8b949e; font-size:0.8rem; align-self:center;">Essayez :</span>
-                <button class="example-btn" onclick="setMessage(this.textContent)">Chante les exploits d'Erik le Rouge</button>
-                <button class="example-btn" onclick="setMessage(this.textContent)">Un chant sur le marteau de Thor</button>
-                <button class="example-btn blocked" onclick="setMessage(this.textContent)">Sing me a heroic Viking song about Odin and his ravens</button>
-                <button class="example-btn blocked" onclick="setMessage(this.textContent)">A song about Thor's hammer</button>
-                <button class="example-btn blocked" onclick="setMessage(this.textContent)">Un chant sur les nains forgeurs</button>
+                <span style="color:#8b949e; font-size:0.8rem; align-self:center;">Try:</span>
+                <button class="example-btn" onclick="setMessage(this.textContent)">Sing the exploits of Erik the Red</button>
+                <button class="example-btn" onclick="setMessage(this.textContent)">A song about Thor's hammer</button>
+                <button class="example-btn blocked" onclick="setMessage(this.textContent)">Chante les exploits d'Erik le Rouge</button>
+                <button class="example-btn blocked" onclick="setMessage(this.textContent)">Un chant sur le marteau de Thor</button>
+                <button class="example-btn blocked" onclick="setMessage(this.textContent)">A song about the dwarves of the mountain</button>
             </div>
         </div>
 
@@ -133,9 +133,9 @@
 
     <div id="input-bar">
         <input type="text" id="message" autocomplete="off"
-               placeholder="Demandez un chant viking en français…">
+               placeholder="Request a Viking song in English…">
         <button id="send-btn" onclick="composeSong()">
-            <span class="label">Composer</span>
+            <span class="label">Compose</span>
             <span class="spinner">
                 <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             </span>
@@ -176,12 +176,12 @@
                     result.textContent = text;
                 } else {
                     result.classList.add('error');
-                    result.textContent = 'Guardrail bloqué : ' + text;
+                    result.textContent = 'Guardrail blocked: ' + text;
                 }
             } catch (err) {
                 result.style.display = 'block';
                 result.classList.add('error');
-                result.textContent = 'Erreur : ' + err.message;
+                result.textContent = 'Error: ' + err.message;
             } finally {
                 btn.classList.remove('loading');
             }
