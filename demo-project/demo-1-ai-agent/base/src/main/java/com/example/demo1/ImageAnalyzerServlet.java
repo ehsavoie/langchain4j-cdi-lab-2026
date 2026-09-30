@@ -15,8 +15,8 @@ import java.io.InputStream;
 import java.util.Base64;
 
 /**
- * Servlet pour analyser des images téléchargées avec l'IA.
- * Utilise un modèle de vision (ex. : llama3.2-vision, llama-3.2-11b-vision-preview)
+ * Servlet to analyze uploaded images using AI.
+ * Uses a vision model (e.g.: llama3.2-vision, llama-3.2-11b-vision-preview)
  *
  * @author JavaOne Demo
  */
@@ -30,11 +30,11 @@ public class ImageAnalyzerServlet extends HttpServlet {
 
         response.setContentType("text/plain");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("TODO: Intégrer l'analyse d'image ici");
+        response.getWriter().write("TODO: Integrate image analysis here");
     }
 
     /**
-     * Extrait le nom du fichier depuis les en-têtes HTTP
+     * Extracts the filename from the HTTP headers
      */
     private static String getFilename(Part part) {
         for (String cd : part.getHeader("content-disposition").split(";")) {
@@ -48,7 +48,7 @@ public class ImageAnalyzerServlet extends HttpServlet {
     }
 
     /**
-     * Encode un InputStream en Base64 (nécessaire pour envoyer l'image à l'IA)
+     * Encodes an InputStream to Base64 (required to send the image to the AI)
      */
     private static String encodeBase64(InputStream in) throws IOException {
         try (ByteArrayOutputStream tempBuffer = new ByteArrayOutputStream()) {

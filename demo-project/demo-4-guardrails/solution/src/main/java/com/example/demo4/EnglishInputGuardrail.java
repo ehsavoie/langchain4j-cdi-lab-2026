@@ -11,13 +11,13 @@ import org.apache.tika.language.detect.LanguageDetector;
 import org.apache.tika.language.detect.LanguageResult;
 
 /**
- * Guardrail d'entrée qui accepte uniquement les requêtes en français.
- * Utilise Apache Tika pour détecter la langue du message.
- * Si la langue est identifiée avec certitude comme non-française, la requête est rejetée.
+ * Input guardrail that only accepts English requests.
+ * Uses Apache Tika for language detection.
+ * If the language is confidently identified as non-English, the request is rejected.
  */
 @ApplicationScoped
-@Named("french-input")
-public class FrenchInputGuardrail implements InputGuardrail {
+@Named("english-input")
+public class EnglishInputGuardrail implements InputGuardrail {
 
     private LanguageDetector detector;
 
@@ -33,8 +33,8 @@ public class FrenchInputGuardrail implements InputGuardrail {
         synchronized (detector) {
             result = detector.detect(text);
         }
-        if (result.isReasonablyCertain() && !"fr".equals(result.getLanguage())) {
-            return failure("Seul le français est accepté ! Parlez français pour invoquer le skald.");
+        if (result.isReasonablyCertain() && !"en".equals(result.getLanguage())) {
+            return failure("Only English is accepted! Speak English to invoke the skald.");
         }
         return success();
     }

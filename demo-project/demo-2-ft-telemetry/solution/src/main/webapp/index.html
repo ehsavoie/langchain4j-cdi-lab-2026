@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grande Salle — Expéditions Vikings</title>
+    <title>Great Hall — Viking Expeditions</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -319,42 +319,42 @@
 <body>
     <header>
         <div>
-            <h1>Expéditions Vikings</h1>
-            <div class="hotel-name">Grande Salle &nbsp;&middot;&nbsp; Scandinavia</div>
+            <h1>Viking Expeditions</h1>
+            <div class="hotel-name">Great Hall &nbsp;&middot;&nbsp; Scandinavia</div>
         </div>
         <span class="badge">SOLUTION</span>
-        <button class="debug-btn" onclick="openMemory()">Mémoire des Guerriers</button>
+        <button class="debug-btn" onclick="openMemory()">Warrior Memory</button>
         <span class="session-id" id="session-display"></span>
     </header>
 
     <div class="hints">
-        <span class="label">Disponible :</span>
+        <span class="label">Available:</span>
         <span class="tool-tag">listExpeditions</span>
         <span class="tool-tag">enrollWarrior</span>
         <span class="tool-tag">cancelEnrollment</span>
         <span class="tool-tag">remainingSlots</span>
         <span class="tool-tag">myEnrollments</span>
         <span class="sep">·</span>
-        <span class="label">Protégé par :</span>
+        <span class="label">Protected by:</span>
         <code>@Retry</code> <code>@Timeout</code> <code>@Fallback</code> <code>@CircuitBreaker</code>
     </div>
 
     <div id="chat">
         <div class="welcome">
-            <span class="venue-name">Grande Salle Viking</span>
-            <span class="tagline">Scandinavie &nbsp;&middot;&nbsp; Expéditions Vikings</span>
+            <span class="venue-name">Viking Great Hall</span>
+            <span class="tagline">Scandinavia &nbsp;&middot;&nbsp; Viking Expeditions</span>
             <div class="divider"></div>
-            <p>Essayez : <code>Quelles expéditions sont disponibles ?</code></p>
-            <p>Puis : <code>Je suis Yann Blazart, inscrivez-moi pour le raid sur l'Angleterre</code></p>
-            <p class="note">Ouvrez un 2e onglet pour découvrir la mémoire de session séparée</p>
+            <p>Try: <code>What expeditions are available?</code></p>
+            <p>Then: <code>I am Yann Blazart, enroll me for the Raid on England</code></p>
+            <p class="note">Open a 2nd tab to discover separate session memory</p>
         </div>
     </div>
 
     <div id="input-bar">
         <input type="text" id="message" autocomplete="off"
-               placeholder="Demandez des expéditions, inscrivez-vous, vérifiez les places...">
+               placeholder="Ask about expeditions, enroll, check available slots...">
         <button id="send-btn" onclick="sendMessage()">
-            <span class="label">Rejoindre</span>
+            <span class="label">Join</span>
             <span class="spinner"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
         </button>
     </div>
@@ -363,7 +363,7 @@
     <div class="modal-overlay" id="memory-modal" onclick="if(event.target===this)closeMemory()">
         <div class="modal">
             <div class="modal-header">
-                <h2>Historique de Conversation Guerrier</h2>
+                <h2>Warrior Conversation History</h2>
                 <span class="meta" id="memory-meta"></span>
                 <button class="modal-close" onclick="closeMemory()">&times;</button>
             </div>
@@ -430,16 +430,16 @@
         }
 
         const TYPE_LABELS = {
-            'SYSTEM': 'Système',
-            'USER': 'Utilisateur',
-            'AI': 'IA',
-            'TOOL_EXECUTION_RESULT': 'Résultat Outil'
+            'SYSTEM': 'System',
+            'USER': 'User',
+            'AI': 'AI',
+            'TOOL_EXECUTION_RESULT': 'Tool Result'
         };
 
         async function openMemory() {
             const body = document.getElementById('memory-body');
             const meta = document.getElementById('memory-meta');
-            body.innerHTML = '<div class="mem-empty">Chargement...</div>';
+            body.innerHTML = '<div class="mem-empty">Loading...</div>';
             meta.textContent = '';
             document.getElementById('memory-modal').classList.add('open');
 
@@ -447,10 +447,10 @@
                 const resp = await fetch('api/chat/memory?sessionId=' + SESSION_ID);
                 const data = await resp.json();
 
-                meta.textContent = `session ${data.sessionId}... | ${data.messageCount ?? 0} message(s) | ${data.sessionCount} guerrier(s) actif(s)`;
+                meta.textContent = `session ${data.sessionId}... | ${data.messageCount ?? 0} message(s) | ${data.sessionCount} active warrior(s)`;
 
                 if (!data.messages || data.messages.length === 0) {
-                    body.innerHTML = '<div class="mem-empty">Aucun message en mémoire.<br>Envoyez un message pour commencer !</div>';
+                    body.innerHTML = '<div class="mem-empty">No messages in memory.<br>Send a message to get started!</div>';
                     return;
                 }
 
@@ -467,7 +467,7 @@
                     body.appendChild(div);
                 }
             } catch (e) {
-                body.innerHTML = `<div class="mem-empty">Erreur : ${e.message}</div>`;
+                body.innerHTML = `<div class="mem-empty">Error: ${e.message}</div>`;
             }
         }
 

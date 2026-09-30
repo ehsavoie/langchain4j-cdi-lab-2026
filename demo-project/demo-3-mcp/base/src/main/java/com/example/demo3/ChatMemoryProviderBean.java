@@ -11,13 +11,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@link ChatMemoryProvider} géré par CDI qui crée une {@link LastDiceRollChatMemory}
- * par session (indexée par la valeur passée en {@code @MemoryId}).
+ * CDI-managed {@link ChatMemoryProvider} that creates a {@link LastDiceRollChatMemory}
+ * per session (indexed by the value passed via {@code @MemoryId}).
  *
- * <p>Nommé {@code "my-memory"} pour être référencé depuis
+ * <p>Named {@code "my-memory"} to be referenced from
  * {@code @RegisterAIService(chatMemoryProviderName = "my-memory")}.
- * Chaque session conserve les deux derniers échanges de lancer, permettant au modèle
- * de comparer le résultat actuel avec le précédent sans accumuler d'historique obsolète.
+ * Each session keeps the last two cast exchanges, allowing the model
+ * to compare the current result with the previous one without accumulating stale history.
  */
 @ApplicationScoped
 @Named("my-memory")
@@ -31,10 +31,10 @@ public class ChatMemoryProviderBean implements ChatMemoryProvider {
     }
 
     /**
-     * Retourne la liste de messages courante pour une session (à des fins de débogage uniquement).
+     * Returns the current message list for a session (for debugging purposes only).
      *
-     * @param sessionId l'identifiant mémoire utilisé lors de la création de la session
-     * @return les messages en mémoire, ou une liste vide si la session est inconnue
+     * @param sessionId the memory identifier used when the session was created
+     * @return the messages in memory, or an empty list if the session is unknown
      */
     public List<ChatMessage> getMessages(String sessionId) {
         ChatMemory memory = memories.get(sessionId);
@@ -42,7 +42,7 @@ public class ChatMemoryProviderBean implements ChatMemoryProvider {
         return memory.messages();
     }
 
-    /** Retourne le nombre de sessions actives en mémoire. */
+    /** Returns the number of active sessions in memory. */
     public int getSessionCount() {
         return memories.size();
     }

@@ -185,7 +185,7 @@ Open **http://localhost:8080/demo-1/** and test the chat UI.
 Or via curl:
 ```bash
 curl -X POST -H "Content-Type: text/plain" \
-  -d "Raconte-moi une blague sur les raiders vikings" \
+  -d "Tell me a joke about Viking raiders" \
   http://localhost:8080/demo-1/api/chat
 ```
 
@@ -200,7 +200,7 @@ browser as they arrive from the LLM.
 
 ## Bonus: Vision / Image Analysis
 
-`ImageAnalyzerServlet.java` contains its own TODO steps (ÉTAPE 1–6) for injecting a
+`ImageAnalyzerServlet.java` contains its own TODO steps (STEP 1–6) for injecting a
 vision-capable `ChatModel` via `@Named` and sending an image to the LLM:
 
 ```java

@@ -6,40 +6,40 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 /**
- * Point d'entrée REST pour jouer au Hnefatafl au Grand Thing des vikings.
+ * REST endpoint for playing Hnefatafl at the Viking Grand Thing.
  */
 @Path("/game")
 @ApplicationScoped
 public class GameResource {
 
     /**
-     * Jouer une action dans la partie de Hnefatafl.
+     * Play an action in the Hnefatafl game.
      */
     @POST
     @Path("/play")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
     public String play(String playerAction) {
-        throw new UnsupportedOperationException("TODO: À implémenter pendant le live coding");
+        throw new UnsupportedOperationException("TODO: To implement during live coding");
     }
 
     /**
-     * Entrer dans le Thing et démarrer une partie.
+     * Enter the Thing and start a game.
      */
     @GET
     @Path("/start")
     @Produces(MediaType.TEXT_PLAIN)
     public String start() {
-        throw new UnsupportedOperationException("TODO: À implémenter pendant le live coding");
+        throw new UnsupportedOperationException("TODO: To implement during live coding");
     }
 
     /**
-     * Endpoint de vérification de disponibilité.
+     * Health check endpoint.
      */
     @GET
     @Path("/health")
     @Produces(MediaType.TEXT_PLAIN)
     public String health() {
-        return "Le Grand Thing est ouvert - Ragnar le Skald est prêt pour un Hnefatafl !";
+        return "The Grand Thing is open - Ragnar the Skald is ready for Hnefatafl!";
     }
 }

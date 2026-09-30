@@ -1,14 +1,14 @@
-# AGENT.md — Contexte pour Claude Code
+# AGENT.md — Context for Claude Code
 
-> Ce fichier permet à un agent IA (Claude Code) de comprendre le projet et de contribuer efficacement.
-> Intervenants : **Yann Blazart** & **Emmanuel Hugonnet** — Devoxx France 2026.
+> This file helps an AI agent (Claude Code) understand the project and contribute effectively.
+> Speakers: **Yann Blazart** & **Emmanuel Hugonnet** — Devoxx France 2026.
 
-## Projet
+## Project
 
-Présentation Devoxx France 2026 sur **LangChain4j-CDI** : intégration de LangChain4j dans Jakarta EE / MicroProfile via CDI.
-Le dépôt contient des **slides Reveal.js** et un **projet Maven multi-modules** avec 3 démos progressives.
+Devoxx France 2026 presentation on **LangChain4j-CDI**: integrating LangChain4j into Jakarta EE / MicroProfile via CDI.
+The repository contains **Reveal.js slides** and a **multi-module Maven project** with 3 progressive demos.
 
-Licence : Apache 2.0.
+License: Apache 2.0.
 
 ## Tech Stack
 
@@ -19,48 +19,48 @@ Licence : Apache 2.0.
 - **Ollama** locally with model `ministral-3:3b`
 - **Reveal.js 5.1.0** for slides (CDN, no npm)
 
-## Structure des Répertoires
+## Directory Structure
 
 ```
 .
-├── AGENT.md                 <- Ce fichier
-├── README.md                <- Instructions de lancement des slides
+├── AGENT.md                 <- This file
+├── README.md                <- Instructions for launching the slides
 ├── LICENSE                  <- Apache 2.0
 ├── slides/
-│   ├── index.html           <- Présentation Reveal.js (tout-en-un)
-│   └── (ouvrir index.html directement dans le navigateur)
+│   ├── index.html           <- Reveal.js presentation (all-in-one)
+│   └── (open index.html directly in the browser)
 └── demo-project/
-    ├── pom.xml              <- POM parent (versions centralisées)
-    ├── README.md            <- Stratégie globale des démos
-    ├── demo-1-ai-agent/     <- Agent IA injectable (@RegisterAIService)
-    │   ├── base/            <- Squelette avec TODOs pour le live coding
-    │   └── solution/        <- Référence complète
+    ├── pom.xml              <- Parent POM (centralized versions)
+    ├── README.md            <- Overall demo strategy
+    ├── demo-1-ai-agent/     <- Injectable AI Agent (@RegisterAIService)
+    │   ├── base/            <- Skeleton with TODOs for live coding
+    │   └── solution/        <- Complete reference
     ├── demo-2-ft-telemetry/ <- Memory + Tools + Fault Tolerance + Telemetry
-    │   ├── base/            <- Squelette (FT en TODOs, Tools/Memory fonctionnels)
-    │   └── solution/        <- Référence complète avec FT
-    └── demo-3-mcp/          <- Intégration MCP (Model Context Protocol)
-        ├── mcp-server/      <- Serveur MCP standalone (Helidon 4, endpoint /mcp)
-        ├── base/            <- Squelette
-        └── solution/        <- Référence complète
+    │   ├── base/            <- Skeleton (FT as TODOs, Tools/Memory functional)
+    │   └── solution/        <- Complete reference with FT
+    └── demo-3-mcp/          <- MCP Integration (Model Context Protocol)
+        ├── mcp-server/      <- Standalone MCP server (Helidon 4, endpoint /mcp)
+        ├── base/            <- Skeleton
+        └── solution/        <- Complete reference
 ```
 
-## Convention base / solution
+## base / solution Convention
 
-Chaque démo possède deux modules Maven :
-- **base/** : squelette avec marqueurs `// TODO STEP N` pour le live coding sur scène
-- **solution/** : code complet, sert de filet de sécurité pendant la présentation
+Each demo has two Maven modules:
+- **base/**: skeleton with `// TODO STEP N` markers for live coding on stage
+- **solution/**: complete code, serves as a safety net during the presentation
 
-Les classes métier partagées (modèles, repositories, tools) sont **identiques** dans base et solution.
-Seules les annotations/config faisant l'objet du live coding diffèrent (TODOs dans base, complet dans solution).
+Shared business classes (models, repositories, tools) are **identical** in base and solution.
+Only annotations/config targeted for live coding differ (TODOs in base, complete in solution).
 
-**Règle** : toute modification d'une classe partagée doit être faite dans les deux modules.
+**Rule**: any modification to a shared class must be made in both modules.
 
-## Lancer les Démos
+## Running the Demos
 
 ```bash
-# Prérequis : Ollama (dans un terminal séparé, laisser tourner)
+# Prerequisites: Ollama (in a separate terminal, keep running)
 ollama serve
-# Dans un autre terminal :
+# In another terminal:
 ollama pull ministral-3:3b
 
 # Demo 1
@@ -77,7 +77,7 @@ mvn clean install
 target\server\bin\standalone.bat           # Windows
 # -> http://localhost:8080/demo-2/
 
-# Demo 3 (démarrer d'abord le serveur MCP sur le port 8090)
+# Demo 3 (start the MCP server first on port 8090)
 cd demo-project/demo-3-mcp/mcp-server
 mvn clean package
 java -jar target/casino-dice-roller.jar
@@ -88,32 +88,32 @@ target\server\bin\standalone.bat           # Windows
 # -> http://localhost:8080/demo-3/
 ```
 
-Le context-root est défini par `<name>` dans le `wildfly-maven-plugin` de chaque POM.
+The context-root is defined by `<name>` in each POM's `wildfly-maven-plugin`.
 
 ## Slides
 
-Ouvrir `slides/index.html` directement dans le navigateur.
-Touche S = Vue présentateur (notes), F = plein écran, O = vue d'ensemble.
+Open `slides/index.html` directly in the browser.
+S key = Speaker view (notes), F = fullscreen, O = overview.
 
-Les slides constituent un fichier unique `slides/index.html`. Les notes pour le présentateur sont dans les balises `<aside class="notes">`.
+The slides are a single file `slides/index.html`. Speaker notes are in `<aside class="notes">` tags.
 
-Navigation : slides horizontales = sections principales, slides verticales = sous-sections (ex. `/0/3` = section 0, sous-slide 3).
+Navigation: horizontal slides = main sections, vertical slides = sub-sections (e.g. `/0/3` = section 0, sub-slide 3).
 
-## Architecture LangChain4j-CDI (à connaître pour modifier le code)
+## LangChain4j-CDI Architecture (must know to modify the code)
 
-### Pattern de Configuration
+### Configuration Pattern
 
-Les composants LLM sont configurés via MicroProfile Config avec le préfixe `dev.langchain4j.cdi.plugin.<name>` :
+LLM components are configured via MicroProfile Config with the prefix `dev.langchain4j.cdi.plugin.<name>`:
 
 ```properties
-# Déclarer la classe du composant
+# Declare the component class
 dev.langchain4j.cdi.plugin.my-model.class=dev.langchain4j.model.ollama.OllamaChatModel
-# Configurer ses propriétés (préfixe .config.)
+# Configure its properties (.config. prefix)
 dev.langchain4j.cdi.plugin.my-model.config.base-url=http://localhost:11434
 dev.langchain4j.cdi.plugin.my-model.config.model-name=ministral-3:3b
 ```
 
-**Important** : le préfixe `.config.` est obligatoire pour les propriétés de builder. Sans lui, la propriété est ignorée.
+**Important**: the `.config.` prefix is mandatory for builder properties. Without it, the property is silently ignored.
 
 ### @RegisterAIService
 
@@ -131,9 +131,9 @@ public interface ChatAssistant {
 
 ### ChatMemoryProvider vs ChatMemory
 
-- `@MemoryId` nécessite un **ChatMemoryProvider** (pas un ChatMemory)
-- Le provider doit être un bean CDI `@Named` implémentant `ChatMemoryProvider`
-- **Critique** : utiliser `ConcurrentHashMap.computeIfAbsent()` pour mettre en cache les mémoires par session, sinon une nouvelle mémoire est créée à chaque appel
+- `@MemoryId` requires a **ChatMemoryProvider** (not a ChatMemory)
+- The provider must be a CDI bean `@Named` implementing `ChatMemoryProvider`
+- **Critical**: use `ConcurrentHashMap.computeIfAbsent()` to cache memories per session, otherwise a new memory is created on every call
 
 ```java
 @ApplicationScoped
@@ -151,8 +151,8 @@ public class ChatMemoryProviderBean implements ChatMemoryProvider {
 
 ### Tools (function calling)
 
-Les tools sont des beans CDI `@ApplicationScoped` avec des méthodes annotées `@Tool`.
-Ils peuvent injecter d'autres beans via `@Inject`.
+Tools are CDI beans `@ApplicationScoped` with methods annotated `@Tool`.
+They can inject other beans via `@Inject`.
 
 ```java
 @ApplicationScoped
@@ -167,67 +167,67 @@ public class ExpeditionTools {
 }
 ```
 
-Les descriptions `@Tool` et `@P` sont envoyées au LLM : elles doivent être claires et précises car le modèle les utilise pour décider quand/comment appeler le tool.
+`@Tool` and `@P` descriptions are sent to the LLM: they must be clear and precise because the model uses them to decide when/how to call the tool.
 
-### SPI et Résolution
+### SPI and Resolution
 
-LangChain4j-CDI utilise un **SPI** (`LLMConfig`) découvert via `ServiceLoader`.
-L'implémentation **MicroProfile Config** est fournie par l'artefact `langchain4j-cdi-config` (groupId: `dev.langchain4j.cdi.mp`).
+LangChain4j-CDI uses an **SPI** (`LLMConfig`) discovered via `ServiceLoader`.
+The **MicroProfile Config** implementation is provided by the `langchain4j-cdi-config` artifact (groupId: `dev.langchain4j.cdi.mp`).
 
-### Hiérarchie ChatMessage
+### ChatMessage Hierarchy
 
-`ChatMessage` est une interface sans méthode `text()`. Sous-types :
+`ChatMessage` is an interface without a `text()` method. Subtypes:
 - `SystemMessage` -> `.text()`
 - `UserMessage` -> `.singleText()`
-- `AiMessage` -> `.text()` (peut être null si appels de tools)
+- `AiMessage` -> `.text()` (may be null if tool calls)
 - `ToolExecutionResultMessage` -> `.toolName()` + `.text()`
 
-## Demo 2 — Détails Spécifiques
+## Demo 2 — Specific Details
 
-La démo 2 est la plus riche. Elle contient :
+Demo 2 is the richest. It contains:
 
 ### RAG (Retrieval Augmented Generation)
 
-- `KnowledgeBaseProvider.java` : producteur CDI `@ApplicationScoped` créant un `ContentRetriever`
-  - Utilise `OllamaEmbeddingModel` (qwen2.5:7b) pour les embeddings
-  - Stocke dans un `InMemoryEmbeddingStore<TextSegment>`
-  - Ingère les expéditions via `Expedition.toRagDocument()`
-  - Produit un `@Named("my-rag") ContentRetriever` de type `EmbeddingStoreContentRetriever`
-- `ChatAssistant.java` : référence le ContentRetriever via `contentRetrieverName = "my-rag"` dans `@RegisterAIService`
-- Le RAG est fonctionnel dans base ET solution (ce n'est pas un TODO de live coding)
+- `KnowledgeBaseProvider.java`: CDI `@ApplicationScoped` producer creating a `ContentRetriever`
+  - Uses `OllamaEmbeddingModel` (qwen2.5:7b) for embeddings
+  - Stores in an `InMemoryEmbeddingStore<TextSegment>`
+  - Ingests expeditions via `Expedition.toRagDocument()`
+  - Produces a `@Named("my-rag") ContentRetriever` of type `EmbeddingStoreContentRetriever`
+- `ChatAssistant.java`: references the ContentRetriever via `contentRetrieverName = "my-rag"` in `@RegisterAIService`
+- RAG is functional in both base AND solution (it is not a live coding TODO)
 
-### API d'Expédition (mock en mémoire)
+### Expedition API (in-memory mock)
 
-- `Expedition.java` : modèle (id, destination, departureDate, warriorSlots, enrollments)
-- `ExpeditionRepository.java` : `@ApplicationScoped`, 3 expéditions pré-remplies :
-  - `iceland-raid` : Iceland Raid, 5 warrior slots (petit pour tester le scénario "complet")
-  - `england-conquest` : England Conquest, 30 warrior slots
-  - `north-sea-exploration` : North Sea Exploration, 200 warrior slots
+- `Expedition.java`: model (id, destination, departureDate, warriorSlots, enrollments)
+- `ExpeditionRepository.java`: `@ApplicationScoped`, 3 pre-filled expeditions:
+  - `iceland-raid`: Iceland Raid, 5 warrior slots (small to test the "full" scenario)
+  - `england-conquest`: England Conquest, 30 warrior slots
+  - `north-sea-exploration`: North Sea Exploration, 200 warrior slots
 
-### Mémoire par Onglet
+### Per-Tab Memory
 
-Chaque onglet de navigateur génère un `SESSION_ID` via `crypto.randomUUID()`, envoyé dans l'en-tête `X-Session-Id`. Deux onglets = deux conversations indépendantes.
+Each browser tab generates a `SESSION_ID` via `crypto.randomUUID()`, sent in the `X-Session-Id` header. Two tabs = two independent conversations.
 
-Un bouton "Memory" dans l'IU ouvre un endpoint de debug : `GET /api/chat/memory?sessionId=xxx`.
+A "Memory" button in the UI opens a debug endpoint: `GET /api/chat/memory?sessionId=xxx`.
 
-### Règles Métier (dans @SystemMessage)
+### Business Rules (in @SystemMessage)
 
-- L'utilisateur doit fournir prénom ET nom
-- Il ne peut enregistrer que lui-même
-- L'IA gère les IDs d'expédition en interne (l'utilisateur n'a pas besoin de les connaître)
-- Les tools acceptent un ID exact ou une destination partielle (fallback `findByDestination`)
+- The user must provide first name AND last name
+- They can only register themselves
+- The AI handles expedition IDs internally (the user doesn't need to know them)
+- Tools accept an exact ID or a partial destination (fallback `findByDestination`)
 
-### Fault Tolerance (sujet de live coding)
+### Fault Tolerance (live coding topic)
 
-Dans **base/** les annotations FT sont en TODOs. Dans **solution/** :
+In **base/** the FT annotations are TODOs. In **solution/**:
 - `@Retry(maxRetries = 3, delay = 1000)`
 - `@Timeout(value = 30, unit = ChronoUnit.SECONDS)`
 - `@Fallback(fallbackMethod = "chatFallback")`
 - `@CircuitBreaker(requestVolumeThreshold = 5, failureRatio = 0.5)`
 
-### Layers Galleon (Provisioning WildFly)
+### Galleon Layers (WildFly Provisioning)
 
-Le POM de demo-2 nécessite des layers spécifiques :
+The demo-2 POM requires specific layers:
 ```xml
 <layers>
     <layer>jaxrs-server</layer>
@@ -236,61 +236,61 @@ Le POM de demo-2 nécessite des layers spécifiques :
 </layers>
 ```
 
-Sans ceux-ci : `ClassNotFoundException: org.eclipse.microprofile.faulttolerance.Retry`.
+Without these: `ClassNotFoundException: org.eclipse.microprofile.faulttolerance.Retry`.
 
-## IU de Chat
+## Chat UI
 
-Chaque démo possède un `index.html` dans `src/main/webapp/` avec :
-- Interface de chat minimaliste (style HTMX, fetch API)
-- Auto-scroll fluide (`scrollIntoView({ behavior: 'smooth', block: 'end' })`)
-- Animation du bouton (3 points rebondissants) en attendant la réponse
-- Demo-2 uniquement : ID de session par onglet + bouton de debug Memory
+Each demo has an `index.html` in `src/main/webapp/` with:
+- Minimalist chat interface (HTMX-style, fetch API)
+- Smooth auto-scroll (`scrollIntoView({ behavior: 'smooth', block: 'end' })`)
+- Button animation (3 bouncing dots) while waiting for a response
+- Demo-2 only: per-tab session ID + Memory debug button
 
-**Règle** : les 6 fichiers `index.html` (3 démos x 2 modules) doivent rester cohérents pour les éléments partagés (style, animation, scroll).
+**Rule**: the 6 `index.html` files (3 demos x 2 modules) must remain consistent for shared elements (style, animation, scroll).
 
-## Pièges Connus
+## Known Pitfalls
 
-| Problème | Cause | Solution |
+| Problem | Cause | Solution |
 |---------|-------|----------|
-| `ClassNotFoundException: ...faulttolerance.Retry` | Layers Galleon manquantes | Ajouter `microprofile-fault-tolerance` dans `<layers>` |
-| `IllegalConfigurationException: ...ChatMemoryProvider` | MicroProfile Config crée un ChatMemory, pas un Provider | Utiliser un bean CDI `ChatMemoryProviderBean` |
-| La mémoire ne persiste pas entre les messages | `get()` crée une nouvelle instance à chaque appel | Utiliser `computeIfAbsent()` dans le provider |
-| `ChatMessage.text()` ne compile pas | `ChatMessage` est une interface sans `text()` | Pattern-match sur les sous-types (SystemMessage, UserMessage, etc.) |
-| context-root incorrect (404) | Pas de `<name>` dans wildfly-maven-plugin | Ajouter `<name>demo-N</name>` dans la config du plugin |
-| Propriétés ignorées | Préfixe `.config.` manquant | `dev.langchain4j.cdi.plugin.X.config.prop=val` |
-| L'IA n'affiche pas les IDs d'expédition | Comportement normal du LLM | Le @SystemMessage dit à l'IA de gérer les IDs en interne |
+| `ClassNotFoundException: ...faulttolerance.Retry` | Missing Galleon layers | Add `microprofile-fault-tolerance` in `<layers>` |
+| `IllegalConfigurationException: ...ChatMemoryProvider` | MicroProfile Config creates a ChatMemory, not a Provider | Use a CDI bean `ChatMemoryProviderBean` |
+| Memory doesn't persist between messages | `get()` creates a new instance on each call | Use `computeIfAbsent()` in the provider |
+| `ChatMessage.text()` doesn't compile | `ChatMessage` is an interface without `text()` | Pattern-match on subtypes (SystemMessage, UserMessage, etc.) |
+| Incorrect context-root (404) | No `<name>` in wildfly-maven-plugin | Add `<name>demo-N</name>` in the plugin config |
+| Properties ignored | Missing `.config.` prefix | `dev.langchain4j.cdi.plugin.X.config.prop=val` |
+| AI doesn't show expedition IDs | Normal LLM behavior | The @SystemMessage tells the AI to manage IDs internally |
 
-## Conventions de Code
+## Code Conventions
 
-- Package : `com.example.demoN` (N = 1, 2 ou 3)
-- GroupId POM parent : `com.example`
-- GroupId LangChain4j-CDI core : `dev.langchain4j.cdi`
-- GroupId LangChain4j-CDI MicroProfile : `dev.langchain4j.cdi.mp`
-- Langue : Anglais pour le code, commentaires, @SystemMessage, et IUs
-- Tous les modules ont un `beans.xml` dans `WEB-INF/` (requis pour la découverte CDI)
-- Chaque démo a un `JaxRsActivator.java` avec `@ApplicationPath("api")`
+- Package: `com.example.demoN` (N = 1, 2, or 3)
+- GroupId parent POM: `com.example`
+- GroupId LangChain4j-CDI core: `dev.langchain4j.cdi`
+- GroupId LangChain4j-CDI MicroProfile: `dev.langchain4j.cdi.mp`
+- Language: English for code, comments, @SystemMessage, and UIs
+- All modules have a `beans.xml` in `WEB-INF/` (required for CDI discovery)
+- Each demo has a `JaxRsActivator.java` with `@ApplicationPath("api")`
 
-## Commandes Utiles
+## Useful Commands
 
 ```bash
-# Vérifier qu'Ollama est en cours d'exécution
+# Verify Ollama is running
 curl http://localhost:11434/api/tags
 
-# Lancer les slides : ouvrir slides/index.html dans le navigateur
+# Launch the slides: open slides/index.html in the browser
 
-# Lancer une démo (remplacer N et le module)
+# Run a demo (replace N and the module name)
 cd demo-project/demo-N-xxx/solution
 mvn clean install
 ./target/server/bin/standalone.sh    # Linux / macOS
 target\server\bin\standalone.bat     # Windows
 
-# Tester un endpoint de chat
+# Test a chat endpoint
 curl -X POST -H "Content-Type: text/plain" -d "Hello" http://localhost:8080/demo-1/api/chat
 
-# Tester avec un ID de session (demo-2)
+# Test with a session ID (demo-2)
 curl -X POST -H "Content-Type: text/plain" -H "X-Session-Id: test-123" \
   -d "What expeditions are available?" http://localhost:8080/demo-2/api/chat
 
-# Debugger la mémoire (demo-2)
+# Debug memory (demo-2)
 curl "http://localhost:8080/demo-2/api/chat/memory?sessionId=test-123"
 ```

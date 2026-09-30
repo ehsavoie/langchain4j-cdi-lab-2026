@@ -10,12 +10,12 @@ import org.apache.tika.language.detect.LanguageDetector;
 import org.apache.tika.language.detect.LanguageResult;
 
 /**
- * Guardrail de sortie qui vérifie que le chant généré est en français.
- * Utilise Apache Tika pour confirmer la langue de la réponse du LLM.
- * La réponse étant suffisamment longue, la détection est fiable.
+ * Output guardrail that verifies the generated song is in English.
+ * Uses Apache Tika to confirm the language of the LLM response.
+ * Since the response is long enough, detection is reliable.
  */
 @ApplicationScoped
-public class FrenchOutputGuardrail implements OutputGuardrail {
+public class EnglishOutputGuardrail implements OutputGuardrail {
 
     private LanguageDetector detector;
 

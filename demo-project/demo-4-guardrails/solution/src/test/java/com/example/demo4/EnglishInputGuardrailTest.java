@@ -8,47 +8,46 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FrenchInputGuardrailTest {
+class EnglishInputGuardrailTest {
 
-    private FrenchInputGuardrail guardrail;
+    private EnglishInputGuardrail guardrail;
 
     @BeforeEach
     void setUp() {
-        guardrail = new FrenchInputGuardrail();
+        guardrail = new EnglishInputGuardrail();
         guardrail.init();
     }
 
     @Test
-    void frenchRequestIsAccepted() {
+    void englishRequestIsAccepted() {
         InputGuardrailResult result = guardrail.validate(
-                UserMessage.from("Chante les exploits d'Erik le Rouge, grand guerrier du Nord. Raconte ses batailles épiques et ses voyages vers le Vinland."));
+                UserMessage.from("Sing me a song about the great Viking warrior Erik the Red and his epic battles across the northern seas."));
 
         assertEquals(GuardrailResult.Result.SUCCESS, result.result());
         assertTrue(result.failures().isEmpty());
     }
 
     @Test
-    void englishRequestIsBlocked() {
+    void frenchRequestIsBlocked() {
         InputGuardrailResult result = guardrail.validate(
-                UserMessage.from("Sing me a song about the great Viking warrior Erik the Red and his epic battles across the northern seas."));
+                UserMessage.from("Chante les exploits d'Erik le Rouge, grand guerrier du Nord. Raconte ses batailles épiques et ses voyages vers le Vinland."));
 
         assertEquals(GuardrailResult.Result.FAILURE, result.result());
         assertFalse(result.failures().isEmpty());
     }
 
     @Test
-    void failureMessageIsInFrench() {
+    void failureMessageIsInEnglish() {
         InputGuardrailResult result = guardrail.validate(
-                UserMessage.from("Can you sing about the great Viking warrior and his legendary battles across the northern seas?"));
+                UserMessage.from("Chante les exploits d'Erik le Rouge, grand guerrier du Nord. Raconte ses batailles épiques et ses voyages vers le Vinland."));
 
         assertFalse(result.failures().isEmpty());
         String message = result.failures().get(0).message();
-        assertTrue(message.contains("français"), "Failure message should be in French: " + message);
+        assertTrue(message.contains("English"), "Failure message should mention English: " + message);
     }
 
     @Test
     void shortOrAmbiguousTextIsAccepted() {
-        // Tika cannot be confident about very short texts → benefit of the doubt
         InputGuardrailResult result = guardrail.validate(UserMessage.from("Odin"));
 
         assertEquals(GuardrailResult.Result.SUCCESS, result.result());

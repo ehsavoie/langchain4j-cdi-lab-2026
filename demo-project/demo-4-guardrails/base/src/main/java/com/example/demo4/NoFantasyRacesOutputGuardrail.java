@@ -8,14 +8,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Set;
 
 /**
- * Guardrail de sortie qui rejette les chants générés mentionnant des races fantastiques.
- * Garantit que le LLM n'a pas glissé des nains ou des elfes dans le chant viking.
+ * Output guardrail that rejects generated songs mentioning fantasy races.
+ * Ensures the LLM did not slip dwarves, elves, halflings, or dragons into the Viking song.
  */
 @ApplicationScoped
 public class NoFantasyRacesOutputGuardrail implements OutputGuardrail {
 
     private static final Set<String> FORBIDDEN_WORDS = Set.of(
-            "nain", "nains", "elfe", "elf", "elfes"
+            "dwarf", "dwarves", "elf", "elves", "halfling", "halflings", "dragon", "dragons"
     );
 
     @Override

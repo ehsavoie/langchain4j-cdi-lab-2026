@@ -76,6 +76,6 @@ demo-project/
 - **Synchronisation base/solution** : les classes métier partagées (modèles, repositories, tools) doivent être identiques dans `base/` et `solution/`. Seules les annotations/config pour le live coding diffèrent.
 - **Les 6 fichiers `index.html`** (3 démos x 2 modules) doivent rester cohérents pour les éléments partagés (style, animation, scroll).
 - **Package** : `com.example.demoN` (N = 1, 2 ou 3).
-- **Langue** : Français pour le code, `@SystemMessage`, et les IUs.
+- **Language** : English for code, `@SystemMessage`, and UIs.
 - **MicroProfile Config** : le préfixe `.config.` est obligatoire pour les propriétés de builder (`dev.langchain4j.cdi.plugin.<name>.config.<prop>=val`). Sans lui, la propriété est ignorée silencieusement.
 - Chaque module WAR nécessite un `beans.xml` dans `WEB-INF/` et un `JaxRsActivator.java` avec `@ApplicationPath("api")`.

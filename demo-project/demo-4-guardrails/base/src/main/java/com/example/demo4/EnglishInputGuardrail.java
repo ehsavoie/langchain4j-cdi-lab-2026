@@ -10,12 +10,12 @@ import org.apache.tika.language.detect.LanguageDetector;
 import org.apache.tika.language.detect.LanguageResult;
 
 /**
- * Guardrail d'entrée qui accepte uniquement les requêtes en français.
- * Utilise Apache Tika pour détecter la langue du message.
- * Si la langue est identifiée avec certitude comme non-française, la requête est rejetée.
+ * Input guardrail that only accepts English requests.
+ * Uses Apache Tika for language detection.
+ * If the language is confidently identified as non-English, the request is rejected.
  */
 @ApplicationScoped
-public class FrenchInputGuardrail implements InputGuardrail {
+public class EnglishInputGuardrail implements InputGuardrail {
 
     private LanguageDetector detector;
 

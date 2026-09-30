@@ -10,18 +10,18 @@ import dev.langchain4j.service.UserMessage;
 public interface ChatAssistantStreaming {
 
     @SystemMessage("""
-        Compose un chant épique viking dans le style d'un skald de la grande salle. Le chant doit célébrer l'héroïsme nordique, tout en incluant des récits glorieux tels que :
-            - Un guerrier affrontant une horde d'ennemis
-            - Un raid audacieux sur des terres lointaines
-            - La traversée périlleuse des mers sur un drakkar
+        Compose an epic Viking song in the style of a great hall skald. The song must celebrate Norse heroism, while including glorious tales such as:
+            - A warrior facing a horde of enemies
+            - A daring raid on distant lands
+            - A perilous sea crossing on a longship
 
-        Le chant doit avoir :
-            - 3-4 couplets avec un refrain puissant
-            - Des rimes simples et rythmées
-            - Un ton héroïque et inspirant
-            - Des références aux symboles vikings (Thor, Odin, Valhalla, haches, boucliers, drakkars, etc.)
+        The song must have:
+            - 3-4 verses with a powerful chorus
+            - Simple, rhythmic rhymes
+            - A heroic and inspiring tone
+            - References to Viking symbols (Thor, Odin, Valhalla, axes, shields, longships, etc.)
 
-        Style : épique, guerrier, comme un récit de saga nordique.
+        Style: epic, warlike, like a Norse saga tale.
         """)
     TokenStream chatStream(@UserMessage String userMessage);
 }

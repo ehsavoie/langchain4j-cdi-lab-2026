@@ -6,14 +6,14 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 /**
- * Point d'entrée REST pour le Hnefatafl au Grand Thing.
+ * REST endpoint for Hnefatafl at the Grand Thing.
  *
- * <p>Délègue toute la logique de jeu à {@link HnefataflJarlAI}. Trois endpoints sont exposés
- * sous {@code /api/game} :
+ * <p>Delegates all game logic to {@link HnefataflJarlAI}. Three endpoints are exposed
+ * under {@code /api/game}:
  * <ul>
- *   <li>{@code GET  /start} — accueillir le guerrier et démarrer une nouvelle session.</li>
- *   <li>{@code POST /play}  — envoyer une action du guerrier (texte brut) et recevoir la réponse du Jarl.</li>
- *   <li>{@code GET  /health} — vérification de disponibilité.</li>
+ *   <li>{@code GET  /start} — welcome the warrior and start a new session.</li>
+ *   <li>{@code POST /play}  — send a warrior action (plain text) and receive the Jarl's response.</li>
+ *   <li>{@code GET  /health} — health check.</li>
  * </ul>
  */
 @Path("/game")
@@ -24,12 +24,12 @@ public class GameResource {
     HnefataflJarlAI gameMaster;
 
     /**
-     * Envoie une action du guerrier au Jarl et reçoit la réponse de jeu.
+     * Sends a warrior action to the Jarl and receives the game response.
      *
-     * <p>Exemple : {@code POST /api/game/play} avec le corps {@code Lance les runes}
+     * <p>Example: {@code POST /api/game/play} with body {@code Cast the runes}
      *
-     * <p>Le Jarl invoquera l'outil MCP {@code roll} pour lancer 2 pierres runiques, puis
-     * annoncera le résultat (Faveur d'Odin, Malédiction, rune marquée, atteinte ou Ragnarök).
+     * <p>The Jarl will invoke the MCP tool {@code roll} to cast 2 rune stones, then
+     * announce the result (Odin's Favour, Curse, marked rune, rune hit, or Ragnarök).
      */
     @POST
     @Path("/play")
@@ -40,22 +40,22 @@ public class GameResource {
     }
 
     /**
-     * Accueille le guerrier et démarre une nouvelle session de jeu.
+     * Welcomes the warrior and starts a new game session.
      */
     @GET
     @Path("/start")
     @Produces(MediaType.TEXT_PLAIN)
     public String start() {
-        return gameMaster.play("Salve ! Je suis prêt à jouer au Hnefatafl.");
+        return gameMaster.play("Hail! I am ready to play Hnefatafl.");
     }
 
     /**
-     * Endpoint de vérification de disponibilité.
+     * Health check endpoint.
      */
     @GET
     @Path("/health")
     @Produces(MediaType.TEXT_PLAIN)
     public String health() {
-        return "Le Grand Thing est ouvert - Ragnar le Skald est prêt pour un Hnefatafl !";
+        return "The Grand Thing is open - Ragnar the Skald is ready for Hnefatafl!";
     }
 }

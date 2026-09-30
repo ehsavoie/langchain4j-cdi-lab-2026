@@ -1,70 +1,70 @@
-# Serveur MCP de Dés
+# MCP Dice Server
 
-Serveur MCP (Model Context Protocol) autonome pour le lancer de pierres runiques.
+Standalone MCP (Model Context Protocol) server for rune stone rolling.
 
 ## Description
 
-Ce serveur expose un outil de lancer de dés via le protocole MCP sur stdio (JSON-RPC 2.0). Il est utilisé par l'agent `CasinoDealerAI` (Ragnar le Skald) pour gérer les mécaniques de jeu (lancers de pierres runiques).
+This server exposes a dice rolling tool via the MCP protocol over stdio (JSON-RPC 2.0). It is used by the `CasinoDealerAI` agent (Ragnar the Skald) to manage game mechanics (rune stone rolls).
 
-## Outil Disponible
+## Available Tool
 
-| Outil | Description | Paramètres |
-|-------|-------------|------------|
-| `roll` | Lance un nombre de dés à 6 faces | `numberOfDice` (int) : nombre de dés |
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `roll` | Rolls a number of 6-sided dice | `numberOfDice` (int): number of dice |
 
-## Compilation
+## Build
 
 ```bash
 cd demo-3-mcp/mcp-server
 mvn clean package
 ```
 
-Le JAR généré se trouve dans `target/demo-3-mcp-dice-server.jar`.
+The generated JAR is located at `target/demo-3-mcp-dice-server.jar`.
 
-## Utilisation
+## Usage
 
-### En tant que serveur MCP (mode normal)
+### As an MCP server (normal mode)
 
-Le serveur est lancé **automatiquement** par le module `solution` ou `base` via le producteur CDI `McpConfig`. Il communique via stdin/stdout avec l'application WildFly.
+The server is launched **automatically** by the `solution` or `base` module via the CDI producer `McpConfig`. It communicates via stdin/stdout with the WildFly application.
 
-Vous **n'avez pas besoin** de le démarrer manuellement pour la démo.
+You **don't need** to start it manually for the demo.
 
-### Test manuel (mode autonome)
+### Manual testing (standalone mode)
 
-Pour tester le serveur de façon indépendante :
+To test the server independently:
 
 ```bash
 java -jar target/demo-3-mcp-dice-server.jar
 ```
 
-Puis envoyer des commandes JSON-RPC sur stdin. Exemples :
+Then send JSON-RPC commands on stdin. Examples:
 
-**1. Initialisation**
+**1. Initialization**
 ```json
 {"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}
 ```
 
-**2. Lister les outils**
+**2. List tools**
 ```json
 {"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}
 ```
 
-**3. Appel d'outil (lancer 2 pierres runiques)**
+**3. Tool call (roll 2 rune stones)**
 ```json
 {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"roll","arguments":{"numberOfDice":2}}}
 ```
 
-**4. Lancer 3 dés**
+**4. Roll 3 dice**
 ```json
 {"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"roll","arguments":{"numberOfDice":3}}}
 ```
 
-## Protocole MCP
+## MCP Protocol
 
-Le serveur implémente le protocole MCP version `2024-11-05` :
+The server implements MCP protocol version `2024-11-05`:
 - Communication via **stdin/stdout**
-- Format **JSON-RPC 2.0**
-- Transport **stdio** (pas de réseau)
+- **JSON-RPC 2.0** format
+- **stdio** transport (no network)
 
 ## Architecture
 
@@ -73,48 +73,48 @@ Le serveur implémente le protocole MCP version `2024-11-05` :
 |  WildFly (solution)  |
 |                      |
 |  +----------------+  |
-|  | CasinoDealerAI  |  |  Le LLM décide de lancer
-|  +-------+--------+  |  les runes (tool calling)
+|  | CasinoDealerAI  |  |  The LLM decides to roll
+|  +-------+--------+  |  the runes (tool calling)
 |          |           |
 |  +-------v--------+  |
-|  |  McpConfig     |  |  Producteur CDI qui lance
-|  |  (Producteur)  |  |  le processus MCP
+|  |  McpConfig     |  |  CDI producer that launches
+|  |  (Producer)    |  |  the MCP process
 |  +-------+--------+  |
 +-----------+-----------+
             | stdio
             | (JSON-RPC)
 +-----------v-----------+
-|  Serveur MCP de Dés   |
-|  (ce module)          |
+|  MCP Dice Server      |
+|  (this module)        |
 |                       |
-|  - roll               |  Lance N dés à 6 faces
-|                       |  et retourne les résultats
+|  - roll               |  Rolls N 6-sided dice
+|                       |  and returns the results
 +-----------------------+
 ```
 
 ## Logs
 
-Les logs sont envoyés vers stderr :
+Logs are sent to stderr:
 ```
-[main] INFO org.acme.DiceRoller - Lancer de dés : 2 dés
-[main] INFO org.acme.DiceRoller - Dé 0 : 4
+[main] INFO org.acme.DiceRoller - Dice roll: 2 dice
+[main] INFO org.acme.DiceRoller - Die 0: 4
 ```
 
-## Résolution de Problèmes
+## Troubleshooting
 
-**Le serveur ne répond pas**
-- Vérifier que le JAR est correctement compilé : `ls -lh target/demo-3-mcp-dice-server.jar`
-- Consulter les logs dans la console WildFly
+**Server doesn't respond**
+- Check that the JAR is correctly built: `ls -lh target/demo-3-mcp-dice-server.jar`
+- Check the logs in the WildFly console
 
-**Erreur "Unable to start MCP server"**
-- Le chemin vers le JAR dans `McpConfig.java` est incorrect
-- Le JAR n'a pas les permissions d'exécution
+**Error "Unable to start MCP server"**
+- The path to the JAR in `McpConfig.java` is incorrect
+- The JAR doesn't have execution permissions
 
-**Les dés ne sont pas lancés**
-- Vérifier que le `McpToolProvider` est correctement injecté avec `@Named("mcp")`
-- Vérifier que le LLM supporte le tool calling (Ollama avec des modèles récents)
+**Dice are not rolled**
+- Check that `McpToolProvider` is correctly injected with `@Named("mcp")`
+- Check that the LLM supports tool calling (Ollama with recent models)
 
-## Ressources
+## Resources
 
-- **Protocole MCP** : https://modelcontextprotocol.io
-- **Spécification JSON-RPC 2.0** : https://www.jsonrpc.org/specification
+- **MCP Protocol**: https://modelcontextprotocol.io
+- **JSON-RPC 2.0 Specification**: https://www.jsonrpc.org/specification

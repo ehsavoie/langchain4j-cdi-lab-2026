@@ -9,16 +9,16 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Une ChatMemory qui conserve les deux derniers échanges de lancer de runes.
+ * A ChatMemory that keeps the last two rune cast exchanges.
  *
- * Le modèle voit toujours :
+ * The model always sees:
  *   [SystemMessage]
- *   + [UserMessage précédent] + [AiMessage(appel outil)] + [ToolResult] + [AiMessage(réponse)]
- *   + [UserMessage courant] + ... (en cours)
+ *   + [previous UserMessage] + [AiMessage(tool call)] + [ToolResult] + [AiMessage(response)]
+ *   + [current UserMessage] + ... (in progress)
  *
- * Ceci permet au LLM de comparer le résultat du lancer actuel avec le précédent.
- * L'éviction ne se déclenche que lorsqu'un troisième UserMessage arrive,
- * en supprimant l'échange le plus ancien.
+ * This allows the LLM to compare the current cast result with the previous one.
+ * Eviction only triggers when a third UserMessage arrives,
+ * removing the oldest exchange.
  */
 public class LastDiceRollChatMemory implements ChatMemory {
 
@@ -29,7 +29,7 @@ public class LastDiceRollChatMemory implements ChatMemory {
 
     public LastDiceRollChatMemory(Object id) {
         this.id = id;
-        LOG.fine("[mémoire:%s] Créée".formatted(id));
+        LOG.fine("[memory:%s] Created".formatted(id));
     }
 
     @Override
@@ -39,15 +39,15 @@ public class LastDiceRollChatMemory implements ChatMemory {
 
     @Override
     public void add(ChatMessage message) {
-        LOG.fine("[mémoire:%s] Ajout du message type=%s".formatted(id, message.type()));
+        LOG.fine("[memory:%s] Adding message type=%s".formatted(id, message.type()));
         messages.add(message);
         evict();
     }
 
     /**
-     * Conserve le SystemMessage (si présent) + les deux derniers échanges (lancer précédent + lancer courant).
-     * L'éviction ne se déclenche que lorsqu'un troisième UserMessage est présent.
-     * Appelé après chaque add() pour toujours faire respecter la fenêtre.
+     * Keeps the SystemMessage (if present) + the last two exchanges (previous cast + current cast).
+     * Eviction only triggers when a third UserMessage is present.
+     * Called after each add() to always enforce the window.
      */
     private void evict() {
         List<Integer> userIndices = new ArrayList<>();
@@ -74,7 +74,7 @@ public class LastDiceRollChatMemory implements ChatMemory {
         }
         retained.addAll(messages.subList(keepFromIndex, messages.size()));
 
-        LOG.fine("[mémoire:%s] Éviction du lancer le plus ancien : %d messages conservés (%d supprimés)"
+        LOG.fine("[memory:%s] Evicting oldest cast: %d messages kept (%d removed)"
                 .formatted(id, retained.size(), messages.size() - retained.size()));
         messages.clear();
         messages.addAll(retained);
@@ -87,7 +87,7 @@ public class LastDiceRollChatMemory implements ChatMemory {
 
     @Override
     public void clear() {
-        LOG.fine("[mémoire:%s] Effacée".formatted(id));
+        LOG.fine("[memory:%s] Cleared".formatted(id));
         messages.clear();
     }
 }

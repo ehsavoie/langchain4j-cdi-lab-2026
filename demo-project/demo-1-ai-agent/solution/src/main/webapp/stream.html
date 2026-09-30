@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚔️ La Grande Salle Viking — Streaming SSE</title>
+    <title>⚔️ The Viking Great Hall — SSE Streaming</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -210,30 +210,30 @@
 </head>
 <body>
     <header>
-        <h1>⚔️ La Grande Salle Viking — Streaming SSE</h1>
-        <span class="badge">🔥 Feu Sacré</span>
-        <span class="subtitle">TokenStream en direct avec Server-Sent Events</span>
-        <a href="index.html" style="margin-left: auto;">🗡️ Chat Simple</a>
-        <a href="image.html">🖼️ Analyse d'Images</a>
+        <h1>⚔️ The Viking Great Hall — SSE Streaming</h1>
+        <span class="badge">🔥 Sacred Fire</span>
+        <span class="subtitle">Live TokenStream with Server-Sent Events</span>
+        <a href="index.html" style="margin-left: auto;">🗡️ Simple Chat</a>
+        <a href="image.html">🖼️ Image Analysis</a>
     </header>
 
     <div id="chat">
         <div class="welcome">
-            <p>⚔️ <strong>Bienvenue dans La Grande Salle Viking !</strong> ⚔️</p>
-            <p>🎵 <code>TokenStream</code> + <code>JAX-RS SSE</code> devant le feu sacré</p>
-            <p>🔥 Modèle: <code>ministral-3:3b</code> via Ollama (composition en direct)</p>
-            <p>⚡ Demandez au skald de composer des chants épiques sur les batailles et la bravoure !</p>
+            <p>⚔️ <strong>Welcome to The Viking Great Hall!</strong> ⚔️</p>
+            <p>🎵 <code>TokenStream</code> + <code>JAX-RS SSE</code> by the sacred fire</p>
+            <p>🔥 Model: <code>ministral-3:3b</code> via Ollama (live composition)</p>
+            <p>⚡ Ask the skald to compose epic songs about battles and bravery!</p>
             <p style="font-size: 0.85rem; margin-top: 1rem; color: #a08878;">
-                <em>"Les sagas s'écrivent mot par mot, comme les runes sur la pierre !"</em>
+                <em>"Sagas are written word by word, like runes carved in stone!"</em>
             </p>
         </div>
     </div>
 
     <div id="input-bar">
         <input type="text" id="message" autocomplete="off"
-               placeholder="⚔️ Demandez au skald un chant sur les raids, les batailles et la gloire...">
+               placeholder="⚔️ Ask the skald for a song about raids, battles, and glory...">
         <button id="send-btn" onclick="sendMessage()">
-            <span class="label">🎵 Composer</span>
+            <span class="label">🎵 Compose</span>
             <span class="spinner"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
         </button>
     </div>
