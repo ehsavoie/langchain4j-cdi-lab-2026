@@ -166,8 +166,8 @@ mvn clean install
 target\server\bin\standalone.bat    # Windows
 
 curl -X POST -H "Content-Type: text/plain" \
-  -d "Chante-moi une chanson viking à" \
-  http://localhost:8080/demo-4/api/chat
+  -d "Compose un chant sur la gloire d'Odin et les batailles vikings" \
+  http://localhost:8080/demo-4/api/song
 ```
 
 ### Démo 5 — A2A Story Forge
