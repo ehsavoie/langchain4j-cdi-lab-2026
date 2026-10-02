@@ -1,4 +1,4 @@
-# LangChain4j-CDI — Riviera Dev 2026
+# LangChain4j-CDI — Volcamp 2026
 
 ## Prérequis
 
