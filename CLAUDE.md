@@ -4,7 +4,7 @@ Ce fichier fournit des instructions à Claude Code (claude.ai/code) lors du trav
 
 ## Projet
 
-Présentation Devoxx France 2026 sur **LangChain4j-CDI** : intégration de LangChain4j dans Jakarta EE / MicroProfile via CDI.
+Présentation {{conference_name}} sur **LangChain4j-CDI** : intégration de LangChain4j dans Jakarta EE / MicroProfile via CDI.
 Intervenants : Yann Blazart & Emmanuel Hugonnet. Licence : Apache 2.0.
 
 Le dépôt contient des **slides Reveal.js** (`slides/`) et un **projet Maven multi-modules** (`demo-project/`) avec 3 démos progressives, chacune ayant un module `base/` (squelette avec des TODOs pour le live coding) et `solution/` (référence complète).

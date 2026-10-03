@@ -1,4 +1,4 @@
-# LangChain4j-CDI — Devoxx 2026 Demos
+# LangChain4j-CDI — {{conference_name}} Demos
 
 **Branch** : `devoxx2026`
 

@@ -1,6 +1,6 @@
 # Demo 1 - Injectable AI Agent with @RegisterAIService
 
-First demo at Devoxx on **LangChain4j-CDI**: creating an injectable AI agent via CDI on WildFly with Ollama or Mistral AI.
+First demo at {{conference_name}} on **LangChain4j-CDI**: creating an injectable AI agent via CDI on WildFly with Ollama or Mistral AI.
 
 ## Objective
 
