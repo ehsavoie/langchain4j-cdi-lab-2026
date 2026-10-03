@@ -1,6 +1,6 @@
-# LangChain4j-CDI — RivieraDev 2026 Demos
+# LangChain4j-CDI — Devoxx 2026 Demos
 
-**Branch** : `rivieradev`
+**Branch** : `devoxx2026`
 
 ## Setup before the big day
 
@@ -26,7 +26,7 @@ Ollama must stay running on `http://localhost:11434` during the entire workshop.
 ```bash
 git clone https://github.com/ehsavoie/langchain4j-cdi-lab-2026.git
 cd langchain4j-cdi-lab-2026/demo-project
-git checkout rivieradev
+git checkout devoxx2026
 ```
 
 ### 3. WildFly (automatic)

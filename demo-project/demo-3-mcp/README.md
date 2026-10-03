@@ -1,6 +1,6 @@
 # Demo 3 - Hnefatafl at the Grand Thing with MCP
 
-Third demo for Devoxx France: play **Hnefatafl** (a Nordic rune stone game) against an AI that uses the **MCP** (Model Context Protocol) to manage dice rolls on WildFly.
+Third demo for Devoxx: play **Hnefatafl** (a Nordic rune stone game) against an AI that uses the **MCP** (Model Context Protocol) to manage dice rolls on WildFly.
 
 ## Overview
 

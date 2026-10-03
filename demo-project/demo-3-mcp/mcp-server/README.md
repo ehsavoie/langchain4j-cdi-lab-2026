@@ -4,7 +4,7 @@ Standalone MCP (Model Context Protocol) server for rune stone rolling.
 
 ## Description
 
-This server exposes a dice rolling tool via the MCP protocol over stdio (JSON-RPC 2.0). It is used by the `CasinoDealerAI` agent (Ragnar the Skald) to manage game mechanics (rune stone rolls).
+This server exposes a dice rolling tool via the MCP protocol over **Streamable HTTP** (JSON-RPC 2.0). It is used by the `HnefataflJarlAI` agent (Ragnar the Skald) to manage game mechanics (rune stone rolls). It listens on port **8090**.
 
 ## Available Tool
 
@@ -19,52 +19,35 @@ cd demo-3-mcp/mcp-server
 mvn clean package
 ```
 
-The generated JAR is located at `target/demo-3-mcp-dice-server.jar`.
+The generated JAR is located at `target/casino-dice-roller.jar`.
 
 ## Usage
 
-### As an MCP server (normal mode)
+### Start the server (required before the WildFly application)
 
-The server is launched **automatically** by the `solution` or `base` module via the CDI producer `McpConfig`. It communicates via stdin/stdout with the WildFly application.
-
-You **don't need** to start it manually for the demo.
-
-### Manual testing (standalone mode)
-
-To test the server independently:
+The server must be **started manually** before launching the WildFly application:
 
 ```bash
-java -jar target/demo-3-mcp-dice-server.jar
+java -jar target/casino-dice-roller.jar
 ```
 
-Then send JSON-RPC commands on stdin. Examples:
+The server starts on `http://localhost:8090/mcp` and waits for JSON-RPC requests over Streamable HTTP.
 
-**1. Initialization**
-```json
-{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}
-```
+### Verification
 
-**2. List tools**
-```json
-{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}
-```
-
-**3. Tool call (roll 2 rune stones)**
-```json
-{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"roll","arguments":{"numberOfDice":2}}}
-```
-
-**4. Roll 3 dice**
-```json
-{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"roll","arguments":{"numberOfDice":3}}}
+```bash
+# List available tools
+curl -X POST http://localhost:8090/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
 ```
 
 ## MCP Protocol
 
 The server implements MCP protocol version `2024-11-05`:
-- Communication via **stdin/stdout**
+- Communication via **Streamable HTTP** on port `8090`
 - **JSON-RPC 2.0** format
-- **stdio** transport (no network)
+- Endpoint: `http://localhost:8090/mcp`
 
 ## Architecture
 
@@ -73,16 +56,15 @@ The server implements MCP protocol version `2024-11-05`:
 |  WildFly (solution)  |
 |                      |
 |  +----------------+  |
-|  | CasinoDealerAI  |  |  The LLM decides to roll
+|  | HnefataflJarlAI|  |  The LLM decides to roll
 |  +-------+--------+  |  the runes (tool calling)
 |          |           |
 |  +-------v--------+  |
-|  |  McpConfig     |  |  CDI producer that launches
-|  |  (Producer)    |  |  the MCP process
+|  |  McpToolProvider|  |  Configured via MicroProfile Config
 |  +-------+--------+  |
 +-----------+-----------+
-            | stdio
-            | (JSON-RPC)
+            | HTTP (Streamable HTTP JSON-RPC)
+            | http://localhost:8090/mcp
 +-----------v-----------+
 |  MCP Dice Server      |
 |  (this module)        |
@@ -94,7 +76,7 @@ The server implements MCP protocol version `2024-11-05`:
 
 ## Logs
 
-Logs are sent to stderr:
+Logs are sent to the console:
 ```
 [main] INFO org.acme.DiceRoller - Dice roll: 2 dice
 [main] INFO org.acme.DiceRoller - Die 0: 4
@@ -103,15 +85,14 @@ Logs are sent to stderr:
 ## Troubleshooting
 
 **Server doesn't respond**
-- Check that the JAR is correctly built: `ls -lh target/demo-3-mcp-dice-server.jar`
-- Check the logs in the WildFly console
+- Check that the JAR is correctly built: `ls -lh target/casino-dice-roller.jar`
+- Check that port 8090 is not already in use: `lsof -i :8090`
 
-**Error "Unable to start MCP server"**
-- The path to the JAR in `McpConfig.java` is incorrect
-- The JAR doesn't have execution permissions
+**Error "Connection refused" on port 8090**
+- The server is not started — relaunch `java -jar target/casino-dice-roller.jar`
 
 **Dice are not rolled**
-- Check that `McpToolProvider` is correctly injected with `@Named("mcp")`
+- Check that `McpToolProvider` is correctly configured with the MCP client pointing to `http://localhost:8090/mcp`
 - Check that the LLM supports tool calling (Ollama with recent models)
 
 ## Resources

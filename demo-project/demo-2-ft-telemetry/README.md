@@ -1,6 +1,6 @@
 # Demo 2 - Fault Tolerance + Telemetry
 
-Second Devoxx France demo: adding **resilience** (MicroProfile Fault Tolerance) and **observability** (OpenTelemetry) to a LangChain4j-CDI AI agent that already uses Memory, RAG, and Tools.
+Second Devoxx demo: adding **resilience** (MicroProfile Fault Tolerance) and **observability** (OpenTelemetry) to a LangChain4j-CDI AI agent that already uses Memory, RAG, and Tools.
 
 ## Goals
 
