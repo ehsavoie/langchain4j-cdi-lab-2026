@@ -5,13 +5,14 @@ Speakers: **Yann Blazart** & **Emmanuel Hugonnet**.
 
 ## Presented At
 
-| Conference | Year |
-|------------|------|
-| JavaOne | 2026 |
-| Devoxx France | 2026 |
-| RivieraDev | 2026 |
-| Volcamp | 2026 |
-| Devoxx Belgium | 2026 |
+| Conference | Year | Repository | Reference |
+|------------|------|------------|-----------|
+| Paris JUG | 2026 | https://github.com/yblazart/confs-langchain4j-cdi-demo-parisjug-19-02-26 | https://www.youtube.com/watch?v=L577FUy9SIQ |
+| JavaOne | 2026 | https://github.com/yblazart/confs-langchain4j-cdi-javaone2026 | https://dev.java/community/javaone-2026/sessions/hck1474/ |
+| Devoxx France | 2026 | https://github.com/ehsavoie/langchain4j-cdi-lab-2026/tree/devoxxfr2026 | https://m.devoxx.com/events/devoxxfr2026/talks/26850/de-java-a-l-ia-construisez-votre-premier-systeme-d-agents-intelligents |
+| RivieraDev | 2026 | https://github.com/ehsavoie/langchain4j-cdi-lab-2026/tree/rivieradev | https://rivieradev.fr/session/972 |
+| Volcamp | 2026 | https://github.com/ehsavoie/langchain4j-cdi-lab-2026/tree/volcamp2026 | https://www.volcamp.io/talks/d2t4s1 |
+| Devoxx Belgium | 2026 | https://github.com/ehsavoie/langchain4j-cdi-lab-2026/tree/devoxx2026 | https://m.devoxx.com/events/dvbe26/talks/17800/from-java-to-ai-build-your-first-intelligent-agent-system |
 
 ## Prerequisites
 
