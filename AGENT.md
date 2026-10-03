@@ -1,11 +1,11 @@
 # AGENT.md — Context for Claude Code
 
 > This file helps an AI agent (Claude Code) understand the project and contribute effectively.
-> Speakers: **Yann Blazart** & **Emmanuel Hugonnet** — Devoxx France 2026.
+> Speakers: **Yann Blazart** & **Emmanuel Hugonnet** — Devoxx 2026.
 
 ## Project
 
-Devoxx France 2026 presentation on **LangChain4j-CDI**: integrating LangChain4j into Jakarta EE / MicroProfile via CDI.
+Devoxx 2026 presentation on **LangChain4j-CDI**: integrating LangChain4j into Jakarta EE / MicroProfile via CDI.
 The repository contains **Reveal.js slides** and a **multi-module Maven project** with 3 progressive demos.
 
 License: Apache 2.0.
