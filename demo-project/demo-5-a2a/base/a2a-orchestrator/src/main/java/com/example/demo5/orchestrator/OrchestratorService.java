@@ -29,7 +29,7 @@ public class OrchestratorService {
     String styleScorerUrl;
 
     @Inject
-    @Named("ollama")
+    @Named("mistral")
     ChatModel chatModel;
 
     private StyledWriter styledWriter;

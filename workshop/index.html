@@ -1187,8 +1187,8 @@ cd langchain4j-cdi-lab-2026/demo-project</code></pre>
 ollama serve
 
 # In a second terminal:
-ollama pull ministral-3:3b   # exercises 1, 2, 3, 4
-ollama pull qwen2.5:7b       # exercise 5 (A2A — always required)</code></pre>
+ollama pull ministral-3:3b   # Option B — exercises 1, 3
+ollama pull qwen2.5:7b       # Option B — exercises 2, 5, 6</code></pre>
     <p>Ollama must remain active at <code>http://localhost:11434</code> throughout the workshop.</p>
 </div>
 
@@ -2719,7 +2719,7 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
     <tbody>
         <tr><td><code>A2ACreativeWriter.java</code></td><td>CDI proxy to the remote Creative Writer</td><td>Add <code>@RegisterA2AAgent(a2aServerUrl=...)</code></td></tr>
         <tr><td><code>A2AStyleScorer.java</code></td><td>CDI proxy to the remote Style Scorer</td><td>Add <code>@RegisterA2AAgent(a2aServerUrl=...)</code></td></tr>
-        <tr><td><code>StyleEditor.java</code></td><td>Local rewriting agent (Ollama)</td><td>Add <code>@RegisterSimpleAgent(chatModelName="ollama")</code></td></tr>
+        <tr><td><code>StyleEditor.java</code></td><td>Local rewriting agent (Mistral AI)</td><td>Add <code>@RegisterSimpleAgent(chatModelName="mistral")</code></td></tr>
         <tr><td><code>StyleReviewLoop.java</code></td><td>Declarative review loop</td><td>Add <code>@RegisterLoopAgent(exitConditionName=...)</code></td></tr>
         <tr><td><code>ScoreExitCondition.java</code></td><td>CDI exit condition (<code>Predicate&lt;AgenticScope&gt;</code>)</td><td>Implement the <code>score &ge; 0.8</code> test</td></tr>
         <tr><td><code>StyledWriter.java</code></td><td>Complete SEQUENCE pipeline</td><td>Add <code>@RegisterSequenceAgent(subAgentNames=...)</code></td></tr>
@@ -2730,7 +2730,7 @@ curl http://localhost:8080/demo-4/api/song/health</code></pre>
 
 <div class="callout warning">
     <div class="callout-title">&#9888; Prerequisites</div>
-    <p>This exercise uses <strong>Ollama</strong> with the <code>qwen2.5:7b</code> model. Make sure Ollama is running (<code>ollama serve</code>) and the model is downloaded (<code>ollama pull qwen2.5:7b</code>).</p>
+    <p>This exercise uses <strong>Mistral AI</strong>. Make sure <code>MISTRAL_API_KEY</code> is exported in your terminal.</p>
 </div>
 </section>
 
@@ -2754,7 +2754,7 @@ import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 import jakarta.enterprise.context.ApplicationScoped;
 
-@RegisterAIService(chatModelName = "ollama", scope = ApplicationScoped.class)
+@RegisterAIService(chatModelName = "mistral", scope = ApplicationScoped.class)
 public interface CreativeWriter {
 
     @UserMessage("""
@@ -2770,7 +2770,7 @@ public interface CreativeWriter {
 
     <div class="callout info">
         <div class="callout-title">&#128161; @RegisterAIService</div>
-        <p>As in previous exercises, <code>@RegisterAIService</code> transforms the interface into an injectable CDI bean. The <code>chatModelName = "ollama"</code> references the configuration in <code>microprofile-config.properties</code>.</p>
+        <p>As in previous exercises, <code>@RegisterAIService</code> transforms the interface into an injectable CDI bean. The <code>chatModelName = "mistral"</code> references the configuration in <code>microprofile-config.properties</code>.</p>
     </div>
 </div>
 </section>
@@ -2795,7 +2795,7 @@ import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 import jakarta.enterprise.context.ApplicationScoped;
 
-@RegisterAIService(chatModelName = "ollama", scope = ApplicationScoped.class)
+@RegisterAIService(chatModelName = "mistral", scope = ApplicationScoped.class)
 public interface StyleScorer {
 
     @UserMessage("""
@@ -2932,7 +2932,7 @@ import dev.langchain4j.service.V;
         name = "style-editor",
         description = "Reforge a saga to better capture a given style",
         outputKey = "story",
-        chatModelName = "ollama")
+        chatModelName = "mistral")
 public interface StyleEditor {
     @UserMessage("""
             You are a master Norse skald who shapes and tempers sagas like a smith forges steel.
@@ -3278,7 +3278,7 @@ static String buildRequest(
     <tbody>
         <tr><td><code>A2ACreativeWriter.java</code></td><td>CDI proxy to the remote Creative Writer</td><td>Step 1: <code>@RegisterA2AAgent</code></td></tr>
         <tr><td><code>A2AStyleScorer.java</code></td><td>CDI proxy to the remote Style Scorer</td><td>Step 2: <code>@RegisterA2AAgent</code></td></tr>
-        <tr><td><code>StyleEditor.java</code></td><td>Local rewriting agent (Ollama)</td><td>Step 3: <code>@RegisterSimpleAgent</code></td></tr>
+        <tr><td><code>StyleEditor.java</code></td><td>Local rewriting agent (Mistral AI)</td><td>Step 3: <code>@RegisterSimpleAgent</code></td></tr>
         <tr><td><code>StyleReviewSupervisor.java</code></td><td>LLM Supervisor (replaces loop + condition)</td><td>Step 4: <code>@RegisterSupervisorAgent</code> + <code>@SupervisorRequest</code> &larr; new!</td></tr>
         <tr><td><code>StyledWriter.java</code></td><td>Complete SEQUENCE pipeline</td><td>Step 5: <code>@RegisterSequenceAgent</code></td></tr>
         <tr><td><code>OrchestratorService.java</code></td><td>Imperative wiring &rarr; <code>@Inject</code></td><td>Step 6: replace with <code>@Inject StyledWriter</code></td></tr>
@@ -3288,7 +3288,7 @@ static String buildRequest(
 
 <div class="callout warning">
     <div class="callout-title">&#9888; Prerequisites</div>
-    <p>This exercise reuses the <strong>Creative Writer</strong> (port 8080) and <strong>Style Scorer</strong> (port 8081) from exercise 5 &mdash; same code, same ports. Only the orchestrator (port 8082) changes. Make sure Ollama is running with <code>qwen2.5:7b</code>.</p>
+    <p>This exercise reuses the <strong>Creative Writer</strong> (port 8080) and <strong>Style Scorer</strong> (port 8081) from exercise 5 &mdash; same code, same ports. Only the orchestrator (port 8082) changes. Make sure <code>MISTRAL_API_KEY</code> is exported in your terminal.</p>
 </div>
 </section>
 
@@ -3358,7 +3358,7 @@ public interface A2AStyleScorer {
         name = "style-editor",
         description = "Reforge a saga to better capture a given style",
         outputKey = "story",
-        chatModelName = "ollama")
+        chatModelName = "mistral")
 public interface StyleEditor {
     @UserMessage("""
             You are a master Norse skald who shapes and tempers sagas like a smith forges steel.
@@ -3382,7 +3382,7 @@ import dev.langchain4j.service.V;
 @RegisterSupervisorAgent(
         name = "style-review-supervisor",
         subAgentNames = {"style-scorer", "style-editor"},
-        chatModelName = "ollama",
+        chatModelName = "mistral",
         maxAgentsInvocations = 10,
         supervisorContext = """
                 You are a Viking saga quality judge overseeing a story refinement process.

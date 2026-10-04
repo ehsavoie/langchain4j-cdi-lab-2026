@@ -4,7 +4,7 @@ import dev.langchain4j.cdi.spi.RegisterSimpleAgent;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 
-@RegisterSimpleAgent(name = "style-editor", description = "Reforge a saga to better capture a given style", outputKey = "story", chatModelName = "ollama")
+@RegisterSimpleAgent(name = "style-editor", description = "Reforge a saga to better capture a given style", outputKey = "story", chatModelName = "mistral")
 public interface StyleEditor {
 
     @UserMessage("""

@@ -36,8 +36,8 @@ Install Ollama from https://ollama.com, then:
 ollama serve
 
 # In a second terminal, download the models
-ollama pull ministral-3:3b   # demos 1, 3, 4
-ollama pull qwen2.5:7b       # demo 2 (tool calling + embeddings), demo 5 (A2A)
+ollama pull ministral-3:3b   # Option B for demos 1, 3
+ollama pull qwen2.5:7b       # Option B for demos 2, 5, 6
 ```
 
 ### Source Code
@@ -90,106 +90,16 @@ demo-project/    → Multi-module Maven project
   demo-3-mcp/              → MCP (Model Context Protocol)
   demo-4-guardrails/       → Guardrails (input/output validation)
   demo-5-a2a/              → A2A (Agent-to-Agent Protocol)
+  demo-6-supervisor/       → Supervisor pattern (multi-agent orchestration)
 ```
 
 ## Demos
+| Demo | Topic | Model | Provider |
+|------|-------|-------|----------|
+| **Demo 1** | Injectable AI Agent — Viking Skald | `mistral-small-latest` | Mistral AI |
+| **Demo 2** | Memory + RAG + Tools + Fault Tolerance + Telemetry | `mistral-small-latest` | Mistral AI |
+| **Demo 3** | MCP — Hnefatafl dice game | `mistral-small-latest` | Mistral AI |
+| **Demo 4** | Guardrails — input/output validation | `mistral-small-latest` | Mistral AI |
+| **Demo 5** | A2A — Story Forge multi-agent pipeline | `mistral-small-latest` | Mistral AI |
+| **Demo 6** | Supervisor — multi-agent orchestration | `mistral-small-latest` | Mistral AI |
 
-Each demo contains a `base/` module (skeleton with TODOs for live coding) and `solution/` (complete reference).
-
-| Demo | Topic | Theme | Model |
-|------|-------|-------|-------|
-| **Demo 1** | Injectable AI Agent (`@RegisterAIService`) | Viking Skald — jokes and epic sagas | `ministral-3:3b` |
-| **Demo 2** | Memory + RAG + Tools + Fault Tolerance + Telemetry | Viking expedition enrollments | `qwen2.5:7b` |
-| **Demo 3** | MCP (Model Context Protocol) | Hnefatafl dice game with Ragnar the Skald | `ministral-3:3b` |
-| **Demo 4** | Guardrails (input/output validation) | Viking Skald with guardrails | `ministral-3:3b` |
-| **Demo 5** | A2A (Agent-to-Agent Protocol) | Story Forge — multi-agent pipeline | `qwen2.5:7b` |
-
-### Demo 1 — Viking Skald
-
-```bash
-cd demo-project/demo-1-ai-agent/solution
-mvn clean install
-./target/server/bin/standalone.sh   # Linux / macOS
-target\server\bin\standalone.bat    # Windows
-
-# Test: Viking joke
-curl -X POST -H "Content-Type: text/plain" \
-  -d "Tell me a Viking joke" \
-  http://localhost:8080/demo-1/api/chat
-
-# Test streaming: epic saga
-curl -X POST -H "Content-Type: text/plain" \
-  -d "Compose an epic saga about Ragnar" \
-  http://localhost:8080/demo-1/api/stream
-```
-
-### Demo 2 — Viking Expeditions
-
-```bash
-cd demo-project/demo-2-ft-telemetry/solution
-mvn clean install
-./target/server/bin/standalone.sh   # Linux / macOS
-target\server\bin\standalone.bat    # Windows
-
-# Test: search for expeditions
-curl -X POST -H "Content-Type: text/plain" \
-  -H "X-Session-Id: session-odin" \
-  -d "What expeditions are available?" \
-  http://localhost:8080/demo-2/api/chat
-
-# Test: enroll in an expedition
-curl -X POST -H "Content-Type: text/plain" \
-  -H "X-Session-Id: session-odin" \
-  -d "Enroll me in the expedition to Lindisfarne" \
-  http://localhost:8080/demo-2/api/chat
-```
-
-### Demo 3 — MCP Integration
-
-```bash
-# Start the MCP server (Helidon 4, port 8090)
-cd demo-project/demo-3-mcp/mcp-server && mvn clean package && java -jar target/casino-dice-roller.jar
-
-# Launch the demo
-cd demo-project/demo-3-mcp/solution
-mvn clean install
-./target/server/bin/standalone.sh   # Linux / macOS
-target\server\bin\standalone.bat    # Windows
-```
-
-### Demo 4 — Guardrails
-
-```bash
-cd demo-project/demo-4-guardrails/solution
-mvn clean install
-./target/server/bin/standalone.sh   # Linux / macOS
-target\server\bin\standalone.bat    # Windows
-
-curl -X POST -H "Content-Type: text/plain" \
-  -d "Sing me a Viking song" \
-  http://localhost:8080/demo-4/api/chat
-```
-
-### Demo 5 — A2A Story Forge
-
-```bash
-# Terminal 1: Creative Writer (port 8080)
-cd demo-project/demo-5-a2a/solution/a2a-creative-writer
-mvn clean install
-./target/server/bin/standalone.sh                                           # Linux / macOS
-target\server\bin\standalone.bat                                            # Windows
-
-# Terminal 2: Style Scorer (port 8081)
-cd demo-project/demo-5-a2a/solution/a2a-style-scorer
-mvn clean install
-./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=1     # Linux / macOS
-target\server\bin\standalone.bat -Djboss.socket.binding.port-offset=1      # Windows
-
-# Terminal 3: Orchestrator (port 8082)
-cd demo-project/demo-5-a2a/solution/a2a-orchestrator
-mvn clean install
-./target/server/bin/standalone.sh -Djboss.socket.binding.port-offset=2     # Linux / macOS
-target\server\bin\standalone.bat -Djboss.socket.binding.port-offset=2      # Windows
-
-curl "http://localhost:8082/api/styled-story?topic=Erik+the+Red+crosses+the+seas&style=epic"
-```
