@@ -5,7 +5,7 @@ import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 import jakarta.enterprise.context.ApplicationScoped;
 
-@RegisterAIService(chatModelName = "ollama", scope = ApplicationScoped.class)
+@RegisterAIService(chatModelName = "mistral", scope = ApplicationScoped.class)
 public interface StyleScorer {
 
     @UserMessage(

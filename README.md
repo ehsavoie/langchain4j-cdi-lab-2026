@@ -43,8 +43,8 @@ Install Ollama from https://ollama.com, then:
 
 ```bash
 ollama serve                         # keep running in a dedicated terminal
-ollama pull ministral-3:3b           # demos 1, 3, 4
-ollama pull qwen2.5:7b               # demo 2 (tools + embeddings), demo 5 (A2A)
+ollama pull ministral-3:3b           # demos 1, 3
+ollama pull qwen2.5:7b               # demo 2 (tools + embeddings)
 ```
 
 ### Get the Source
@@ -71,16 +71,18 @@ demo-project/
   demo-3-mcp/              → MCP (Model Context Protocol)
   demo-4-guardrails/       → Guardrails (input/output validation)
   demo-5-a2a/              → A2A (Agent-to-Agent Protocol)
+  demo-6-supervisor/       → Supervisor pattern (multi-agent orchestration)
 ```
 
 Each demo has a `base/` module (skeleton with TODOs) and a `solution/` module (complete reference).
 
 ## Demos
 
-| Demo | Topic | Model |
-|------|-------|-------|
-| **Demo 1** | Injectable AI Agent — Viking Skald | `ministral-3:3b` |
-| **Demo 2** | Memory + RAG + Tools + Fault Tolerance + Telemetry | `qwen2.5:7b` |
-| **Demo 3** | MCP — Hnefatafl dice game | `ministral-3:3b` |
-| **Demo 4** | Guardrails — input/output validation | `ministral-3:3b` |
-| **Demo 5** | A2A — Story Forge multi-agent pipeline | `qwen2.5:7b` |
+| Demo | Topic | Model | Provider |
+|------|-------|-------|----------|
+| **Demo 1** | Injectable AI Agent — Viking Skald | `ministral-3:3b` | Ollama |
+| **Demo 2** | Memory + RAG + Tools + Fault Tolerance + Telemetry | `qwen2.5:7b` | Ollama |
+| **Demo 3** | MCP — Hnefatafl dice game | `ministral-3:3b` | Ollama |
+| **Demo 4** | Guardrails — input/output validation | `mistral-small-latest` | Mistral AI |
+| **Demo 5** | A2A — Story Forge multi-agent pipeline | `mistral-small-latest` | Mistral AI |
+| **Demo 6** | Supervisor — multi-agent orchestration | `mistral-small-latest` | Mistral AI |

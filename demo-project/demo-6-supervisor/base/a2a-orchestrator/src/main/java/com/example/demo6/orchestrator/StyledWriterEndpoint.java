@@ -9,9 +9,12 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.logging.Logger;
 
 @Path("/styled-story")
 public class StyledWriterEndpoint {
+
+    private static final Logger LOGGER = Logger.getLogger(StyledWriterEndpoint.class.getName());
 
     @Inject
     OrchestratorService orchestratorService;
@@ -36,14 +39,21 @@ public class StyledWriterEndpoint {
         ResultWithAgenticScope<String> result = orchestratorService.writeStyledStory(topic, style);
         AgenticScope scope = result.agenticScope();
         String story = scope.readState("story", "");
+        double score = scope.readState("score", 0.0);
+
+        LOGGER.info("=== [demo-6] Endpoint: story = '" + story + "'");
+        LOGGER.info("=== [demo-6] Endpoint: score = " + score);
+
         String json = """
                 {
                   "story": %s,
+                  "score": %s,
                   "topic": %s,
                   "style": %s
                 }
                 """.formatted(
                 jsonString(story),
+                score,
                 jsonString(topic),
                 jsonString(style));
 

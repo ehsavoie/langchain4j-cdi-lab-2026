@@ -10,7 +10,7 @@ import dev.langchain4j.service.V;
 @RegisterSupervisorAgent(
         name = "style-review-supervisor",
         subAgentNames = {"style-scorer", "style-editor"},
-        chatModelName = "ollama",
+        chatModelName = "mistral",
         maxAgentsInvocations = 10,
         supervisorContext = """
                 You are a Viking saga quality judge overseeing a story refinement process.
