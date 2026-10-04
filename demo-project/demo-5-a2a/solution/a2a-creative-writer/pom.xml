@@ -45,7 +45,25 @@
         </dependency>
         <dependency>
             <groupId>org.wildfly.a2a</groupId>
-            <artifactId>a2a-jakarta-jsonrpc-web</artifactId>
+            <artifactId>a2a-jakarta-jsonrpc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.a2a</groupId>
+            <artifactId>a2a-jakarta-http-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.a2aproject.sdk</groupId>
+            <artifactId>a2a-java-sdk-microprofile-config</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.enterprise</groupId>
+                    <artifactId>jakarta.enterprise.cdi-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jakarta.inject</groupId>
+                    <artifactId>jakarta.inject-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- LangChain4j CDI integration -->

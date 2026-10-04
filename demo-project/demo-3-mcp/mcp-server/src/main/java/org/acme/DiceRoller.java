@@ -1,8 +1,8 @@
 package org.acme;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import org.mcp_java.annotations.tools.Tool;
-import org.mcp_java.annotations.tools.ToolArg;
+import org.mcpjava.server.tools.Tool;
+import org.mcpjava.server.tools.ToolArg;
 
 import java.util.Arrays;
 import java.util.Random;
