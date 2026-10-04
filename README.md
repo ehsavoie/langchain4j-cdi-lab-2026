@@ -71,7 +71,7 @@ A response from the Viking skald confirms that the environment is ready. Stop wi
 
 ## Workshop
 
-Self-paced hands-on guide covering all 5 exercises step by step.
+Self-paced hands-on guide covering all 6 exercises step by step.
 
 Open `workshop/index.html` directly in the browser.
 
@@ -94,6 +94,7 @@ demo-project/    → Multi-module Maven project
 ```
 
 ## Demos
+
 | Demo | Topic | Model | Provider |
 |------|-------|-------|----------|
 | **Demo 1** | Injectable AI Agent — Viking Skald | `mistral-small-latest` | Mistral AI |
@@ -102,4 +103,28 @@ demo-project/    → Multi-module Maven project
 | **Demo 4** | Guardrails — input/output validation | `mistral-small-latest` | Mistral AI |
 | **Demo 5** | A2A — Story Forge multi-agent pipeline | `mistral-small-latest` | Mistral AI |
 | **Demo 6** | Supervisor — multi-agent orchestration | `mistral-small-latest` | Mistral AI |
+
+### Demo 1 — Injectable AI Agent (`@RegisterAIService`)
+
+Annotate a plain Java interface with `@RegisterAIService` and let LangChain4j-CDI turn it into an injectable CDI bean — no boilerplate. The demo exposes a Viking Skald that tells jokes, sings epic songs, and analyses images. Also demonstrates streaming responses via Server-Sent Events (SSE).
+
+### Demo 2 — Memory, RAG, Tools, Fault Tolerance & Telemetry
+
+A Viking expedition booking assistant that combines several production-grade concerns in one CDI bean: conversation memory, retrieval-augmented generation (RAG) over expedition data, Java tool calls (real booking logic), MicroProfile Fault Tolerance annotations (retry, circuit breaker, fallback), and distributed tracing/metrics exported to an OpenTelemetry collector.
+
+### Demo 3 — MCP (Model Context Protocol)
+
+An AI game master runs an Hnefatafl dice game using tools provided by an external MCP server (standalone Helidon 4 JAR). Shows how LangChain4j-CDI wires an `McpToolProvider` via configuration so the AI can invoke remote tools without any glue code.
+
+### Demo 4 — Guardrails
+
+Declarative input and output validation applied to an AI service. An input guardrail blocks off-topic requests before they reach the LLM; an output guardrail inspects and optionally rejects the model's response. No changes to business logic — validation is pure CDI decoration.
+
+### Demo 5 — A2A (Agent-to-Agent Protocol)
+
+Three WildFly instances cooperate over the A2A protocol. The **Creative Writer** (port 8080) drafts a Norse saga, the **Style Scorer** (port 8081) rates it, and the **Style Editor** rewrites it until the score reaches 0.8 — all wired by a declarative `@RegisterLoopAgent` / `@RegisterSequenceAgent` pipeline on the orchestrator (port 8082).
+
+### Demo 6 — Supervisor Pattern
+
+Same three-agent topology as Demo 5, but the explicit review loop and exit condition are replaced by a single `@RegisterSupervisorAgent`. The LLM supervisor autonomously decides which sub-agent to call next and when the story quality is sufficient, demonstrating emergent orchestration without hand-written control flow.
 
