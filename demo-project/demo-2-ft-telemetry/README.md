@@ -62,7 +62,7 @@ Start this before the application so it's ready when you reach the telemetry ste
 
 ```bash
 # Podman
-podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
+podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti docker.io/grafana/otel-lgtm
 
 # Or Docker
 docker run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
