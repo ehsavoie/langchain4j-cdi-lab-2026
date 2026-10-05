@@ -1865,7 +1865,7 @@ curl http://localhost:8080/demo-1/api/chat/health</code></pre>
 
 <pre><code># Start the full LGTM stack (Loki + Grafana + Tempo + Mimir)
 # with the built-in OpenTelemetry collector — keep running in the background
-podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
+podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti docker.io/grafana/otel-lgtm
 
 # Or with Docker
 docker run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm</code></pre>

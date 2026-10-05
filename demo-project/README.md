@@ -71,7 +71,7 @@ You can also test directly in your browser at [http://localhost:8080/demo-1](htt
 ### 6. Grafana LGTM (Exercise 2 only)
 
 ```bash
-podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
+podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti docker.io/grafana/otel-lgtm
 # Or with Docker:
 docker run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
 ```

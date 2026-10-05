@@ -5,7 +5,7 @@
 ### 1. Start the observability stack
 
 ```bash
-podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti grafana/otel-lgtm
+podman run -p 3000:3000 -p 4317:4317 -p 4318:4318 --rm -ti docker.io/grafana/otel-lgtm
 ```
 
 > **Note**: Use `docker` instead of `podman` if you prefer Docker.
@@ -116,4 +116,4 @@ Logs are displayed directly in the terminal where you launched `podman run` (int
 
 **Grafana LGTM does not start**:
 - Check that the ports are not in use: `lsof -i :3000 -i :4317 -i :4318`
-- Update the image: `podman pull grafana/otel-lgtm` (or `docker pull`)
+- Update the image: `podman pull docker.io/grafana/otel-lgtm` (or `docker pull`)
